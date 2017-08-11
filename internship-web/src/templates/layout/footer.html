@@ -1,0 +1,16 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:include="head :: head"></head>
+<body>
+    <footer th:fragment="footer" class="footer">
+        <div class="container">
+            <p>
+                Built with a lot of effort by <a
+                    href="https://github.com/raduAndrada">Andrada</a>.
+            </p>
+        </div>
+        <script type="text/javascript"  th:src="@{/webjars/jquery/jquery.min.js}"></script>
+        <script type="text/javascript" th:src="@{/webjars/bootstrap/js/bootstrap.min.js}"></script>
+    </footer>
+</body>
+</html>

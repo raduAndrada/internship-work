@@ -1,0 +1,34 @@
+.navbar-default .navbar-nav>li>a:hover, .navbar-default .navbar-nav>li>a:focus {
+    color: #e8e9fd; /*Sets the text hover color on navbar*/
+}
+
+.navbar-default .navbar-nav>.active>a, .navbar-default .navbar-nav>.active>a:hover, .navbar-default .navbar-nav>.active>a:focus {
+    color: white; /*BACKGROUND color for active*/
+    background-color: #4e4a0c;
+}
+
+
+.navbar-default {
+    background-color: #546f79;
+    border-color: #d4cc73;
+    margin-bottom: 0!important;
+}
+
+.dropdown-menu>li>a:hover, .dropdown-menu>li>a:focus {
+    color: #262626;
+    text-decoration: none;
+    background-color: #d4cc73; /*change color of links in drop down here*/
+}
+
+.nav>li>a:hover, .nav>li>a:focus {
+    text-decoration: none;
+    background-color: silver; /*Change rollover cell color here*/
+}
+
+.navbar-default .navbar-nav>li>a {
+    color: white; /*Change active text color here*/
+}
+
+.navbar-default .navbar-brand {
+    color: #d6d6d6;
+}

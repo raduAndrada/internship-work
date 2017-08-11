@@ -1,0 +1,67 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE mapper PUBLIC '-//mybatis.org//DTD Mapper 3.0//EN'
+
+      'http://mybatis.org/dtd/mybatis-3-mapper.dtd'>
+<mapper namespace="ro.axonsoft.internship172.data.mappers.ResultDao">
+    <!-- select queries -->
+    <!-- lista cu errori -->
+    <select id="selectResultErrorByMetricsId" resultType="MdfResultError"> select * from RESULT_ERROR where RESULT_METRICS_ID = #{id}
+    </select>
+    <!-- lista cu masini neinregistrate -->
+    <select id="selectResultUnregCarsCountByMetricsId" resultType="MdfResultUnregCarsCountByJud"> select * from RESULT_UNREG_CARS_COUNT_BY_JUD where
+        RESULT_METRICS_ID = #{id}
+    </select>
+    <!-- selectare rezultat dupa id -->
+    <select id="selectAllResultMetrics" resultType="MdfResultMetrics"> select * from RESULT_METRICS
+    </select>
+    <!-- selectare rezultat dupa id -->
+    <select id="selectResultMetricsById" resultType="MdfResultMetrics"> select * from RESULT_METRICS where RESULT_METRICS_ID = #{id}
+    </select>
+    <!-- selectare rezultat dupa batch -->
+    <select id="getResultMetricsByBatchId" resultType="MdfResultMetrics"> select * from RESULT_METRICS where BATCH_ID = #{id}
+    </select>
+    <select id="selectBatchById" resultType="MdfBatch"> select * from BATCH where BATCH_ID = #{ID}
+    </select>
+    <select id="getResultMetricsPage" resultType="MdfResultMetrics">
+        select * from RESULT_METRICS where BATCH_ID = #{batchId}
+        <if test="#{pageSize} != null"> limit #{startIndex}, #{pageSize}
+        </if>
+    </select>
+    <select id="countResultMetricsByBatchId" resultType="Integer"> select count(1) from RESULT_METRICS where BATCH_ID=#{id}
+    </select>
+    
+    <!-- insert queries -->
+    <insert id="insertResultMetrics" useGeneratedKeys='true' keyProperty="resultMetricsId"> insert into RESULT_METRICS
+        (ODD_TO_EVEN_RATIO,PASSED_REG_CHANGE_DUE_DATE, BATCH_ID, RESULT_PROCESS_TIME) values (#{oddToEvenRatio},#{passedRegChangeDueDate},#{batchId},#{resultProcessTime});
+    </insert>
+    <insert id="insertResultError" useGeneratedKeys="true" keyProperty="resultErrorId"> insert into RESULT_ERROR( TYPE,VEHICLE_OWNER_ID,
+        RESULT_METRICS_ID) values (#{type},#{vehicleOwnerId},#{resultMetricsId})
+    </insert>
+    <insert id="insertResultUnregCarsCountByJud" useGeneratedKeys='true' keyProperty="unregCarsId"> insert into
+        RESULT_UNREG_CARS_COUNT_BY_JUD(JUDET,UNREG_CARS_COUNT, RESULT_METRICS_ID) values (#{judet},#{unregCarsCount}, #{resultMetricsId})
+    </insert>
+    <!-- update queries -->
+    <!-- update resultMetrics -->
+    <update id="updateResultMetricsById"> update RESULT_METRICS set ODD_TO_EVEN_RATIO = #{oddToEvenRatio}, PASSED_REG_CHANGE_DUE_DATE
+        =#{passedRegChangeDueDate}, BATCH_ID = #{batchId} where RESULT_METRICS_ID= #{resultMetricsId};
+    </update>
+    <!-- update resultUnregCarsCountByJud -->
+    <update id="updateResultUnregCarsByMetricsId"> update RESULT_UNREG_CARS_COUNT_BY_JUD set JUDET = #{judet}, UNREG_CARS_COUNT = #{unregCarsCount} where
+        RESULT_METRICS_ID= #{resultMetricsId};
+    </update>
+    <!-- update resultErrors -->
+    <update id="updateResulErrorsByMetricsId"> update RESULT_ERROR set TYPE = #{type}, VEHICLE_OWNER_ID = #{vehicleOwnerId} where RESULT_METRICS_ID=
+        #{resultMetricsId};
+    </update>
+    <!-- delete queries -->
+    <!-- unregCars -->
+    <delete id="deleteResultUnregCarsCountByMetricsId" parameterType="Long" flushCache="true"> delete from RESULT_UNREG_CARS_COUNT_BY_JUD
+        where RESULT_METRICS_ID= #{id}
+    </delete>
+    <!-- resultErrors -->
+    <delete id="deleteResultErrosByMetricsId" parameterType="Long"> delete from RESULT_ERROR where RESULT_METRICS_ID= #{id}
+    </delete>
+    <!-- resultMetrics -->
+    <delete id="deleteResultMetricsById" parameterType="Long"> delete from RESULT_METRICS where RESULT_METRICS_ID= #{id}
+    </delete>
+</mapper>

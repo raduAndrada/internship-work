@@ -1,0 +1,9 @@
+rootProject.name = 'internship'
+include 'internship-api'
+include 'internship-impl'
+include 'internship-app'
+include 'internship-spring'
+include 'internship-data'
+include 'internship-web'
+include 'internship-config'
+

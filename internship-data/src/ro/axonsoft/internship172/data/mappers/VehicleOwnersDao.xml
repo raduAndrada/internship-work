@@ -1,0 +1,50 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE mapper PUBLIC '-//mybatis.org//DTD Mapper 3.0//EN'
+
+      'http://mybatis.org/dtd/mybatis-3-mapper.dtd'>
+<mapper namespace="ro.axonsoft.internship172.data.mappers.VehicleOwnersDao">
+    <!-- select queries -->
+    <!-- selectare numar de inregistrari -->
+    <select id="countVehicleOwner" resultType="Integer"> select count(1) from VEHICLE_OWNER
+    </select>
+    <select id="getVehicleOwnersPage" resultType="MdfVehicleOwner">
+        select * from VEHICLE_OWNER where VEHICLE_OWNER.BATCH_ID = #{batchId}
+        <if test="#{pageSize} != null"> limit #{startIndex}, #{pageSize}
+        </if>
+    </select>
+    <select id="getBatchPage" resultType="MdfBatch">
+        select * from BATCH 
+        <if test="#{pageSize} != null"> limit #{startIndex}, #{pageSize}
+        </if>
+    </select>
+    <select id="countVehicleOwnersByBatchId" resultType="Integer"> select count(1) from VEHICLE_OWNER where BATCH_ID=#{id}
+    </select>
+    <select id="countBatches" resultType="Integer"> select count(1) from BATCH
+    </select>
+    <!-- selectare vehicle owner dupa carte de identitate -->
+    <select id="selectVehicleOwnerByRoIdCard" resultType="MdfVehicleOwner"> select * from VEHICLE_OWNER where VEHICLE_OWNER.RO_ID_CARD = #{roIdCard}
+    </select>
+    <!-- selecte inregistrare dupa id -->
+    <select id="selectVehicleOwnerById" resultType="MdfVehicleOwner"> select * from VEHICLE_OWNER where VEHICLE_OWNER_ID = #{id}
+    </select>
+    <!-- selectare ultimul batch din tabela -->
+    <select id="selectLastBatch" resultType="Long"> select max(BATCH_ID) from BATCH;
+    </select>
+    <!-- selectare batch dupa id -->
+    <select id="selectBatchById" resultType="MdfBatch"> select * from BATCH where BATCH_ID = #{ID}
+    </select>
+    <!-- selectare tuturor inregistrarilor din tabela de batch -->
+    <select id="selectAllBatches" resultType="MdfBatch"> select * from BATCH;
+    </select>
+    <!-- insert queries -->
+    <!-- inserare in tabela VEHICLE_OWNER -->
+    <insert id="insertVehicleOwner" useGeneratedKeys='true' keyProperty="vehicleOwnerId"> insert into VEHICLE_OWNER ( RO_ID_CARD,
+        REG_PLATE,ISSUE_DATE,COMENTARIU,BATCH_ID ) values ( #{roIdCard}, #{regPlate}, #{issueDate},#{comentariu},#{batchId} )
+    </insert>
+    <!-- inserare in tabela de batch -->
+    <insert id="insertBatch" useGeneratedKeys='true' keyProperty="batchId"> insert into BATCH values(default)
+    </insert>
+    <!-- delete queries -->
+    <delete id="deleteVehicleOwnerById" parameterType="Long"> delete from VEHICLE_OWNER where VEHICLE_OWNER_ID=#{id}
+    </delete>
+</mapper>

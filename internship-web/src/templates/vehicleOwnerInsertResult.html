@@ -1,0 +1,21 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:include="layout/head :: head">
+<title th:text="#{default-success-msg}"></title>
+</head>
+<body>
+    <div th:substituteby="layout/navbar :: navbar"></div>
+    <div class="lightbox">
+        <div class="container">
+            <section layout:fragment="content">
+                <h1 th:text="#{default-success-msg}"></h1>
+                <p th:text="#{vehicle-owners.input-batch.records.ro-id-card} +':' + ${vehicleOwner.roIdCard}" />
+                <p th:text="#{vehicle-owners.input-batch.records.issue-date} +':' + ${vehicleOwner.issueDate}" />
+                <p th:text="#{vehicle-owners.input-batch.records.reg-plate} +':' + ${vehicleOwner.regPlate}" />
+                <a href="v1/vehicleOwner" th:text="#{default-insert-msg}"></a>
+            </section>
+        </div>
+        <div th:substituteby="layout/footer :: footer"></div>
+    </div>
+</body>
+</html>

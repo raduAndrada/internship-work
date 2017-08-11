@@ -1,0 +1,18 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:include="layout/head :: head">
+<title th:text="#{error.default-err-msg}"></title>
+</head>
+<body>
+    <div class="lightbox">
+        <div th:substituteby="layout/navbar :: navbar"></div>
+        <div class="container">
+            <section layout:fragment="content">
+                <h1 th:text="#{error.default-err-msg}"></h1>
+                <h2 th:text="${error}"></h2>
+            </section>
+        </div>
+        <div th:substituteby="layout/footer :: footer"></div>
+    </div>
+</body>
+</html>

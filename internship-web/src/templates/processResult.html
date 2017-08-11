@@ -1,0 +1,59 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:include="layout/head :: head">
+<title th:text="#{default-success-msg}"></title>
+</head>
+<body>
+	<div th:substituteby="layout/navbar :: navbar"></div>
+	<div class="lightbox">
+		<div class="container">
+
+			<h1 th:text="#{default-success-msg}"></h1>
+			<p
+				th:text="#{result-metrics.odd-to-even-ratio} + ': ' + ${processResult.oddToEvenRatio}" />
+			<p
+				th:text="#{result-metrics.passed-reg-due-date} + ': ' + ${processResult.passedRegChangeDueDate}" />
+			<p
+				th:text="#{batch-list.vehicle-owner.batch-id} + ': ' + ${processResult.batchId}" />
+			<table class="table table-bordered table-hover">
+				<thead>
+					<tr>
+						<td th:text="#{result-metrics.unreg-cars}"></td>
+					</tr>
+				</thead>
+				<tbody>
+					<tr th:if="${processResult.unregCarsCountByJud.size() ==0}">
+						<td th:text="#{result-metrics.no-unreg-cars}" colspan="4"></td>
+					</tr>
+					<tr th:each="unregCarsByJud : ${processResult.unregCarsCountByJud}">
+						<td
+							th:text="#{result-metrics.unreg-cars.judet}+' :' + ${unregCarsByJud.judet}">1</td>
+						<td
+							th:text="#{result-metrics.unreg-cars.count}+' :' + ${unregCarsByJud.unregCarsCount}"></td>
+					</tr>
+				</tbody>
+			</table>
+			<table class="table table-bordered table-hover">
+				<thead>
+					<tr>
+						<td th:text="#{result-metrics.result-error}"></td>
+					</tr>
+				</thead>
+				<tbody>
+					<tr th:if="${processResult.resultErrors.size() ==0}">
+						<td colspan="4" th:text="#{result-metrics.no-errors}"></td>
+					</tr>
+					<tr th:each="error : ${processResult.resultErrors}">
+						<td
+							th:text="#{result-metrics.result-error.type}+' :' + ${error.type}">1</td>
+						<td
+							th:text="#{result-metrics.result-error.vehicle-owner-id}+' :'+ ${error.vehicleOwnerId}"></td>
+					</tr>
+				</tbody>
+			</table>
+
+		</div>
+		<div th:substituteby="layout/footer :: footer"></div>
+	</div>
+</body>
+</html>

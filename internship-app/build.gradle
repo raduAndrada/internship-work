@@ -1,0 +1,13 @@
+dependencies{
+	compile project(":internship-impl")
+	compile group: 'com.esotericsoftware.yamlbeans', name: 'yamlbeans', version: '1.06'
+}
+
+
+jar{
+	manifest{
+		attributes(
+			'Main-Class': 'ro.axonsoft.internship172.app.Application',
+      		'Class-Path': configurations.runtime.collect { it.getName() }.join(' '))
+		}
+}

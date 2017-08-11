@@ -1,0 +1,173 @@
+	buildscript {
+	    repositories {
+		    maven {
+		      url 'https://plugins.gradle.org/m2/'
+		    }
+		    mavenCentral()
+		  }
+	    ext {
+			springBootVersion = '1.5.4.RELEASE'
+		}
+		
+		dependencies {
+			classpath "org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}"
+			classpath 'gradle.plugin.org.inferred:gradle-processors:1.2.11'
+		}
+
+	}
+	
+
+	allprojects {
+	
+		group = 'axonsoft'
+			version = '0.0.1-SNAPSHOT'
+			description = """internship"""
+		
+			repositories {
+			     mavenCentral()
+			    
+			}
+	}
+	
+
+	subprojects{
+	
+				apply plugin : 'org.inferred.processors' 
+				apply plugin: 'java'
+				apply plugin: 'eclipse'
+				apply plugin: 'jacoco'
+				
+				sourceCompatibility = 1.8
+				targetCompatibility = 1.8
+				tasks.withType(JavaCompile) {
+					options.encoding = 'UTF-8'
+				}
+			
+				sourceSets {
+				   main {
+				      java {
+					 srcDir 'src'
+				      }
+				      resources {
+					 srcDir 'src'
+				      }
+				   }
+				
+				   test {
+				      java {
+					 srcDir 'test'
+				      }
+				      resources {
+					 srcDir 'test'
+				      }
+				   }
+				}
+			
+				jacocoTestReport {
+				    additionalSourceDirs = files(sourceSets.main.allSource.srcDirs)
+				    sourceDirectories = files(sourceSets.main.allSource.srcDirs)
+				    classDirectories = files(sourceSets.main.output)
+			        	reports {
+					    html.enabled = true
+					    xml.enabled = true
+					    csv.enabled = false
+					}
+				} 
+				
+				dependencies {
+					processor 'org.immutables:value:2.4.0'
+					processor 'org.immutables:serial:2.4.0'
+					
+					compile 'javax.inject:javax.inject:1'
+					compile 'org.slf4j:slf4j-api:1.7.25'
+					compile 'com.google.guava:guava:19.0'
+					compile 'com.google.code.findbugs:jsr305:3.0.2'
+					
+			
+					testCompile group: 'junit', name: 'junit', version:'4.12'
+					testCompile group: 'org.assertj', name: 'assertj-core', version:'3.8.0'
+					testCompile "org.easymock:easymock:3.4"
+			
+				}
+	}
+	
+		task jacocoRootReport(type: org.gradle.testing.jacoco.tasks.JacocoReport) {
+	    dependsOn = subprojects.test
+	    additionalSourceDirs = files(subprojects.sourceSets.main.allSource.srcDirs)
+	    sourceDirectories = files(subprojects.sourceSets.main.allSource.srcDirs)
+	    classDirectories = files(subprojects.sourceSets.main.output)
+	    executionData = files(subprojects.jacocoTestReport.executionData)
+	    reports {
+	        html.enabled = true
+	        xml.enabled = true
+	        csv.enabled = false
+	    }
+	    onlyIf = {
+	        true
+	    }
+	    doFirst {
+	        executionData = files(executionData.findAll {
+	            it.exists()
+	        })
+	    }
+	 apply plugin: 'base'   
+	 
+	 task distrib(type: Copy){
+		dependsOn subprojects.build
+	 	def appProj = project(':internship-app')
+		def destBase = "${buildDir}/distributions/exploded"
+	 		from (subprojects.configurations.runtime) {
+			into "/lib"
+		}
+		from (appProj.jar) {
+			into "/lib"
+		}
+		
+		from (appProj.projectDir.name + '/jcis.yml') {
+			into "/config"
+		}
+		
+			from (appProj.projectDir.name + '/input.csv') {
+			into "/sample"
+		}
+		from (appProj.projectDir.name + '/internship-app.sh')
+		
+		into destBase
+	 
+	 	}
+	 	
+	task zipDistrib(type: Zip){
+		dependsOn distrib
+		def srcBase = "${buildDir}/distributions/exploded"
+		def srcName = "internship-${version}"
+		from (srcBase){
+			into  (srcName)
+		}
+		archiveName "internship-${version}.zip"
+		}
+		
+		
+	task fileExec(type:Exec) {
+		  dependsOn zipDistrib
+		  workingDir "${buildDir}/distributions/exploded"
+		
+		  //for windows
+		  //commandLine 'sh', './internship-app.sh', 'sample/input.csv', 'sample/output.tmp'
+
+		  //for linux
+		  commandLine './internship-app.sh', 'sample/input.csv', 'sample/output.tmp'
+		}
+	
+	/*	
+	task myJavadoc(type: Javadoc) {
+			dependsOn build
+  			source = subprojects.sourceSets.main.allJava
+  			
+		}
+	  */  
+	  
+
+	}
+	
+	
+	

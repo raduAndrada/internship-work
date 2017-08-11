@@ -1,0 +1,14 @@
+ro.axonsoft.internship172:
+  reference-date: 2017-07-22
+  #mode: db
+  mode: file
+  input-file: input.csv
+  output-file: output.dat
+
+spring.datasource:
+  driver-class-name: org.hsqldb.jdbcDriver
+  url: jdbc:hsqldb:mem:internship
+  username: sa
+  password:
+  initialize: true
+  
