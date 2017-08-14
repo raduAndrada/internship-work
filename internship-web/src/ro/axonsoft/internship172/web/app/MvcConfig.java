@@ -27,67 +27,66 @@ import ro.axonsoft.internship172.web.services.VehicleOwnerRestServiceImpl;
  *
  */
 @Configuration
-@ComponentScan({
-    "ro.axonsoft.internship172.web.controllers",
-    "ro.axonsoft.internship172.web.services"
-})
+@ComponentScan({ "ro.axonsoft.internship172.web.controllers", "ro.axonsoft.internship172.web.services" })
 public class MvcConfig extends WebMvcConfigurerAdapter {
 
-    @Override
-    public void addInterceptors(final InterceptorRegistry registry) {
-        final LocaleChangeInterceptor localeChangeInterceptor = new LocaleChangeInterceptor();
-        localeChangeInterceptor.setParamName("lang");
-        registry.addInterceptor(localeChangeInterceptor);
-    }
+	@Override
+	public void addInterceptors(final InterceptorRegistry registry) {
+		final LocaleChangeInterceptor localeChangeInterceptor = new LocaleChangeInterceptor();
+		localeChangeInterceptor.setParamName("lang");
+		registry.addInterceptor(localeChangeInterceptor);
+	}
 
-    /**
-     * Bean pentru fisiere
-     * @return
-     */
-    @Bean
-    MultipartConfigElement multipartConfigElement() {
-        final MultipartConfigFactory factory = new MultipartConfigFactory();
-        factory.setMaxFileSize("512KB");
-        factory.setMaxRequestSize("512KB");
-        return factory.createMultipartConfig();
-    }
+	/**
+	 * Bean pentru fisiere
+	 * 
+	 * @return
+	 */
+	@Bean
+	MultipartConfigElement multipartConfigElement() {
+		final MultipartConfigFactory factory = new MultipartConfigFactory();
+		factory.setMaxFileSize("512KB");
+		factory.setMaxRequestSize("512KB");
+		return factory.createMultipartConfig();
+	}
 
-    /**
-     * Bean pentru url-ul curent
-     * @return
-     */
-    @Bean
-    public Function<String, String> currentUrlWithoutParam() {
-    return param -> ServletUriComponentsBuilder.fromCurrentRequest().replaceQueryParam(param).toUriString();
-    }
+	/**
+	 * Bean pentru url-ul curent
+	 * 
+	 * @return
+	 */
+	@Bean
+	public Function<String, String> currentUrlWithoutParam() {
+		return param -> ServletUriComponentsBuilder.fromCurrentRequest().replaceQueryParam(param).toUriString();
+	}
 
-    /**
-     *
-     * @return functionare in mai multe limbi - default en
-     */
-    @Bean
-    public SessionLocaleResolver localeResolver() {
-        final SessionLocaleResolver localeResolver = new SessionLocaleResolver();
-        localeResolver.setDefaultLocale(new Locale("en", "US"));
-        return localeResolver;
-    }
+	/**
+	 *
+	 * @return functionare in mai multe limbi - default en
+	 */
+	@Bean
+	public SessionLocaleResolver localeResolver() {
+		final SessionLocaleResolver localeResolver = new SessionLocaleResolver();
+		localeResolver.setDefaultLocale(new Locale("en", "US"));
+		return localeResolver;
+	}
 
-    /**
-     *
-     * @return serviciile rest pentru tabela de intrare
-     */
-    @Bean
-    public VehicleOwnerRestService vehicleOwnerRestService() {
-        return new VehicleOwnerRestServiceImpl();
-    }
+	/**
+	 *
+	 * @return serviciile rest pentru tabela de intrare
+	 */
+	@Bean
+	public VehicleOwnerRestService vehicleOwnerRestService() {
+		return new VehicleOwnerRestServiceImpl();
+	}
 
-    /**
-     *
-     * @return serviciu rest pentru rezultate
-     */
-    @Bean
-    public ResultRestService resultRestService() {
-        return new ResultRestServiceImpl();
-    }
+	/**
+	 *
+	 * @return serviciu rest pentru rezultate
+	 */
+	@Bean
+	public ResultRestService resultRestService() {
+		return new ResultRestServiceImpl();
+	}
 
 }

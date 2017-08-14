@@ -6,7 +6,6 @@ import javax.inject.Inject;
 
 import com.google.common.collect.Lists;
 
-import ro.axonsoft.internship172.data.domain.Batch;
 import ro.axonsoft.internship172.data.domain.VehicleOwner;
 import ro.axonsoft.internship172.data.exceptions.DatabaseIntegrityViolationException;
 import ro.axonsoft.internship172.data.exceptions.InvalidDatabaseAccessException;
@@ -14,6 +13,7 @@ import ro.axonsoft.internship172.data.mappers.ImtVehicleOwnerCriteria;
 import ro.axonsoft.internship172.data.mappers.PageCriteria;
 import ro.axonsoft.internship172.data.mappers.VehicleOwnersDao;
 import ro.axonsoft.internship172.data.services.VehicleOwnerService;
+import ro.axonsoft.internship172.model.base.Batch;
 
 /**
  * Serviciu pentru tabela de inregistrari de intrare aceleasi metode ca si

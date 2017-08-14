@@ -2,10 +2,10 @@ package ro.axonsoft.internship172.data.mappers;
 
 import java.util.List;
 
-import ro.axonsoft.internship172.data.domain.Batch;
 import ro.axonsoft.internship172.data.domain.ResultError;
 import ro.axonsoft.internship172.data.domain.ResultMetrics;
 import ro.axonsoft.internship172.data.domain.ResultUnregCarsCountByJud;
+import ro.axonsoft.internship172.model.base.Batch;
 
 /**
  * Mapper pentru trabela de metrice de rezultate

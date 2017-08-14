@@ -2,11 +2,11 @@ package ro.axonsoft.internship172.data.services;
 
 import java.util.List;
 
-import ro.axonsoft.internship172.data.domain.Batch;
 import ro.axonsoft.internship172.data.domain.VehicleOwner;
 import ro.axonsoft.internship172.data.exceptions.DatabaseIntegrityViolationException;
 import ro.axonsoft.internship172.data.exceptions.InvalidDatabaseAccessException;
 import ro.axonsoft.internship172.data.mappers.PageCriteria;
+import ro.axonsoft.internship172.model.base.Batch;
 
 public interface VehicleOwnerService {
 

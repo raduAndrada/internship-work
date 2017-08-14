@@ -23,64 +23,59 @@ import com.github.springtestdbunit.annotation.DbUnitConfiguration;
 import com.github.springtestdbunit.dataset.ReplacementDataSetLoader;
 import com.google.common.collect.Lists;
 
-import ro.axonsoft.internship172.data.domain.Batch;
-import ro.axonsoft.internship172.data.domain.MdfBatch;
 import ro.axonsoft.internship172.data.domain.VehicleOwner;
 import ro.axonsoft.internship172.data.services.VehicleOwnerService;
+import ro.axonsoft.internship172.model.base.Batch;
+import ro.axonsoft.internship172.model.base.MdfBatch;
 import ro.axonsoft.internship172.spring.SpringLevelApplication;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = { SpringLevelApplication.class })
-@TestExecutionListeners({ DependencyInjectionTestExecutionListener.class,
-        DirtiesContextTestExecutionListener.class,
-        TransactionalTestExecutionListener.class,
-        DbUnitTestExecutionListener.class })
+@TestExecutionListeners({ DependencyInjectionTestExecutionListener.class, DirtiesContextTestExecutionListener.class,
+		TransactionalTestExecutionListener.class, DbUnitTestExecutionListener.class })
 @DbUnitConfiguration(dataSetLoader = ReplacementDataSetLoader.class)
 @ActiveProfiles("test")
 public class VehicleOwnerServiceTest {
 
-    @Inject
-    private VehicleOwnerService service;
+	@Inject
+	private VehicleOwnerService service;
 
-    @BeforeClass
-    public static void setup() {
+	@BeforeClass
+	public static void setup() {
 
-    }
+	}
 
-    @Test
-    @DatabaseSetup("VehicleOwnerServiceTest-i01.xml")
-    public void selectVehicleOwnerByIdTest() {
-       final VehicleOwner vehicleOwner = service.selectVehicleOwnerById(0L);
-       assertThat(vehicleOwner).isNotNull();
-       assertThat(vehicleOwner.getRoIdCard()).isEqualTo("KX636141");
-       }
+	@Test
+	@DatabaseSetup("VehicleOwnerServiceTest-i01.xml")
+	public void selectVehicleOwnerByIdTest() {
+		final VehicleOwner vehicleOwner = service.selectVehicleOwnerById(0L);
+		assertThat(vehicleOwner).isNotNull();
+		assertThat(vehicleOwner.getRoIdCard()).isEqualTo("KX636141");
+	}
 
-    @Test
-    @DatabaseSetup("VehicleOwnerServiceTest-i01.xml")
-    public void insertBatchTest() {
-       final Batch theBatch = MdfBatch.create();
-       service.insertBatch(theBatch);
-       assertThat(theBatch).isNotNull();
-       assertThat(theBatch.getBatchId()).isNotNull();
-       }
+	@Test
+	@DatabaseSetup("VehicleOwnerServiceTest-i01.xml")
+	public void insertBatchTest() {
+		final Batch theBatch = MdfBatch.create();
+		service.insertBatch(theBatch);
+		assertThat(theBatch).isNotNull();
+		assertThat(theBatch.getBatchId()).isNotNull();
+	}
 
-    @Test
-    @DatabaseSetup("VehicleOwnerServiceTest-i01.xml")
-    public void selectLastBatchTest() {
-    	final Batch theBatch = MdfBatch.create(service.selectLastBatch());
-       assertThat(theBatch).isNotNull();
-       assertThat(theBatch.getBatchId()).isNotNull();
-       }
+	@Test
+	@DatabaseSetup("VehicleOwnerServiceTest-i01.xml")
+	public void selectLastBatchTest() {
+		final Batch theBatch = MdfBatch.create(service.selectLastBatch());
+		assertThat(theBatch).isNotNull();
+		assertThat(theBatch.getBatchId()).isNotNull();
+	}
 
-    @Test
-    @DatabaseSetup("VehicleOwnerServiceTest-i01.xml")
-    public void selectAllBatchesTest() {
-        final List<Batch> theBatches = Lists.newArrayList(service.selectAllBatches());
-       assertThat(theBatches).isNotNull();
+	@Test
+	@DatabaseSetup("VehicleOwnerServiceTest-i01.xml")
+	public void selectAllBatchesTest() {
+		final List<Batch> theBatches = Lists.newArrayList(service.selectAllBatches());
+		assertThat(theBatches).isNotNull();
 
-       }
-
-
-
+	}
 
 }

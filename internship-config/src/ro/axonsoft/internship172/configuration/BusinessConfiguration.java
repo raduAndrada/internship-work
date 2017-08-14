@@ -16,7 +16,7 @@ import ro.axonsoft.internship172.api.RoIdCardSeriesJudMapper;
 import ro.axonsoft.internship172.api.RoRegPlateParser;
 import ro.axonsoft.internship172.api.StreamVehicleOwnersProcessor;
 import ro.axonsoft.internship172.api.VehicleOwnersProcessor;
-import ro.axonsoft.internship172.data.DbVehicleOwnersProcessorImpl;
+import ro.axonsoft.internship172.data.impl.DbVehicleOwnersProcessorImpl;
 import ro.axonsoft.internship172.data.impl.ResultServiceImpl;
 import ro.axonsoft.internship172.data.impl.VehicleOwnerServiceImpl;
 import ro.axonsoft.internship172.data.services.ResultService;
@@ -36,68 +36,62 @@ import ro.axonsoft.internship172.impl.VehicleOwnersProcessorImpl;
 @Configuration
 public class BusinessConfiguration {
 
-    /**
-     * Se injecteaza data de referinta si se creaza bean-urile care vor fi
-     * folosite la procesare
-     */
-    private Date referenceDate;
-    private Multimap<String, String> judToSeriesMultimap;
+	/**
+	 * Se injecteaza data de referinta si se creaza bean-urile care vor fi folosite
+	 * la procesare
+	 */
+	private Date referenceDate;
+	private Multimap<String, String> judToSeriesMultimap;
 
-    @Inject
-    public void setReferenceDate(@Named("referenceDate") final Date referenceDate) {
-        this.referenceDate = referenceDate;
-    }
+	@Inject
+	public void setReferenceDate(@Named("referenceDate") final Date referenceDate) {
+		this.referenceDate = referenceDate;
+	}
 
-    @Inject
-    public void setJudToSeriesMultimap(@Named("judToSeriesMultimap") final Multimap<String, String> judToSeriesMultimap) {
-        this.judToSeriesMultimap = judToSeriesMultimap;
-    }
+	@Inject
+	public void setJudToSeriesMultimap(
+			@Named("judToSeriesMultimap") final Multimap<String, String> judToSeriesMultimap) {
+		this.judToSeriesMultimap = judToSeriesMultimap;
+	}
 
-    @Bean
-    public RoIdCardSeriesJudMapper roIdCardSeriesJudMapper() {
-        return new RoIdCardSeriesJudMapperImpl(judToSeriesMultimap);
-    }
+	@Bean
+	public RoIdCardSeriesJudMapper roIdCardSeriesJudMapper() {
+		return new RoIdCardSeriesJudMapperImpl(judToSeriesMultimap);
+	}
 
-    @Bean
-    public RoIdCardParser roIdCardParser() {
-        return new RoIdCardParserImpl(roIdCardSeriesJudMapper());
-    }
+	@Bean
+	public RoIdCardParser roIdCardParser() {
+		return new RoIdCardParserImpl(roIdCardSeriesJudMapper());
+	}
 
-    @Bean
-    public RoRegPlateParser roRegPlateParser() {
-        return new RoRegPlateParserImpl();
-    }
+	@Bean
+	public RoRegPlateParser roRegPlateParser() {
+		return new RoRegPlateParserImpl();
+	}
 
-    @Bean
-    public VehicleOwnersProcessor vehicleOwnersProcessor() {
-        return new VehicleOwnersProcessorImpl(referenceDate);
-    }
+	@Bean
+	public VehicleOwnersProcessor vehicleOwnersProcessor() {
+		return new VehicleOwnersProcessorImpl(referenceDate);
+	}
 
-    @Bean
-    public StreamVehicleOwnersProcessor streamVehicleOwnersProcessor() {
-        return new StreamVehicleOwnersProcessorImpl(
-                roRegPlateParser(),
-                roIdCardParser(),
-                vehicleOwnersProcessor());
-    }
-    @Bean
-    public VehicleOwnerService vehicleOwnerService() {
-        return new VehicleOwnerServiceImpl();
-    }
+	@Bean
+	public StreamVehicleOwnersProcessor streamVehicleOwnersProcessor() {
+		return new StreamVehicleOwnersProcessorImpl(roRegPlateParser(), roIdCardParser(), vehicleOwnersProcessor());
+	}
 
-    @Bean
-    public ResultService resultService() {
-        return new ResultServiceImpl();
-    }
+	@Bean
+	public VehicleOwnerService vehicleOwnerService() {
+		return new VehicleOwnerServiceImpl();
+	}
 
-    @Bean
-    public DbVehicleOwnersProcessor dbVehicleOwnersProcessor() {
-        return new DbVehicleOwnersProcessorImpl(
-                roRegPlateParser(),
-                roIdCardParser(),
-                vehicleOwnersProcessor());
-    }
+	@Bean
+	public ResultService resultService() {
+		return new ResultServiceImpl();
+	}
 
-
+	@Bean
+	public DbVehicleOwnersProcessor dbVehicleOwnersProcessor() {
+		return new DbVehicleOwnersProcessorImpl(roRegPlateParser(), roIdCardParser(), vehicleOwnersProcessor());
+	}
 
 }

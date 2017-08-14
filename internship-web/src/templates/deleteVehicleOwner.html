@@ -9,8 +9,8 @@
         <div class="container">
             <section layout:fragment="content">
                 <h1 th:text="#{default-success-msg}"></h1>
-                <p
-                    th:text="#{vehicle-owners.delete.antet} + ${vehicleOwner.vehicleOwnerId}
+                <p	th:if="${vehicleOwner != null}"
+                    th:text="#{vehicle-owners.delete.antet} + ${vehicleOwner.roIdCard}
             +#{vehicle-owners.delete.rest}
             " />
             </section>

@@ -2,8 +2,8 @@ package ro.axonsoft.internship172.data.mappers;
 
 import java.util.List;
 
-import ro.axonsoft.internship172.data.domain.Batch;
 import ro.axonsoft.internship172.data.domain.VehicleOwner;
+import ro.axonsoft.internship172.model.base.Batch;
 
 /**
  * mapper pentru tabela din baza de date

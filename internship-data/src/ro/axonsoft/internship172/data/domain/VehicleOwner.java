@@ -18,47 +18,47 @@ import org.immutables.value.Value;
 @Value.Immutable
 @Serial.Version(1)
 public interface VehicleOwner {
-    /**
-     *
-     * @return cardul de identitate inscris in tabela
-     */
-    @Nullable
-    String getRoIdCard();
+	/**
+	 *
+	 * @return cardul de identitate inscris in tabela
+	 */
+	@Nullable
+	String getRoIdCard();
 
-    /**
-     *
-     * @return data de referinta
-     */
-    @Nullable
-    Date getIssueDate();
+	/**
+	 *
+	 * @return data de referinta
+	 */
+	@Nullable
+	Date getIssueDate();
 
-    /**
-     *
-     * @return numarul de inmatriculare al cetateanului
-     */
-    @Nullable
-    String getRegPlate();
+	/**
+	 *
+	 * @return numarul de inmatriculare al cetateanului
+	 */
+	@Nullable
+	String getRegPlate();
 
-    /**
-     *
-     * @return linie suplimentara
-     */
-    @Nullable
-    String getComentariu();
+	/**
+	 *
+	 * @return linie suplimentara
+	 */
+	@Nullable
+	String getComentariu();
 
+	/**
+	 *
+	 * @return identificatorul unic al inregistrarii
+	 */
+	@Nullable
+	Long getVehicleOwnerId();
 
-    /**
-     *
-     * @return identificatorul unic al inregistrarii
-     */
-    @Nullable
-    Long getVehicleOwnerId();
-
-    /**
-     * batch-ul de procesare
-     * @return cheia straina spre tabela de batch
-     */
-    @Nullable
-    Long getBatchId();
+	/**
+	 * batch-ul de procesare
+	 *
+	 * @return cheia straina spre tabela de batch
+	 */
+	@Nullable
+	Long getBatchId();
 
 }

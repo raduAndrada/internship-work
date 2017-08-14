@@ -7,7 +7,6 @@ import javax.annotation.Nullable;
 import org.immutables.serial.Serial;
 import org.immutables.value.Value;
 
-
 /**
  * Clasa folosita pentru a extrage date din tabela RESULT_METRICS a bazei de
  * date
@@ -49,7 +48,7 @@ public interface ResultMetrics {
 	@Nullable
 	List<ResultUnregCarsCountByJud> getUnregCarsCountByJud();
 
-
+	@Nullable
 	Long getBatchId();
 
 	@Nullable

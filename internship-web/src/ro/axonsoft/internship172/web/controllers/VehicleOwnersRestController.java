@@ -1,6 +1,7 @@
 package ro.axonsoft.internship172.web.controllers;
 
-import java.util.Calendar;
+import java.sql.Date;
+import java.time.Instant;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -16,18 +17,35 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
 import ro.axonsoft.internship172.api.RoIdCardParser;
-import ro.axonsoft.internship172.data.domain.Batch;
-import ro.axonsoft.internship172.data.domain.MdfBatch;
+import ro.axonsoft.internship172.business.api.vehicleOwner.VehicleOwnerBusiness;
+import ro.axonsoft.internship172.data.domain.ImtVehicleOwner;
 import ro.axonsoft.internship172.data.domain.MdfVehicleOwner;
 import ro.axonsoft.internship172.data.domain.VehicleOwner;
 import ro.axonsoft.internship172.data.exceptions.DatabaseIntegrityViolationException;
 import ro.axonsoft.internship172.data.exceptions.InvalidDatabaseAccessException;
-import ro.axonsoft.internship172.data.mappers.ImtPageCriteria;
-import ro.axonsoft.internship172.web.services.VehicleOwnerRestService;
+import ro.axonsoft.internship172.model.base.Batch;
+import ro.axonsoft.internship172.model.base.ImtBatch;
+import ro.axonsoft.internship172.model.base.ImtPagination;
+import ro.axonsoft.internship172.model.base.MdfBatch;
+import ro.axonsoft.internship172.model.base.SortDirection;
+import ro.axonsoft.internship172.model.batch.BatchCreateResult;
+import ro.axonsoft.internship172.model.batch.BatchGetResult;
+import ro.axonsoft.internship172.model.batch.BatchSortCriterionType;
+import ro.axonsoft.internship172.model.batch.ImtBatchCreate;
+import ro.axonsoft.internship172.model.batch.ImtBatchGet;
+import ro.axonsoft.internship172.model.batch.ImtBatchSortCriterion;
+import ro.axonsoft.internship172.model.vehicleOwner.ImtVehicleOwnerBasic;
+import ro.axonsoft.internship172.model.vehicleOwner.ImtVehicleOwnerCreate;
+import ro.axonsoft.internship172.model.vehicleOwner.ImtVehicleOwnerGet;
+import ro.axonsoft.internship172.model.vehicleOwner.ImtVehicleOwnerSortCriterion;
+import ro.axonsoft.internship172.model.vehicleOwner.VehicleOwnerBasic;
+import ro.axonsoft.internship172.model.vehicleOwner.VehicleOwnerCreateResult;
+import ro.axonsoft.internship172.model.vehicleOwner.VehicleOwnerDeleteResult;
+import ro.axonsoft.internship172.model.vehicleOwner.VehicleOwnerGetResult;
+import ro.axonsoft.internship172.model.vehicleOwner.VehicleOwnerSortCriterionType;
 
 /**
  * Controller pentru partea de in din baza de date
@@ -43,16 +61,16 @@ public class VehicleOwnersRestController {
 
 	RoIdCardParser roIdCardParser;
 
-	VehicleOwnerRestService vehicleOwnerService;
-
-	@Inject
-	public void setVehicleOwnerService(final VehicleOwnerRestService vehicleOwnerService) {
-		this.vehicleOwnerService = vehicleOwnerService;
-	}
+	VehicleOwnerBusiness vhoBusiness;
 
 	@Inject
 	public void setRoIdCardParser(final RoIdCardParser roIdCardParser) {
 		this.roIdCardParser = roIdCardParser;
+	}
+
+	@Inject
+	public void setVhoBusiness(VehicleOwnerBusiness vhoBusiness) {
+		this.vhoBusiness = vhoBusiness;
 	}
 
 	/**
@@ -63,9 +81,11 @@ public class VehicleOwnersRestController {
 	 * @return cetateanul cautat
 	 */
 	@RequestMapping(value = "/getVehicleOwner/{id}", method = RequestMethod.GET)
-	public @ResponseBody VehicleOwner getVehicleOwner(@PathVariable("id") final Long id)
+	public @ResponseBody VehicleOwnerBasic getVehicleOwner(@PathVariable("id") final Long id)
 			throws InvalidDatabaseAccessException {
-		return vehicleOwnerService.selectVehicleOwnerById(id);
+		return vhoBusiness.getVehicleOwners(ImtVehicleOwnerGet.builder()
+				.addSort(ImtVehicleOwnerSortCriterion.of(VehicleOwnerSortCriterionType.RO_ID_CARD, SortDirection.ASC))
+				.vehicleOwnerId(id).build()).getList().get(0).getBasic();
 	}
 
 	/**
@@ -78,23 +98,49 @@ public class VehicleOwnersRestController {
 	@RequestMapping(value = "/insertVehicleOwner", method = RequestMethod.POST)
 	public ResponseEntity<VehicleOwner> insertVehicleOwner(@RequestBody final MdfVehicleOwner vehicleOwner)
 			throws DatabaseIntegrityViolationException {
+
+		String issueDate = vehicleOwner.getIssueDate().toString();
+		issueDate += "T11:59:59.59Z";
+		final VehicleOwnerCreateResult vhoCreateResult = vhoBusiness.createVehicleOwner(ImtVehicleOwnerCreate.builder()
+				.basic(ImtVehicleOwnerBasic.builder().regPlate(vehicleOwner.getRegPlate())
+						.roIdCard(vehicleOwner.getRoIdCard()).issueDate(Instant.parse(issueDate))
+						.comentariu(vehicleOwner.getComentariu()).build())
+				.batch(ImtBatch.builder().batchId(vehicleOwner.getBatchId()).build()).build());
 		LOG.info("inserarea noii inregistrari pe tabela de VEHICLE_OWNER " + vehicleOwner.toString());
-		vehicleOwnerService.insertVehicleOwner(vehicleOwner);
-		LOG.info("dupa inserare " + vehicleOwner.toString());
-		return ResponseEntity.ok(vehicleOwner);
+		// vehicleOwnerService.insertVehicleOwner(vehicleOwner);
+		LOG.info("dupa inserare " + vhoCreateResult.toString());
+		final VehicleOwner vh = ImtVehicleOwner.builder().batchId(vehicleOwner.getBatchId())
+				.comentariu(vhoCreateResult.getBasic().getComentariu())
+				.issueDate(new Date(vhoCreateResult.getBasic().getIssueDate().toEpochMilli()))
+				.regPlate(vhoCreateResult.getBasic().getRegPlate()).roIdCard(vhoCreateResult.getBasic().getRoIdCard())
+				.build();
+
+		return ResponseEntity.ok(vh);
 	}
+
+	/**
+	 * inserarea unui batch nou
+	 *
+	 * @param batch
+	 *            batch-ul ce va fi adaugat
+	 * @param currentPage
+	 *            pagina curenta
+	 * @param pageSize
+	 *            dimensiunea paginii curente
+	 * @return un template cu locul unde a ramas utilizatorul
+	 */
 
 	@RequestMapping(value = "/insertBatch/{pageSize}/{currentPage}", method = RequestMethod.POST)
 	public ResponseEntity<MdfBatch> insertBatchOwner(@RequestBody final MdfBatch batch,
 			@PathVariable("currentPage") final Integer currentPage, @PathVariable("pageSize") final Integer pageSize) {
 		LOG.info("inserarea noii inregistrari pe tabela de BATCH ");
-		vehicleOwnerService.insertBatch(batch);
-		LOG.info("dupa inserare " + batch.toString());
-		return ResponseEntity.ok(batch);
+		final BatchCreateResult batchCreateResult = vhoBusiness
+				.createBatch(ImtBatchCreate.builder().batch(batch).build());
+		return ResponseEntity.ok(MdfBatch.create().setBatchId(batchCreateResult.getBatch().getBatchId()));
 	}
 
 	/**
-	 * Stergere inregistrare dupa id
+	 * Stergere inregistrare dupa carte de identitate
 	 *
 	 * @param vehicleOwner
 	 *            inregistrarea care trebuie stearsa
@@ -104,12 +150,15 @@ public class VehicleOwnersRestController {
 	 * @throws DatabaseIntegrityViolationException
 	 *             daca id-ul nu este in baza de date
 	 */
-	@RequestMapping(value = "/deleteVehicleOwnerById/{id}", method = RequestMethod.POST)
+	@RequestMapping(value = "/deleteVehicleOwnerByRoIdCard/{roIdCard}", method = RequestMethod.POST)
 	public ResponseEntity<MdfVehicleOwner> delete(@RequestBody final MdfVehicleOwner vehicleOwner,
-			@PathVariable("id") final Long id) throws DatabaseIntegrityViolationException {
-		vehicleOwnerService.deleteVehicleOwnerById(id);
-		LOG.info("am primit data:" + vehicleOwner.toString());
-		return ResponseEntity.ok(vehicleOwner);
+			@PathVariable("roIdCard") final String roIdCard) throws DatabaseIntegrityViolationException {
+
+		final VehicleOwnerDeleteResult vhoDeleteResult = vhoBusiness.deleteVehicleOwner(roIdCard);
+		return ResponseEntity.ok(MdfVehicleOwner.create().setComentariu(vhoDeleteResult.getBasic().getComentariu())
+				.setRegPlate(vhoDeleteResult.getBasic().getRegPlate())
+				.setRoIdCard(vhoDeleteResult.getBasic().getRoIdCard())
+				.setIssueDate(new Date(vhoDeleteResult.getBasic().getIssueDate().getEpochSecond())));
 	}
 
 	/**
@@ -130,23 +179,34 @@ public class VehicleOwnersRestController {
 			@PathVariable("pageSize") final int pageSize, @PathVariable("currentPage") final int currentPage
 
 	) throws InvalidDatabaseAccessException {
-		vehicleOwnerService.selectBatchById(batchId);
 		if (pageSize == 0) {
 			throw new InvalidDatabaseAccessException("dimensiunea unei pagini trebuie sa fie mai mare decat 0");
 		}
+		final VehicleOwnerGetResult vhoGetResult = vhoBusiness.getVehicleOwners(ImtVehicleOwnerGet
+				.builder().addSort(ImtVehicleOwnerSortCriterion.builder()
+						.criterion(VehicleOwnerSortCriterionType.RO_ID_CARD).direction(SortDirection.ASC).build())
+				.batchId(batchId).build());
 
-		final Integer vehicleOwnersCount = vehicleOwnerService.countVehicleOwner();
+		final Integer vehicleOwnersCount = vhoGetResult.getCount();
 		final int startIndex = currentPage * pageSize;
-		List<VehicleOwner> vehicleOwnersList = null;
+		final List<VehicleOwner> vehicleOwnersList = Lists.newArrayList();
+		VehicleOwnerGetResult vhoGetResultTemp = null;
 		if (startIndex < vehicleOwnersCount) {
-			vehicleOwnersList = Lists.newArrayList(
-					vehicleOwnerService.getVehicleOwnersPage(ImtPageCriteria.of(startIndex, pageSize, batchId)));
-		}
-		if (vehicleOwnersList == null) {
-			throw new InvalidDatabaseAccessException("pagina depaseste datele din baza de date");
+			vhoGetResultTemp = vhoBusiness.getVehicleOwners(ImtVehicleOwnerGet.builder()
+					.addSort(ImtVehicleOwnerSortCriterion.builder().criterion(VehicleOwnerSortCriterionType.RO_ID_CARD)
+							.direction(SortDirection.ASC).build())
+					.batchId(batchId)
+					.pagination(ImtPagination.builder().offset(new Long(startIndex)).pageSize(pageSize).build())
+					.batchId(batchId).build());
+			vhoGetResultTemp.getList().forEach(e -> {
+				vehicleOwnersList.add(ImtVehicleOwner.builder().batchId(e.getBatch().getBatchId())
+						.roIdCard(e.getBasic().getRoIdCard()).regPlate(e.getBasic().getRegPlate())
+						.comentariu(e.getBasic().getComentariu())
+						.issueDate(new Date(e.getBasic().getIssueDate().toEpochMilli())).build());
+			});
+
 		}
 		final VehicleOwner[] resultArray = vehicleOwnersList.toArray(new VehicleOwner[vehicleOwnersList.size()]);
-		LOG.info("Lista de detinatori de permise pentru batch-ul selectat este" + vehicleOwnersList.toString());
 		return resultArray;
 	}
 
@@ -164,12 +224,14 @@ public class VehicleOwnersRestController {
 	@RequestMapping(value = "/getNumberOfPages/{batchId}/{pageSize}", method = RequestMethod.GET)
 	public @ResponseBody Integer getNumberOfPages(@PathVariable("batchId") final Long batchId,
 			@PathVariable("pageSize") final int pageSize) throws InvalidDatabaseAccessException {
-		vehicleOwnerService.selectBatchById(batchId);
-
+		final VehicleOwnerGetResult vhoGetResult = vhoBusiness.getVehicleOwners(ImtVehicleOwnerGet
+				.builder().addSort(ImtVehicleOwnerSortCriterion.builder()
+						.criterion(VehicleOwnerSortCriterionType.RO_ID_CARD).direction(SortDirection.ASC).build())
+				.batchId(batchId).build());
 		if (pageSize == 0) {
 			throw new InvalidDatabaseAccessException("dimensiunea unei pagini trebuie sa fie mai mare decat 0");
 		}
-		final Integer vehicleOwnersCount = vehicleOwnerService.countVehicleOwnersByBatchId(batchId);
+		final Integer vehicleOwnersCount = vhoGetResult.getCount();
 		Integer numOfPages = vehicleOwnersCount / pageSize;
 		if (vehicleOwnersCount % pageSize != 0) {
 			numOfPages++;
@@ -197,18 +259,23 @@ public class VehicleOwnersRestController {
 			throw new InvalidDatabaseAccessException("dimensiunea unei pagini trebuie sa fie mai mare decat 0");
 		}
 
-		final Integer countedBatches = vehicleOwnerService.countBatches();
+		final BatchGetResult batchGetResult = vhoBusiness.getBatches(ImtBatchGet.builder()
+				.addSort(ImtBatchSortCriterion.of(BatchSortCriterionType.BATCH_ID, SortDirection.ASC)).build());
+		final Integer countedBatches = batchGetResult.getCount();
 		final int startIndex = currentPage * pageSize;
-		List<Batch> batchList = null;
+		final List<Batch> batchList = Lists.newArrayList();
 		if (startIndex < countedBatches) {
-			batchList = Lists
-					.newArrayList(vehicleOwnerService.getBatchPage(ImtPageCriteria.of(startIndex, pageSize, 0L)));
-		}
-		if (batchList == null) {
-			throw new InvalidDatabaseAccessException("pagina depaseste datele din baza de date");
+			final BatchGetResult batchGetResultTemp = vhoBusiness.getBatches(ImtBatchGet.builder()
+					.addSort(ImtBatchSortCriterion.of(BatchSortCriterionType.BATCH_ID, SortDirection.ASC))
+					.pagination(ImtPagination.builder().offset(new Long(startIndex)).pageSize(pageSize).build())
+					.build());
+			batchGetResultTemp.getList().forEach(e -> {
+				batchList.add(MdfBatch.create().setBatchId(e.getBatchId()));
+
+			});
+
 		}
 		final Batch[] resultArray = batchList.toArray(new Batch[batchList.size()]);
-		LOG.info("Lista de detinatori de permise pentru batch-ul selectat este" + batchList.toString());
 		return resultArray;
 	}
 
@@ -229,7 +296,10 @@ public class VehicleOwnersRestController {
 		if (pageSize == 0) {
 			throw new InvalidDatabaseAccessException("dimensiunea unei pagini trebuie sa fie mai mare decat 0");
 		}
-		final Integer batchesCount = vehicleOwnerService.countBatches();
+
+		final BatchGetResult batchGetResult = vhoBusiness.getBatches(ImtBatchGet.builder().addSort(ImtBatchSortCriterion
+				.builder().criterion(BatchSortCriterionType.BATCH_ID).direction(SortDirection.ASC).build()).build());
+		final Integer batchesCount = batchGetResult.getCount();
 		Integer numOfPages = batchesCount / pageSize;
 		if (batchesCount % pageSize != 0) {
 			numOfPages++;
@@ -237,34 +307,9 @@ public class VehicleOwnersRestController {
 		return numOfPages;
 	}
 
-	/**
-	 * Lista cu toti detinatorii de permise
-	 * @return array cu toate datele din baza de date
-	 * @throws InvalidDatabaseAccessException
-	 */
-	@RequestMapping(value = "/getAllVehicleOwners", method = RequestMethod.GET)
-	public @ResponseBody VehicleOwner[] getAllVehicleOwners() throws InvalidDatabaseAccessException {
-		final int pageSize = 3;
-		Iterable<VehicleOwner> vehicleOwnersRecordsIterable = Lists.newArrayList();
-		final Integer vehicleOwnersCount = vehicleOwnerService.countVehicleOwner();
-		final Iterable<Batch> batchIdsList = vehicleOwnerService.selectAllBatches();
-		for (final Batch e : batchIdsList) {
-			for (int startIndex = 0; startIndex < vehicleOwnersCount; startIndex += pageSize) {
-
-				final List<VehicleOwner> vehicleOwnersList = Lists.newArrayList(vehicleOwnerService
-						.getVehicleOwnersPage(ImtPageCriteria.of(startIndex, pageSize, e.getBatchId())));
-				vehicleOwnersRecordsIterable = Iterables.concat(vehicleOwnersRecordsIterable, vehicleOwnersList);
-				LOG.info("Procesarea paginii cu " + vehicleOwnersRecordsIterable.toString());
-			}
-		}
-		final List<VehicleOwner> vehicleOwnersList = Lists.newArrayList(vehicleOwnersRecordsIterable);
-		final VehicleOwner[] resultArray = vehicleOwnersList.toArray(new VehicleOwner[vehicleOwnersList.size()]);
-		LOG.info("Lista de detinatori de permise pentru batch-ul selectat este" + vehicleOwnersList.toString());
-		return resultArray;
-	}
-
 	@ExceptionHandler({ DatabaseIntegrityViolationException.class, InvalidDatabaseAccessException.class })
 	public String vehicleOwnerExceptionsHandling(final Exception exception) throws Exception {
+
 		throw exception;
 	}
 
@@ -278,7 +323,7 @@ public class VehicleOwnersRestController {
 		final MdfVehicleOwner tmp = MdfVehicleOwner.create();
 		tmp.setComentariu("");
 		tmp.setBatchId(1L);
-		tmp.setIssueDate(new java.sql.Date(Calendar.getInstance().getTimeInMillis()));
+		tmp.setIssueDate(new Date(System.currentTimeMillis()));
 		tmp.setRegPlate("");
 		tmp.setVehicleOwnerId(0L);
 		tmp.setRoIdCard("");
@@ -296,17 +341,21 @@ public class VehicleOwnersRestController {
 	public @ResponseBody Integer setEvent(@PathVariable("roIdCard") final String roIdCard,
 			@PathVariable("batchId") final Long batchId) {
 		try {
-			final List<VehicleOwner> temp = Lists
-					.newArrayList(vehicleOwnerService.selectVehicleOwnerByRoIdCard(roIdCard));
-			if (temp != null) {
-				if (temp.size() != 0) {
-					return -1;
-				}
-				final Batch b = vehicleOwnerService.selectBatchById(batchId);
-				if (b == null) {
-					System.out.println("In here");
-					return -2;
-				}
+			final VehicleOwnerGetResult vhoGetResult = vhoBusiness.getVehicleOwners(ImtVehicleOwnerGet
+					.builder().addSort(ImtVehicleOwnerSortCriterion.builder()
+							.criterion(VehicleOwnerSortCriterionType.RO_ID_CARD).direction(SortDirection.ASC).build())
+					.roIdCard(roIdCard).build());
+			LOG.info(vhoGetResult.toString());
+			if (vhoGetResult.getCount() != 0) {
+				return -1;
+			}
+
+			final BatchGetResult batchGetResult = vhoBusiness.getBatches(ImtBatchGet.builder()
+					.addSort(ImtBatchSortCriterion.of(BatchSortCriterionType.BATCH_ID, SortDirection.DESC))
+					.batchId(batchId).pagination(ImtPagination.of(1, 1)).build());
+			LOG.info(batchGetResult.toString());
+			if (batchGetResult.getCount() == 0) {
+				return -2;
 			}
 			roIdCardParser.parseIdCard(roIdCard);
 		} catch (final Exception e) {

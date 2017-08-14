@@ -36,107 +36,76 @@ import ro.axonsoft.internship172.spring.SpringLevelApplication;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = { SpringLevelApplication.class })
-@TestExecutionListeners({ DependencyInjectionTestExecutionListener.class,
-        DirtiesContextTestExecutionListener.class,
-        TransactionalTestExecutionListener.class,
-        DbUnitTestExecutionListener.class })
+@TestExecutionListeners({ DependencyInjectionTestExecutionListener.class, DirtiesContextTestExecutionListener.class,
+		TransactionalTestExecutionListener.class, DbUnitTestExecutionListener.class })
 @DbUnitConfiguration(dataSetLoader = ReplacementDataSetLoader.class)
 @ActiveProfiles("test")
 public class DbVehicleOwnersProcessorImplTest {
 
-    private static final String DFT_PAGE_SIZE = "3";
-    private static final String PAGE_SIZE_SYSTEM_PROP = "ro.axonsoft.internship.process.pageSize";
+	private static final String DFT_PAGE_SIZE = "3";
+	private static final String PAGE_SIZE_SYSTEM_PROP = "ro.axonsoft.internship.process.pageSize";
 
-    @Inject
-    private DbVehicleOwnersProcessor processor;
-    @Inject
-    private ResultService service;
+	@Inject
+	private DbVehicleOwnersProcessor processor;
+	@Inject
+	private ResultService service;
 
-    @Test
-    @DatabaseSetup("DbVehicleOwnersProcessorImplTest-i01.xml")
-    public void processComplexTest() {
-        System.setProperty(PAGE_SIZE_SYSTEM_PROP, DFT_PAGE_SIZE);
+	@Test
+	@DatabaseSetup("DbVehicleOwnersProcessorImplTest-i01.xml")
+	public void processComplexTest() {
+		System.setProperty(PAGE_SIZE_SYSTEM_PROP, DFT_PAGE_SIZE);
 
-        processor.process(100L);
-        final List<ResultMetrics> theResultMetricsList = service.findAllResults();
+		processor.process(100L);
+		final List<ResultMetrics> theResultMetricsList = service.findAllResults();
 
-        final ResultMetrics result = theResultMetricsList.get(theResultMetricsList.size()-1);
-        assertThat(result).isNotNull();
-        assertThat(result.getOddToEvenRatio()).isEqualTo(66);
-        assertThat(result.getPassedRegChangeDueDate()).isEqualTo(2);
-        final Long resultMetricsId = result.getResultMetricsId();
-        final ArrayList<ResultError> errors = Lists.newArrayList();
-        assertThat(result.getUnregCarsCountByJud())
-                .isNotNull()
-                .isNotEmpty();
-        final ArrayList<Long> errIds = Lists.newArrayList();
+		final ResultMetrics result = theResultMetricsList.get(theResultMetricsList.size() - 1);
+		assertThat(result).isNotNull();
+		assertThat(result.getOddToEvenRatio()).isEqualTo(66);
+		assertThat(result.getPassedRegChangeDueDate()).isEqualTo(3);
+		final Long resultMetricsId = result.getResultMetricsId();
+		final ArrayList<ResultError> errors = Lists.newArrayList();
+		assertThat(result.getUnregCarsCountByJud()).isNotNull().isNotEmpty();
+		final ArrayList<Long> errIds = Lists.newArrayList();
 
-        result.getResultErrors().forEach(e -> errors
-                .add(ImtResultError.of(e.getType(), e.getResultErrorId(), e.getVehicleOwnerId(), e.getResultMetricsId())));
+		result.getResultErrors().forEach(e -> errors.add(
+				ImtResultError.of(e.getType(), e.getResultErrorId(), e.getVehicleOwnerId(), e.getResultMetricsId())));
 
-        result.getResultErrors().forEach(e -> errIds.add(e.getResultErrorId()));
-        int i = 0;
-        assertThat(ImmutableList.of(errors))
-                .isEqualTo(ImmutableList.of(Lists
-                        .newArrayList(
-                                ImtResultError.builder()
-                                        .type(1)
-                                        .vehicleOwnerId(7L)
-                                        .resultErrorId(errIds.get(i++))
-                                        .resultMetricsId(resultMetricsId)
-                                        .build(),
-                                ImtResultError.builder()
-                                        .type(2)
-                                        .vehicleOwnerId(7L)
-                                        .resultErrorId(errIds.get(i++))
-                                        .resultMetricsId(resultMetricsId)
-                                        .build(),
-                                ImtResultError.builder()
-                                        .type(1)
-                                        .vehicleOwnerId(8L)
-                                        .resultErrorId(errIds.get(i++))
-                                        .resultMetricsId(resultMetricsId)
-                                        .build(),
-                                ImtResultError.builder()
-                                        .type(0)
-                                        .vehicleOwnerId(10L)
-                                        .resultErrorId(errIds.get(i++))
-                                        .resultMetricsId(resultMetricsId)
-                                        .build())));
-        final ArrayList<ResultUnregCarsCountByJud> unregCars = Lists.newArrayList();
-        result.getUnregCarsCountByJud().forEach(
-                            e -> unregCars.add(ImtResultUnregCarsCountByJud.builder()
-                                    .judet(e.getJudet())
-                                    .unregCarsCount(e.getUnregCarsCount())
-                                    .resultMetricsId(e.getResultMetricsId())
-                                    .unregCarsId(e.getUnregCarsId())
-                                     .build()));
+		result.getResultErrors().forEach(e -> errIds.add(e.getResultErrorId()));
+		int i = 0;
+		assertThat(ImmutableList.of(errors)).isEqualTo(ImmutableList.of(Lists.newArrayList(
+				ImtResultError.builder().type(1).vehicleOwnerId(7L).resultErrorId(errIds.get(i++))
+						.resultMetricsId(resultMetricsId).build(),
+				ImtResultError.builder().type(1).vehicleOwnerId(8L).resultErrorId(errIds.get(i++))
+						.resultMetricsId(resultMetricsId).build())));
+		final ArrayList<ResultUnregCarsCountByJud> unregCars = Lists.newArrayList();
+		result.getUnregCarsCountByJud()
+				.forEach(e -> unregCars.add(
+						ImtResultUnregCarsCountByJud.builder().judet(e.getJudet()).unregCarsCount(e.getUnregCarsCount())
+								.resultMetricsId(e.getResultMetricsId()).unregCarsId(e.getUnregCarsId()).build()));
 
-        assertThat(ImmutableList.of(unregCars))
-                .isEqualTo(ImmutableList.of(Lists
-                        .newArrayList(
-                                ImtResultUnregCarsCountByJud.of(Judet.MM, 1,
-                                        result.getUnregCarsCountByJud().get(0).getUnregCarsId(),
-                                        resultMetricsId))));
+		assertThat(unregCars).isEqualTo(ImmutableList.of(
+				ImtResultUnregCarsCountByJud.of(Judet.MM, 2, result.getUnregCarsCountByJud().get(0).getUnregCarsId(),
+						resultMetricsId),
+				ImtResultUnregCarsCountByJud.of(Judet.B, 1, result.getUnregCarsCountByJud().get(0).getUnregCarsId(),
+						resultMetricsId)));
 
-    }
+	}
 
+	@Test
+	@DatabaseSetup("DbVehicleOwnersProcessorImplTest-i01.xml")
+	public void processSimpleTest() {
+		System.setProperty(PAGE_SIZE_SYSTEM_PROP, DFT_PAGE_SIZE);
 
-    @Test
-    @DatabaseSetup("DbVehicleOwnersProcessorImplTest-i01.xml")
-    public void processSimpleTest() {
-        System.setProperty(PAGE_SIZE_SYSTEM_PROP, DFT_PAGE_SIZE);
+		processor.process(3L);
 
-        processor.process(3L);
+		final List<ResultMetrics> theResultMetricsList = service.findAllResults();
+		final ResultMetrics result = theResultMetricsList.get(theResultMetricsList.size() - 1);
+		assertThat(result).isNotNull();
+		assertThat(result.getResultErrors()).isNullOrEmpty();
+		assertThat(result.getUnregCarsCountByJud()).isNullOrEmpty();
+		assertThat(result.getBatchId()).isEqualTo(3L);
+		assertThat(result.getOddToEvenRatio()).isEqualTo(100);
+		assertThat(result.getPassedRegChangeDueDate()).isEqualTo(0);
 
-        final List<ResultMetrics> theResultMetricsList = service.findAllResults();
-        final ResultMetrics result = theResultMetricsList.get(theResultMetricsList.size() - 1);
-        assertThat(result).isNotNull();
-        assertThat(result.getResultErrors()).isNullOrEmpty();
-        assertThat(result.getUnregCarsCountByJud()).isNullOrEmpty();
-        assertThat(result.getBatchId()).isEqualTo(3L);
-        assertThat(result.getOddToEvenRatio()).isEqualTo(100);
-        assertThat(result.getPassedRegChangeDueDate()).isEqualTo(0);
-
-    }
+	}
 }

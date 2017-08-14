@@ -18,31 +18,30 @@ import org.springframework.core.io.ClassPathResource;
 @Configuration
 public class DataConfiguration {
 
-/* *//**
-     * Setare dataSource si inregistrarea bean-urilor care mapeaza fisierele xml
-     * pe interfatele mapper
-     *//*
+	/* *//**
+			 * Setare dataSource si inregistrarea bean-urilor care mapeaza fisierele xml pe
+			 * interfatele mapper
+			 *//*
+				 * 
+				 * @Bean public PlatformTransactionManager transactionManager(final DataSource
+				 * dataSource) { final DataSourceTransactionManager transactionManager = new
+				 * DataSourceTransactionManager(); transactionManager.setDataSource(dataSource);
+				 * return transactionManager; }
+				 */
 
-    @Bean
-    public PlatformTransactionManager transactionManager(final DataSource dataSource) {
-        final DataSourceTransactionManager transactionManager = new DataSourceTransactionManager();
-        transactionManager.setDataSource(dataSource);
-        return transactionManager;
-    }*/
+	@Bean
+	public SqlSessionFactory sqlSessionFactory(final DataSource dataSource) throws Exception {
+		final SqlSessionFactoryBean sessionFactoryBean = new SqlSessionFactoryBean();
+		sessionFactoryBean.setDataSource(dataSource);
+		sessionFactoryBean.setConfigLocation(new ClassPathResource("mybatis-config.xml"));
+		return sessionFactoryBean.getObject();
+	}
 
-    @Bean
-    public SqlSessionFactory sqlSessionFactory(final DataSource dataSource) throws Exception {
-        final SqlSessionFactoryBean sessionFactoryBean = new SqlSessionFactoryBean();
-        sessionFactoryBean.setDataSource(dataSource);
-        sessionFactoryBean.setConfigLocation(new ClassPathResource("mybatis-config.xml"));
-        return sessionFactoryBean.getObject();
-    }
-
-    @Bean
-    public MapperScannerConfigurer mybatisMapperScannerConfigurer() {
-        final MapperScannerConfigurer mapperScannerConfigurer = new MapperScannerConfigurer();
-        mapperScannerConfigurer.setBasePackage("ro.axonsoft.internship172.data.mappers");
-        return mapperScannerConfigurer;
-    }
+	@Bean
+	public MapperScannerConfigurer mybatisMapperScannerConfigurer() {
+		final MapperScannerConfigurer mapperScannerConfigurer = new MapperScannerConfigurer();
+		mapperScannerConfigurer.setBasePackage("ro.axonsoft.internship172.data");
+		return mapperScannerConfigurer;
+	}
 
 }

@@ -11,40 +11,40 @@ import org.immutables.value.Value;
 @Value.Modifiable
 @Serial.Version(1)
 public interface ConcreteResultMetrics {
-    /**
-     *
-     * @param oddToEvenRatio
-     *            datele de pe coloana ODD_TO_EVEN_RATIO
-     * @param passedRegChangeDueDate
-     *            datele de pe coloana PASSED_REG_CHANGE_DUE_DATE
-     * @param resultMetricsId
-     *            datele de pe coloana RESULT_METRICS_ID
-     * @param batchId
-     *            datele de pe coloana BATCH_ID
-     * @param unregCarsCountByJud
-     *            lista cu masinile neinregistrate pentru judete
-     * @param resultError
-     *            lista cu erorile pentru batch-ul de procesare
-     */
+	/**
+	 *
+	 * @param oddToEvenRatio
+	 *            datele de pe coloana ODD_TO_EVEN_RATIO
+	 * @param passedRegChangeDueDate
+	 *            datele de pe coloana PASSED_REG_CHANGE_DUE_DATE
+	 * @param resultMetricsId
+	 *            datele de pe coloana RESULT_METRICS_ID
+	 * @param batchId
+	 *            datele de pe coloana BATCH_ID
+	 * @param unregCarsCountByJud
+	 *            lista cu masinile neinregistrate pentru judete
+	 * @param resultError
+	 *            lista cu erorile pentru batch-ul de procesare
+	 */
 
-    @Nullable
-    Integer getOddToEvenRatio();
+	@Nullable
+	Integer getOddToEvenRatio();
 
-    @Nullable
-    Integer getPassedRegChangeDueDate();
+	@Nullable
+	Integer getPassedRegChangeDueDate();
 
-    @Nullable
-    Long getResultMetricsId();
+	@Nullable
+	Long getResultMetricsId();
 
-    @Nullable
-    List<MdfResultUnregCarsCountByJud> getUnregCarsCountByJud();
+	@Nullable
+	List<MdfResultUnregCarsCountByJud> getUnregCarsCountByJud();
 
+	@Nullable
+	Long getBatchId();
 
-    Long getBatchId();
+	@Nullable
+	List<MdfResultError> getResultErrors();
 
-    @Nullable
-    List<MdfResultError> getResultErrors();
-
-    @Nullable
+	@Nullable
 	java.sql.Timestamp getResultProcessTime();
 }

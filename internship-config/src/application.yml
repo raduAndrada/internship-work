@@ -23,9 +23,9 @@ ro.axonsoft.internship172:
 spring:
   datasource:
     driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://mysql.axonsoft.local:3306/internship_learn
-    username: internship_learn
-    password: internship_learn
+    url: jdbc:mysql://localhost:3306/internship_learn
+    username: root
+    password: warlord
     initialize: false
     tomcat:
       max-active: 5

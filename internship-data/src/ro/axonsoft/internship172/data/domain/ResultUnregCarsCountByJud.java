@@ -20,38 +20,37 @@ import ro.axonsoft.internship172.api.Judet;
 @Serial.Version(1)
 public interface ResultUnregCarsCountByJud {
 
-    /**
-     * Judetul de care apartine masina neinregistrat
-     *
-     * @return enum cu judetel respectiv
-     */
-    @Parameter
-    @Nullable
-    Judet getJudet();
+	/**
+	 * Judetul de care apartine masina neinregistrat
+	 *
+	 * @return enum cu judetel respectiv
+	 */
+	@Parameter
+	@Nullable
+	Judet getJudet();
 
-    /**
-     *
-     * @return numarul de masini neinregistrate din judetul judet
-     */
-    @Parameter
-    @Nullable
-    Integer getUnregCarsCount();
+	/**
+	 *
+	 * @return numarul de masini neinregistrate din judetul judet
+	 */
+	@Parameter
+	@Nullable
+	Integer getUnregCarsCount();
 
+	/**
+	 *
+	 * @return identificatorul unic al tabelei
+	 */
+	@Nullable
+	@Parameter
+	Long getUnregCarsId();
 
-    /**
-     *
-     * @return identificatorul unic al tabelei
-     */
-    @Nullable
-    @Parameter
-    Long getUnregCarsId();
-
-    /**
-     *
-     * @return metricea rezultat de care apartine
-     */
-    @Nullable
-    @Parameter
-    Long getResultMetricsId();
+	/**
+	 *
+	 * @return metricea rezultat de care apartine
+	 */
+	@Nullable
+	@Parameter
+	Long getResultMetricsId();
 
 }
