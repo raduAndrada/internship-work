@@ -1,12 +1,12 @@
 drop table BATCH if exists; 
 create table BATCH (
-	BATCH_ID integer identity primary key,
+	BATCH_ID numeric identity primary key,
 );
 
 drop table RESULT_METRICS if exists;
 
 create table RESULT_METRICS (
-  RESULT_METRICS_ID integer identity primary key,
+  RESULT_METRICS_ID numeric identity primary key,
   ODD_TO_EVEN_RATIO integer null,
   PASSED_REG_CHANGE_DUE_DATE int null ,
   BATCH_ID int not null,
@@ -18,19 +18,19 @@ create table RESULT_METRICS (
 drop table RESULT_ERROR if exists;
 
 create table RESULT_ERROR (
-  RESULT_ERROR_ID integer identity primary key,
+  RESULT_ERROR_ID numeric identity primary key,
   TYPE integer null,
-  VEHICLE_OWNER_ID integer null,
-  RESULT_METRICS_ID integer not null);
+  VEHICLE_OWNER_ID numeric null,
+  RESULT_METRICS_ID numeric not null);
 
 
 drop table RESULT_UNREG_CARS_COUNT_BY_JUD if exists;
 
 create table RESULT_UNREG_CARS_COUNT_BY_JUD (
-  RESULT_UNREG_CARS_COUNT_ID integer identity primary key,
+  UNREG_CARS_COUNT_ID numeric identity primary key,
   JUDET varchar(2) null,
   UNREG_CARS_COUNT integer null,
-  RESULT_METRICS_ID integer not null
+  RESULT_METRICS_ID numeric not null
   );
 
 drop table VEHICLE_OWNER if exists;

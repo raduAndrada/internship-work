@@ -4,35 +4,54 @@
 
 <!-- TO DO -->
 <!-- this is a working progress -->
-<mapper namespace="ro.axonsoft.recrutare.data.api.user.UserDao">
+<mapper namespace="ro.axonsoft.internship172.data.api.result.ResultMetricsDao">
 
-	<resultMap id="ResultMap" type="MdfResultMetricsEntity">
+	<resultMap id="ResultMap" type="MdfResultEntity">
 		<id column="RESULT_METRICS_ID" property="resultMetricsId" />
 		<association property="record" javaType="MdfResultRecord">
-			<association property="basic" javaType="MdfResult">
+			<association property="basic" javaType="MdfResultBasic">
 				<result column="ODD_TO_EVEN_RATIO" property="oddToEvenRatio" />
 				<result column="PASSED_REG_CHANGE_DUE_DATE" property="passedRegChangeDueDate" />
 				<result column="RESULT_PROCESS_TIME" property="resultProcessTime" />
 			</association>
 			<association property="batch" javaType="MdfBatch">
-				<id column="BATCH_ID" property="batch_id" />
+				<id column="BATCH_ID" property="batchId" />
 			</association>
 		</association>
-		<association property="update" javaType="MdfActionAudit">
-			<id column="MDF_USR" property="author" />
-			<id column="MDF_TMS" property="instant" />
-		</association>
-		<association property="passwordUpdate" javaType="MdfActionAudit">
-			<id column="PASSWD_MDF_USR" property="author" />
-			<id column="PASSWD_MDF_TMS" property="instant" />
-		</association>
+		<collection property="unregCars" javaType="ArrayList"
+			ofType="MdfResultUnregCarsCountByJudRecord">
+			<id column="UNREG_CARS_COUNT_ID" property="unregCarsCountId"></id>
+			<result column="RESULT_METRICS_ID" property="resultMetricsId" />
+			<association property="basic" javaType="MdfResultUnregCarsCountByJudBasic">
+				<result column="JUDET" property="judet" />
+				<result column="UNREG_CARS_COUNT" property="unregCarsCount" />
+			</association>
+		</collection>
+		<collection property="errors" javaType="ArrayList"
+			ofType="MdfResultErrorRecord">
+			<id column="RESULT_ERROR_ID" property="resultErrorId"></id>
+			<result column="RESULT_METRICS_ID" property="resultMetricsId" />
+			<association property="basic" javaType="MdfResultErrorBasic">
+				<result column="TYPE" property="type" />
+				<result column="VEHICLE_OWNER_ID" property="vehicleOwnerId" />
+			</association>
+		</collection>
+
 	</resultMap>
 
-	<select id="getUser" resultMap="UserMap">
-		select distinct
-		ID,
-		<include refid="usrColumns" />
-		from USR
+	<select id="getResult" resultMap="ResultMap">
+		select * <!--distinct RESULT_METRICS_ID, <include refid="resmColumns" /> -->
+		from RESULT_METRICS
+
+		left join
+		RESULT_UNREG_CARS_COUNT_BY_JUD on
+		RESULT_METRICS.RESULT_METRICS_ID =
+		RESULT_UNREG_CARS_COUNT_BY_JUD.RESULT_METRICS_ID
+
+		left join
+		RESULT_ERROR on
+		RESULT_METRICS.RESULT_METRICS_ID =
+		RESULT_ERROR.RESULT_METRICS_ID
 		<where>
 			<include refid="whereCriteria" />
 			<include refid="searchCriteria" />
@@ -41,44 +60,70 @@
 		<include refid="pagination" />
 	</select>
 
-	<insert id="addUser" keyProperty="id">
-		insert into USR (
-		<include refid="usrColumns" />
+	<insert id="addResult" keyProperty="resultMetricsId">
+
+		insert into RESULT_METRICS (
+		<include refid="resmColumns" />
 		) VALUES (
-		#{record.basic.firstName}, #{record.basic.lastName}, #{record.basic.username},
-		#{record.basic.email}, #{password},
-		#{record.passwordUpdate.author}, #{record.passwordUpdate.instant}, #{record.create.author},
-		#{record.create.instant}, #{record.update.author},
-		#{record.update.instant}
+		#{record.basic.oddToEvenRatio},
+		#{record.basic.passedRegChangeDueDate},
+		#{record.basic.resultProcessTime},
+		#{record.batch.batchId}
 		)
 	</insert>
 
-	<update id="updateUser">
-		update USR
+	<insert id="addUnregCars" keyProperty="resultUnregCarsId">
+		<if test="unregCars != null and !unregCars.empty">
+			insert into RESULT_UNREG_CARS_COUNT_BY_JUD (
+			<include refid="unregColumns" />
+			) VALUES
+			<foreach item="unregCar" collection="unregCars" separator=",">
+				(#{unregCar.basic.judet},
+				#{unregCar.basic.unregCarsCount},
+				#{unregCar.resultMetricsId} )
+			</foreach>
+		</if>
+	</insert>
+
+	<insert id="addErrors" keyProperty="resultErrorId">
+		<if test="errors != null and !errors.empty">
+			insert into RESULT_ERROR (
+			<include refid="errColumns" />
+			) VALUES
+			<foreach item="error" collection="errors" separator=",">
+				(
+				#{error.basic.type},
+				#{error.basic.vehicleOwnerId},
+				#{error.resultMetricsId}
+				)
+			</foreach>
+		</if>
+
+
+	</insert>
+	<update id="updateResult">
+		update RESULT_METRICS
 		<set>
-			<if test="firstName != null">F_NM=#{firstName},</if>
-			<if test="lastName != null">L_NM=#{lastName},</if>
-			<if test="email != null">EMAIL=#{email},</if>
-			<if test="password != null">PSSWD=#{password}, PASSWD_MDF_USR=#{audit.author},
-				PASSWD_MDF_TMS=#{audit.instant}</if>
-			MDF_USR = #{audit.author},
-			MDF_TMS = #{audit.instant}
+			<if test="oddToEvenRatio != null">ODD_TO_EVEN_RATIO=#{oddToEvenRatio},</if>
+			<if test="passedRegChangeDueDate != null">PASSED_REG_CHANGE_DUE_DATE=#{passedRegChangeDueDate},
+			</if>
+			<if test="resultProcessTime != null">RESULT_PROCESS_TIME=#{resultProcessTime},</if>
 		</set>
 		<where>
 			<include refid="whereCriteria" />
 		</where>
 	</update>
 
-	<delete id="deleteUser">
-		delete from USR
+	<delete id="deleteResult">
+		delete from RESULT_METRICS
 		<where>
 			<include refid="whereCriteria" />
 		</where>
 	</delete>
 
-	<select id="countUser" resultType="Integer">
+	<select id="countResult" resultType="Integer">
 		select count(*)
-		from USR
+		from RESULT_METRICS
 		<where>
 			<include refid="whereCriteria" />
 			<include refid="searchCriteria" />
@@ -89,11 +134,14 @@
 		<if test="criteria != null">
 			<if test="criteria.idIncl != null and !criteria.idIncl.empty">
 				<foreach item="idInclItem" collection="criteria.idIncl"
-					open="and ID in (" separator="," close=")">#{idInclItem}</foreach>
+					open="and RESULT_METRICS.RESULT_METRICS_ID in (" separator=","
+					close=")">#{idInclItem}</foreach>
 			</if>
-			<if test="criteria.usernameIncl != null and !criteria.usernameIncl.empty">
-				<foreach item="usrnmInclItem" collection="criteria.usernameIncl"
-					open="and USRNM in (" separator="," close=")">#{usrnmInclItem}
+
+			<if
+				test="criteria.idBatchSelect != null and !criteria.idBatchSelect.empty">
+				<foreach item="idBatchSelect" collection="criteria.idBatchSelect"
+					open="and BATCH_ID in (" separator="," close=")">#{idBatchSelect}
 				</foreach>
 			</if>
 		</if>
@@ -120,19 +168,25 @@
 		<if test="search != null">
 			<bind name="likePattern" value="'%' + search + '%'" />
 			and
-			UPPER(USRNM) like UPPER(#{likePattern})
-			or
-			UPPER(F_NM) like UPPER(#{likePattern})
-			or
-			UPPER(L_NM) like UPPER(#{likePattern})
-			or
-			UPPER(EMAIL) like UPPER(#{likePattern})
+			UPPER(JUDET) like UPPER(#{likePattern})
 		</if>
 	</sql>
 
-	<sql id="usrColumns">
-		F_NM, L_NM, USRNM, EMAIL, PASSWD, PASSWD_MDF_USR, PASSWD_MDF_TMS, CRT_USR,
-		CRT_TMS, MDF_USR, MDF_TMS
+	<sql id="resmColumns">
+		ODD_TO_EVEN_RATIO, PASSED_REG_CHANGE_DUE_DATE,
+		RESULT_PROCESS_TIME,
+		BATCH_ID
+	</sql>
+
+	<sql id="unregColumns">
+		JUDET,
+		UNREG_CARS_COUNT,
+		RESULT_METRICS_ID
+	</sql>
+
+	<sql id="errColumns">
+		TYPE, VEHICLE_OWNER_ID,
+		RESULT_METRICS_ID
 	</sql>
 
 </mapper>

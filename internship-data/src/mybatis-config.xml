@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd">
 <configuration>
-    <settings>      
-        <setting name="cacheEnabled" value="true" />        
-        <setting name="lazyLoadingEnabled" value="true" />     
-        <setting name="multipleResultSetsEnabled" value="true" />       
-        <setting name="useColumnLabel" value="true" />      
-        <setting name="useGeneratedKeys" value="false" />       
-        <setting name="autoMappingBehavior" value="PARTIAL" />      
-        <setting name="defaultExecutorType" value="SIMPLE" />       
-        <setting name="defaultStatementTimeout" value="25" />       
-        <setting name="safeRowBoundsEnabled" value="false" />       
-        <setting name="mapUnderscoreToCamelCase" value="true" />        
-        <setting name="localCacheScope" value="SESSION" />      
-        <setting name="jdbcTypeForNull" value="OTHER" />        
-        <setting name="lazyLoadTriggerMethods" value="equals,clone,hashCode,toString" />        
-        <setting name="logImpl" value="SLF4J"/>        
-         <setting name="jdbcTypeForNull" value="NULL" />     
-    </settings>
+	<settings>
+		<setting name="cacheEnabled" value="true" />
+		<setting name="lazyLoadingEnabled" value="true" />
+		<setting name="multipleResultSetsEnabled" value="true" />
+		<setting name="useColumnLabel" value="true" />
+		<setting name="useGeneratedKeys" value="false" />
+		<setting name="autoMappingBehavior" value="PARTIAL" />
+		<setting name="defaultExecutorType" value="SIMPLE" />
+		<setting name="defaultStatementTimeout" value="25" />
+		<setting name="safeRowBoundsEnabled" value="false" />
+		<setting name="mapUnderscoreToCamelCase" value="true" />
+		<setting name="localCacheScope" value="SESSION" />
+		<setting name="jdbcTypeForNull" value="OTHER" />
+		<setting name="lazyLoadTriggerMethods" value="equals,clone,hashCode,toString" />
+		<setting name="logImpl" value="SLF4J" />
+		<setting name="jdbcTypeForNull" value="NULL" />
+	</settings>
 
 	<typeAliases>
 
@@ -41,17 +41,38 @@
 		<typeAlias
 			type="ro.axonsoft.internship172.data.api.vehicleOwner.MdfVehicleOwnerEntity"
 			alias="MdfVehicleOwnerEntity" />
+
+		<!-- continuam de aici -->
+		<typeAlias type="ro.axonsoft.internship172.data.api.result.MdfResultEntity"
+			alias="MdfResultEntity" />
+		<typeAlias type="ro.axonsoft.internship172.model.result.MdfResultRecord"
+			alias="MdfResultRecord" />
+		<typeAlias type="ro.axonsoft.internship172.model.result.MdfResultBasic"
+			alias="MdfResultBasic" />
+		<typeAlias
+			type="ro.axonsoft.internship172.model.result.MdfResultUnregCarsCountByJudRecord"
+			alias="MdfResultUnregCarsCountByJudRecord" />
+		<typeAlias
+			type="ro.axonsoft.internship172.model.result.MdfResultUnregCarsCountByJudBasic"
+			alias="MdfResultUnregCarsCountByJudBasic" />
+		<typeAlias
+			type="ro.axonsoft.internship172.model.result.MdfResultErrorRecord"
+			alias="MdfResultErrorRecord" />
+		<typeAlias
+			type="ro.axonsoft.internship172.model.result.MdfResultErrorBasic"
+			alias="MdfResultErrorBasic" />
+
 	</typeAliases>
 
-    
-    <typeHandlers>      
-        <typeHandler handler="org.apache.ibatis.type.InstantTypeHandler" />         
-        <typeHandler handler="org.apache.ibatis.type.LocalDateTimeTypeHandler" />       
-        <typeHandler handler="org.apache.ibatis.type.LocalDateTypeHandler" />       
-        <typeHandler handler="org.apache.ibatis.type.LocalTimeTypeHandler" />       
-        <typeHandler handler="org.apache.ibatis.type.OffsetDateTimeTypeHandler" />      
-        <typeHandler handler="org.apache.ibatis.type.OffsetTimeTypeHandler" />      
-        <typeHandler handler="org.apache.ibatis.type.ZonedDateTimeTypeHandler" />   
-    </typeHandlers> 
+
+	<typeHandlers>
+		<typeHandler handler="org.apache.ibatis.type.InstantTypeHandler" />
+		<typeHandler handler="org.apache.ibatis.type.LocalDateTimeTypeHandler" />
+		<typeHandler handler="org.apache.ibatis.type.LocalDateTypeHandler" />
+		<typeHandler handler="org.apache.ibatis.type.LocalTimeTypeHandler" />
+		<typeHandler handler="org.apache.ibatis.type.OffsetDateTimeTypeHandler" />
+		<typeHandler handler="org.apache.ibatis.type.OffsetTimeTypeHandler" />
+		<typeHandler handler="org.apache.ibatis.type.ZonedDateTimeTypeHandler" />
+	</typeHandlers>
 
 </configuration>
