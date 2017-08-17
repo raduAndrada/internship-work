@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:include="head :: head">
 </head>
-<body th:onload="changeClass()">
+<body>
 
 	<nav class="navbar navbar-default" th:fragment="navbar">
 		<div class="container-fluid">
@@ -22,9 +22,9 @@
 			<div class="collapse navbar-collapse"
 				id="nav">
 				<ul class="nav navbar-nav">
-					<li class="menu-item" onclick="changeClass(this);" id="/home"><a class="nav-link"
+					<li class="menu-item" id="/home"><a class="nav-link"
 						 th:href="@{/home}">Home</a></li>
-					<li onclick="changeClass(this);" ><a class="nav-link"
+					<li><a class="nav-link"
 						 th:text="#{default-insert-msg}"
 						href="/insertVehicleOwner"></a></li>
 					<li ><a class="nav-link"

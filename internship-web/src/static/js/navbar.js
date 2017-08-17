@@ -1,4 +1,4 @@
-function changeClass(){
+window.onload = function() {
 	console.log($("a[href*='" + location.pathname + "']")[0].pathname);
 	var path = $("a[href*='" + location.pathname + "']")[0].pathname;
 	var liNodes = $('#nav li');
@@ -10,6 +10,7 @@ function changeClass(){
 		if (liNodes[i].id === path){
 			console.log(liNodes[i]);
 			liNodes[i].className += " active-page";
+			liNodes[i].style.color ="Black;";
 		}
-	}
-}
+	};
+};
