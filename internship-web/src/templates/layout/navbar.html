@@ -2,39 +2,57 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:include="head :: head">
 </head>
-<body>
-    <nav class="navbar navbar-default" th:fragment="navbar">
-        <div class="container-fluid">
-            <!-- Brand and toggle get grouped for better mobile display -->
-            <div class="navbar-header">
-                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1"
-                    aria-expanded="false">
-                    <span class="sr-only"></span> <span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span>
-                </button>
-                <a class="navbar-brand" href="#"> <i class="fa fa-car" aria-hidden="true"></i> Vehicle Owner's process Application
-                </a>
-            </div>
-            <!-- Collect the nav links, forms, and other content for toggling -->
-            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-                <ul class="nav navbar-nav">
-                    <li><a th:href="@{/home}">Home</a></li>
-                    <li><a th:text="#{default-insert-msg}" href="/insertVehicleOwner"></a></li>
-                    <li><a th:text="#{default-view-batch}" th:href="@{/batches/(pageSize=${3},currentPage=${0})}"></a></li>
-                    <li><a th:text="#{file-upload}" th:href="@{/process/fileUpload}"></a></li>
-                    <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
-                        aria-expanded="false"> <span th:text="#{lang}"></span> <span class="caret"></span></a>
-                        <ul class="dropdown-menu">
-                            <th:block th:with="currentUrl=${@currentUrlWithoutParam.apply('lang')}">
-                                <li><a th:href="@{${currentUrl}(lang=ro)}"> <font color="black">RO</font>
-                                </a></li>
-                                <li><a th:href="@{${currentUrl}(lang=en)}"> <font color="black">EN</font>
-                                </a></li>
-                            </th:block>
-                        </ul></li>
-                </ul>
-            </div>
-            <!-- /.navbar-collapse -->
-        </div>
-    </nav>
+<body th:onload="changeClass()">
+
+	<nav class="navbar navbar-default" th:fragment="navbar">
+		<div class="container-fluid">
+			<!-- Brand and toggle get grouped for better mobile display -->
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle collapsed"
+					data-toggle="collapse" data-target="#nav"
+					aria-expanded="false">
+					<span class="sr-only"></span> <span class="icon-bar"></span> <span
+						class="icon-bar"></span> <span class="icon-bar"></span>
+				</button>
+				<a class="navbar-brand" href="#"> <i class="fa fa-car"
+					aria-hidden="true"></i> Vehicle Owner's process Application
+				</a>
+			</div>
+			<!-- Collect the nav links, forms, and other content for toggling -->
+			<div class="collapse navbar-collapse"
+				id="nav">
+				<ul class="nav navbar-nav">
+					<li class="menu-item" onclick="changeClass(this);" id="/home"><a class="nav-link"
+						 th:href="@{/home}">Home</a></li>
+					<li onclick="changeClass(this);" ><a class="nav-link"
+						 th:text="#{default-insert-msg}"
+						href="/insertVehicleOwner"></a></li>
+					<li ><a class="nav-link"
+						 th:text="#{default-view-batch}"
+						th:href="@{/batches/(pageSize=${3},currentPage=${0})}"></a></li>
+					<li ><a class="nav-link"
+						 th:text="#{file-upload}"
+						th:href="@{/process/fileUpload}"></a></li>
+					<li class="dropdown"><a href="#" class="dropdown-toggle"
+						data-toggle="dropdown" role="button" aria-haspopup="true"
+						aria-expanded="false"> <span th:text="#{lang}"></span> <span
+							class="caret"></span></a>
+						<ul class="dropdown-menu">
+							<th:block
+								th:with="currentUrl=${@currentUrlWithoutParam.apply('lang')}">
+								<li><a th:href="@{${currentUrl}(lang=ro)}"> <font
+										color="black">RO</font>
+								</a></li>
+								<li><a th:href="@{${currentUrl}(lang=en)}"> <font
+										color="black">EN</font>
+								</a></li>
+							</th:block>
+						</ul></li>
+				</ul>
+			</div>
+			<!-- /.navbar-collapse -->
+		</div>
+	</nav>
+
 </body>
 </html>
