@@ -1,4 +1,4 @@
-package ro.axonsoft.internship172.api;
+package ro.axonsoft.internship172.model.api;
 
 import org.immutables.serial.Serial;
 import org.immutables.value.Value;

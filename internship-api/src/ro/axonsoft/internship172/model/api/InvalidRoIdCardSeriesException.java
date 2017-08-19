@@ -1,4 +1,4 @@
-package ro.axonsoft.internship172.api;
+package ro.axonsoft.internship172.model.api;
 /**
  * Clasa care defineste exceptiile pentru seria cartii de identitate invalida
  * @author intern

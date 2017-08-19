@@ -1,4 +1,4 @@
-package ro.axonsoft.internship172.api;
+package ro.axonsoft.internship172.model.api;
 /**
  * Clasa pentru exceptiile aparute daca numarul de inmatriculare al masinii este invalid
  * @author intern

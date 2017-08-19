@@ -6,10 +6,11 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import ro.axonsoft.internship172.api.InvalidRoIdCardSeriesException;
-import ro.axonsoft.internship172.api.Judet;
-import ro.axonsoft.internship172.api.RoIdCardSeriesJudMapper;
 import ro.axonsoft.internship172.impl.RoIdCardSeriesJudMapperImpl;
+import ro.axonsoft.internship172.model.api.InvalidRoIdCardSeriesException;
+import ro.axonsoft.internship172.model.api.Judet;
+import ro.axonsoft.internship172.model.api.RoIdCardSeriesJudMapper;
+import ro.axonsoft.internship172.model.base.RoIdCardSeriesMapperUtil;
 
 public class RoIdCardSeriesJudMapperTest {
 

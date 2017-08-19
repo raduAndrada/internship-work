@@ -19,13 +19,13 @@ import com.esotericsoftware.yamlbeans.YamlReader;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 
-import ro.axonsoft.internship172.api.StreamVehicleOwnersProcessor;
-import ro.axonsoft.internship172.api.VehicleOwnersProcessor;
 import ro.axonsoft.internship172.impl.RoIdCardParserImpl;
 import ro.axonsoft.internship172.impl.RoIdCardSeriesJudMapperImpl;
 import ro.axonsoft.internship172.impl.RoRegPlateParserImpl;
 import ro.axonsoft.internship172.impl.StreamVehicleOwnersProcessorImpl;
 import ro.axonsoft.internship172.impl.VehicleOwnersProcessorImpl;
+import ro.axonsoft.internship172.model.api.StreamVehicleOwnersProcessor;
+import ro.axonsoft.internship172.model.api.VehicleOwnersProcessor;
 
 public class Application {
 

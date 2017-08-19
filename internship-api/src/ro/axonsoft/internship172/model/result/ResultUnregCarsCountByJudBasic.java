@@ -8,7 +8,7 @@ import org.immutables.value.Value;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
-import ro.axonsoft.internship172.api.Judet;
+import ro.axonsoft.internship172.model.api.Judet;
 
 @Value.Modifiable
 @Value.Immutable

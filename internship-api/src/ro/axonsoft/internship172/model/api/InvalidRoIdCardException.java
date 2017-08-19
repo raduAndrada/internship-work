@@ -1,4 +1,4 @@
-package ro.axonsoft.internship172.api;
+package ro.axonsoft.internship172.model.api;
 
 /**
  * Clasa care defineste exceptiile aparute daca id cardului de identitate este

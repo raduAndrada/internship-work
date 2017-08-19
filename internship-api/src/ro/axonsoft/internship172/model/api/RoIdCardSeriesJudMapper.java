@@ -1,4 +1,4 @@
-package ro.axonsoft.internship172.api;
+package ro.axonsoft.internship172.model.api;
 
 /**
  * Interfata folosita la maparea unei carti de identitate pe un judet

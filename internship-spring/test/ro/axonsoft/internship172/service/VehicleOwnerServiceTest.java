@@ -25,8 +25,8 @@ import com.google.common.collect.Lists;
 
 import ro.axonsoft.internship172.data.domain.VehicleOwner;
 import ro.axonsoft.internship172.data.services.VehicleOwnerService;
-import ro.axonsoft.internship172.model.base.Batch;
-import ro.axonsoft.internship172.model.base.MdfBatch;
+import ro.axonsoft.internship172.model.base.MdfResultBatch;
+import ro.axonsoft.internship172.model.base.ResultBatch;
 import ro.axonsoft.internship172.spring.SpringLevelApplication;
 
 @RunWith(SpringRunner.class)
@@ -56,7 +56,7 @@ public class VehicleOwnerServiceTest {
 	@Test
 	@DatabaseSetup("VehicleOwnerServiceTest-i01.xml")
 	public void insertBatchTest() {
-		final Batch theBatch = MdfBatch.create();
+		final ResultBatch theBatch = MdfResultBatch.create();
 		service.insertBatch(theBatch);
 		assertThat(theBatch).isNotNull();
 		assertThat(theBatch.getBatchId()).isNotNull();
@@ -65,7 +65,7 @@ public class VehicleOwnerServiceTest {
 	@Test
 	@DatabaseSetup("VehicleOwnerServiceTest-i01.xml")
 	public void selectLastBatchTest() {
-		final Batch theBatch = MdfBatch.create(service.selectLastBatch());
+		final ResultBatch theBatch = MdfResultBatch.create(service.selectLastBatch());
 		assertThat(theBatch).isNotNull();
 		assertThat(theBatch.getBatchId()).isNotNull();
 	}
@@ -73,7 +73,7 @@ public class VehicleOwnerServiceTest {
 	@Test
 	@DatabaseSetup("VehicleOwnerServiceTest-i01.xml")
 	public void selectAllBatchesTest() {
-		final List<Batch> theBatches = Lists.newArrayList(service.selectAllBatches());
+		final List<ResultBatch> theBatches = Lists.newArrayList(service.selectAllBatches());
 		assertThat(theBatches).isNotNull();
 
 	}

@@ -16,8 +16,8 @@ import com.github.springtestdbunit.assertion.DatabaseAssertionMode;
 import ro.axonsoft.internship172.business.api.vehicleOwner.VehicleOwnerBusiness;
 import ro.axonsoft.internship172.data.tests.RecrutareBusinessTests;
 import ro.axonsoft.internship172.data.tests.TestDbUtil;
-import ro.axonsoft.internship172.model.base.ImtBatch;
 import ro.axonsoft.internship172.model.base.ImtPagination;
+import ro.axonsoft.internship172.model.base.ImtResultBatch;
 import ro.axonsoft.internship172.model.base.SortDirection;
 import ro.axonsoft.internship172.model.batch.BatchCreateResult;
 import ro.axonsoft.internship172.model.batch.BatchGetResult;
@@ -58,48 +58,40 @@ public class VehicleOwnerBusinessTests extends RecrutareBusinessTests {
 	@DatabaseSetup(value = "VehicleOwnerBusinessTests-01-i.xml", type = DatabaseOperation.TRUNCATE_TABLE)
 	@ExpectedDatabase(value = "VehicleOwnerBusinessTests-01-e.xml", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
 	public void testCreateUserOnEmptyDatabase() throws Exception {
-		dbUtil.setIdentity(VHO_TN, VHO_ID_CLM_NAME, 6);
-		pushInstant(Instant.parse("2017-08-03T11:41:00.00Z"));
-		final VehicleOwnerCreateResult vhoCreateResult = vhoBusiness.createVehicleOwner(ImtVehicleOwnerCreate.builder()
-				.basic(ImtVehicleOwnerBasic.builder().regPlate("CJ84ADC").roIdCard("KX636141")
-						.issueDate(Instant.parse("2017-08-02T11:47:00.00Z")).comentariu("000").build())
-				.batch(ImtBatch.builder().batchId(0L).build()).build());
-		assertThat(vhoCreateResult)
-				.isEqualTo(ImtVehicleOwnerCreateResult.builder()
-						.basic(ImtVehicleOwnerBasic.builder().regPlate("CJ84ADC").roIdCard("KX636141")
-								.issueDate(Instant.parse("2017-08-02T11:47:00.00Z")).comentariu("000").build())
-						.build());
 		dbUtil.setIdentity(BATCH_TN, BATCH_ID_CLM_NAME, 6);
 		final BatchCreateResult batchCreateResult = vhoBusiness
-				.createBatch(ImtBatchCreate.builder().batch(ImtBatch.builder().build()).build());
+				.createBatch(ImtBatchCreate.builder().batch(ImtResultBatch.builder().build()).build());
 
 		assertThat(batchCreateResult)
-				.isEqualTo(ImtBatchCreateResult.builder().batch(ImtBatch.builder().build()).build());
+				.isEqualTo(ImtBatchCreateResult.builder().batch(ImtResultBatch.builder().build()).build());
 
 		final BatchGetResult batchGetResult = vhoBusiness.getBatches(ImtBatchGet.builder()
 				.addSort(ImtBatchSortCriterion.of(BatchSortCriterionType.BATCH_ID, SortDirection.DESC)).batchId(6L)
 				.pagination(ImtPagination.of(1, 1)).build());
 		assertThat(batchGetResult).isEqualTo(
-				ImtBatchGetResult.builder().count(1).addList(ImtBatch.builder().batchId(6L).build()).pageCount(1)
+				ImtBatchGetResult.builder().count(1).addList(ImtResultBatch.builder().batchId(6L).build()).pageCount(1)
 						.pagination(ImtPagination.builder().page(1).pageSize(1).offset(0L).build()).build());
 
-	}
-
-	@Test
-	@DatabaseSetup(value = "VehicleOwnerBusinessTests-02-i.xml", type = DatabaseOperation.TRUNCATE_TABLE)
-	@ExpectedDatabase(value = "VehicleOwnerBusinessTests-02-i.xml", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
-	public void testDeleteVehicleOwner() throws Exception {
 		dbUtil.setIdentity(VHO_TN, VHO_ID_CLM_NAME, 6);
 		pushInstant(Instant.parse("2017-08-03T11:41:00.00Z"));
 		final VehicleOwnerCreateResult vhoCreateResult = vhoBusiness.createVehicleOwner(ImtVehicleOwnerCreate.builder()
 				.basic(ImtVehicleOwnerBasic.builder().regPlate("CJ84ADC").roIdCard("KX636141")
 						.issueDate(Instant.parse("2017-08-02T11:47:00.00Z")).comentariu("000").build())
-				.batch(ImtBatch.builder().batchId(0L).build()).build());
+				.batch(ImtResultBatch.builder().batchId(6L).build()).build());
 		assertThat(vhoCreateResult)
 				.isEqualTo(ImtVehicleOwnerCreateResult.builder()
 						.basic(ImtVehicleOwnerBasic.builder().regPlate("CJ84ADC").roIdCard("KX636141")
 								.issueDate(Instant.parse("2017-08-02T11:47:00.00Z")).comentariu("000").build())
 						.build());
+
+	}
+
+	@Test
+	@DatabaseSetup(value = "VehicleOwnerBusinessTests-02-i.xml")
+	@ExpectedDatabase(value = "VehicleOwnerBusinessTests-02-e.xml", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
+	public void testDeleteVehicleOwner() throws Exception {
+		dbUtil.setIdentity(VHO_TN, VHO_ID_CLM_NAME, 6);
+		pushInstant(Instant.parse("2017-08-03T11:41:00.00Z"));
 		final VehicleOwnerDeleteResult vhoDeleteResult = vhoBusiness.deleteVehicleOwner("KX636141");
 		assertThat(vhoDeleteResult)
 				.isEqualTo(ImtVehicleOwnerDeleteResult.builder()
@@ -109,31 +101,10 @@ public class VehicleOwnerBusinessTests extends RecrutareBusinessTests {
 	}
 
 	@Test
-	@DatabaseSetup(value = "VehicleOwnerBusinessTests-02-i.xml", type = DatabaseOperation.TRUNCATE_TABLE)
-	@ExpectedDatabase(value = "VehicleOwnerBusinessTests-02-e.xml", assertionMode = DatabaseAssertionMode.NON_STRICT_UNORDERED)
+	@DatabaseSetup(value = "VehicleOwnerBusinessTests-02-i.xml")
 	public void testGetVehicleOwnersAfter2Inserts() throws Exception {
 		dbUtil.setIdentity(VHO_TN, VHO_ID_CLM_NAME, 6);
 		pushInstant(Instant.parse("2017-08-03T11:41:00.00Z"));
-		final VehicleOwnerCreateResult vhoCreateResult = vhoBusiness.createVehicleOwner(ImtVehicleOwnerCreate.builder()
-				.basic(ImtVehicleOwnerBasic.builder().regPlate("CJ84ADC").roIdCard("KX636141")
-						.issueDate(Instant.parse("2017-08-02T11:47:00.00Z")).comentariu("000").build())
-				.batch(ImtBatch.builder().batchId(0L).build()).build());
-		assertThat(vhoCreateResult)
-				.isEqualTo(ImtVehicleOwnerCreateResult.builder()
-						.basic(ImtVehicleOwnerBasic.builder().regPlate("CJ84ADC").roIdCard("KX636141")
-								.issueDate(Instant.parse("2017-08-02T11:47:00.00Z")).comentariu("000").build())
-						.build());
-
-		final VehicleOwnerCreateResult vhoCreateResult0 = vhoBusiness.createVehicleOwner(ImtVehicleOwnerCreate.builder()
-				.basic(ImtVehicleOwnerBasic.builder().regPlate("CJ84ADD").roIdCard("KX636142")
-						.issueDate(Instant.parse("2017-08-02T11:47:00.00Z")).comentariu("000").build())
-				.batch(ImtBatch.builder().batchId(0L).build()).build());
-		assertThat(vhoCreateResult0)
-				.isEqualTo(ImtVehicleOwnerCreateResult.builder()
-						.basic(ImtVehicleOwnerBasic.builder().regPlate("CJ84ADD").roIdCard("KX636142")
-								.issueDate(Instant.parse("2017-08-02T11:47:00.00Z")).comentariu("000").build())
-						.build());
-
 		final VehicleOwnerGetResult vhoGetResult = vhoBusiness.getVehicleOwners(ImtVehicleOwnerGet.builder()
 				.addSort(ImtVehicleOwnerSortCriterion.builder().criterion(VehicleOwnerSortCriterionType.RO_ID_CARD)
 						.direction(SortDirection.ASC).build())
@@ -143,7 +114,7 @@ public class VehicleOwnerBusinessTests extends RecrutareBusinessTests {
 				.addList(ImtVehicleOwnerBasicRecord.builder()
 						.basic(ImtVehicleOwnerBasic.builder().comentariu("000").roIdCard("KX636142").regPlate("CJ84ADD")
 								.issueDate(Instant.parse("2017-08-02T11:47:00.00Z")).build())
-						.batch(ImtBatch.builder().batchId(0L).build()).build())
+						.batch(ImtResultBatch.builder().batchId(0L).build()).build())
 				.build());
 
 	}

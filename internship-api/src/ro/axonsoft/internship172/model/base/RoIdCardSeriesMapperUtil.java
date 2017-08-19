@@ -1,4 +1,4 @@
-package ro.axonsoft.internship.impl;
+package ro.axonsoft.internship172.model.base;
 
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;

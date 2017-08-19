@@ -22,12 +22,12 @@ import com.github.springtestdbunit.annotation.DbUnitConfiguration;
 import com.github.springtestdbunit.dataset.ReplacementDataSetLoader;
 import com.google.common.collect.ImmutableList;
 
-import ro.axonsoft.internship172.api.Judet;
 import ro.axonsoft.internship172.data.domain.ImtResultMetrics;
 import ro.axonsoft.internship172.data.domain.ImtResultUnregCarsCountByJud;
 import ro.axonsoft.internship172.data.domain.ResultMetrics;
 import ro.axonsoft.internship172.data.impl.ResultServiceImpl;
 import ro.axonsoft.internship172.data.mappers.ImtResultUnregCarsCriteria;
+import ro.axonsoft.internship172.model.api.Judet;
 import ro.axonsoft.internship172.spring.SpringLevelApplication;
 
 @RunWith(SpringRunner.class)

@@ -13,13 +13,13 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 
-import ro.axonsoft.internship172.api.InvalidRoIdCardException;
-import ro.axonsoft.internship172.api.InvalidRoIdCardSeriesException;
-import ro.axonsoft.internship172.api.Judet;
-import ro.axonsoft.internship172.api.RoIdCardParser;
-import ro.axonsoft.internship172.api.RoIdCardProperties;
-import ro.axonsoft.internship172.api.RoIdCardSeriesJudMapper;
 import ro.axonsoft.internship172.impl.RoIdCardParserImpl;
+import ro.axonsoft.internship172.model.api.InvalidRoIdCardException;
+import ro.axonsoft.internship172.model.api.InvalidRoIdCardSeriesException;
+import ro.axonsoft.internship172.model.api.Judet;
+import ro.axonsoft.internship172.model.api.RoIdCardParser;
+import ro.axonsoft.internship172.model.api.RoIdCardProperties;
+import ro.axonsoft.internship172.model.api.RoIdCardSeriesJudMapper;
 
 @RunWith(EasyMockRunner.class)
 public class RoIdCardParserTest {

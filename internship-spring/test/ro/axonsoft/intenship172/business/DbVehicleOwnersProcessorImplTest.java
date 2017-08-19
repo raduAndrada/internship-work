@@ -24,14 +24,14 @@ import com.github.springtestdbunit.dataset.ReplacementDataSetLoader;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 
-import ro.axonsoft.internship172.api.DbVehicleOwnersProcessor;
-import ro.axonsoft.internship172.api.Judet;
 import ro.axonsoft.internship172.data.domain.ImtResultError;
 import ro.axonsoft.internship172.data.domain.ImtResultUnregCarsCountByJud;
 import ro.axonsoft.internship172.data.domain.ResultError;
 import ro.axonsoft.internship172.data.domain.ResultMetrics;
 import ro.axonsoft.internship172.data.domain.ResultUnregCarsCountByJud;
 import ro.axonsoft.internship172.data.services.ResultService;
+import ro.axonsoft.internship172.model.api.DbVehicleOwnersProcessor;
+import ro.axonsoft.internship172.model.api.Judet;
 import ro.axonsoft.internship172.spring.SpringLevelApplication;
 
 @RunWith(SpringRunner.class)

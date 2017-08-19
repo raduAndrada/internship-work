@@ -18,9 +18,9 @@ import com.google.common.collect.ImmutableList;
 import ro.axonsoft.internship172.data.api.batch.ImtBatchEntityGet;
 import ro.axonsoft.internship172.data.tests.RecrutareDataTests;
 import ro.axonsoft.internship172.data.tests.TestDbUtil;
-import ro.axonsoft.internship172.model.base.Batch;
 import ro.axonsoft.internship172.model.base.ImtPagination;
-import ro.axonsoft.internship172.model.base.MdfBatch;
+import ro.axonsoft.internship172.model.base.MdfResultBatch;
+import ro.axonsoft.internship172.model.base.ResultBatch;
 import ro.axonsoft.internship172.model.base.SortDirection;
 import ro.axonsoft.internship172.model.batch.BatchSortCriterionType;
 import ro.axonsoft.internship172.model.batch.ImtBatchSortCriterion;
@@ -36,17 +36,17 @@ public class VehicleOwnerDaoTests extends RecrutareDataTests {
 					.setBasic(MdfVehicleOwnerBasic.create().setRoIdCard("KX636141")
 							.setIssueDate(Instant.parse("2017-08-02T11:47:00.00Z")).setRegPlate("CJ84ADC")
 							.setComentariu("000"))
-					.setBatch(MdfBatch.create().setBatchId(0L)));
+					.setBatch(MdfResultBatch.create().setBatchId(0L)));
 
 	private static final VehicleOwnerEntity VHO2 = MdfVehicleOwnerEntity.create().setVehicleOwnerId(1L)
 			.setRecord(MdfVehicleOwnerBasicRecord.create()
 					.setBasic(MdfVehicleOwnerBasic.create().setRoIdCard("KX636142").setComentariu("000")
 							.setIssueDate(Instant.parse("2017-08-02T11:47:00.00Z")).setRegPlate("CJ84ADD"))
-					.setBatch(MdfBatch.create().setBatchId(0L)));
+					.setBatch(MdfResultBatch.create().setBatchId(0L)));
 
-	private static final Batch BATCH1 = MdfBatch.create().setBatchId(6L);
-	private static final Batch BATCH2 = MdfBatch.create().setBatchId(7L);
-	private static final Batch BATCH3 = MdfBatch.create().setBatchId(8L);
+	private static final ResultBatch BATCH1 = MdfResultBatch.create().setBatchId(6L);
+	private static final ResultBatch BATCH2 = MdfResultBatch.create().setBatchId(7L);
+	private static final ResultBatch BATCH3 = MdfResultBatch.create().setBatchId(8L);
 
 	static {
 		TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
@@ -66,7 +66,7 @@ public class VehicleOwnerDaoTests extends RecrutareDataTests {
 		vehicleOwnerDao.addVehicleOwner(MdfVehicleOwnerEntity.create().from(VHO1).setVehicleOwnerId(null));
 		vehicleOwnerDao.addVehicleOwner(MdfVehicleOwnerEntity.create().from(VHO2).setVehicleOwnerId(null));
 		dbUtil.setIdentity("BATCH", "BATCH_ID", 9);
-		vehicleOwnerDao.addBatch(MdfBatch.create().from(BATCH1));
+		vehicleOwnerDao.addBatch(MdfResultBatch.create().from(BATCH1));
 
 	}
 

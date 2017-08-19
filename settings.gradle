@@ -1,5 +1,5 @@
 rootProject.name = 'internship'
-include 'internship-api'
+include 'internship-model'
 include 'internship-impl'
 include 'internship-app'
 include 'internship-spring'

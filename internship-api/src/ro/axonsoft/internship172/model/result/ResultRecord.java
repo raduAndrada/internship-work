@@ -8,7 +8,7 @@ import org.immutables.value.Value;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
-import ro.axonsoft.internship172.model.base.Batch;
+import ro.axonsoft.internship172.model.base.ResultBatch;
 
 @Value.Immutable
 @Value.Modifiable
@@ -21,5 +21,5 @@ public interface ResultRecord {
 	ResultBasic getBasic();
 
 	@Nullable
-	Batch getBatch();
+	ResultBatch getBatch();
 }

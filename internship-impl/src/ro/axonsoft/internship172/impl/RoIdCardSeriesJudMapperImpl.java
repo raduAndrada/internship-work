@@ -8,9 +8,9 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSortedMap;
 import com.google.common.collect.Multimap;
 
-import ro.axonsoft.internship172.api.InvalidRoIdCardSeriesException;
-import ro.axonsoft.internship172.api.Judet;
-import ro.axonsoft.internship172.api.RoIdCardSeriesJudMapper;
+import ro.axonsoft.internship172.model.api.InvalidRoIdCardSeriesException;
+import ro.axonsoft.internship172.model.api.Judet;
+import ro.axonsoft.internship172.model.api.RoIdCardSeriesJudMapper;
 /**
  * Maparea unui string pe un judet
  *

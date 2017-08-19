@@ -4,9 +4,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.Test;
 
-import ro.axonsoft.internship172.api.InvalidRoRegPlateException;
-import ro.axonsoft.internship172.api.Judet;
 import ro.axonsoft.internship172.impl.RoRegPlateParserImpl;
+import ro.axonsoft.internship172.model.api.InvalidRoRegPlateException;
+import ro.axonsoft.internship172.model.api.Judet;
 
 public class RoRegPlateParserImplTest {
 

@@ -10,12 +10,6 @@ import org.springframework.context.annotation.Configuration;
 
 import com.google.common.collect.Multimap;
 
-import ro.axonsoft.internship172.api.DbVehicleOwnersProcessor;
-import ro.axonsoft.internship172.api.RoIdCardParser;
-import ro.axonsoft.internship172.api.RoIdCardSeriesJudMapper;
-import ro.axonsoft.internship172.api.RoRegPlateParser;
-import ro.axonsoft.internship172.api.StreamVehicleOwnersProcessor;
-import ro.axonsoft.internship172.api.VehicleOwnersProcessor;
 import ro.axonsoft.internship172.data.impl.DbVehicleOwnersProcessorImpl;
 import ro.axonsoft.internship172.data.impl.ResultServiceImpl;
 import ro.axonsoft.internship172.data.impl.VehicleOwnerServiceImpl;
@@ -26,6 +20,12 @@ import ro.axonsoft.internship172.impl.RoIdCardSeriesJudMapperImpl;
 import ro.axonsoft.internship172.impl.RoRegPlateParserImpl;
 import ro.axonsoft.internship172.impl.StreamVehicleOwnersProcessorImpl;
 import ro.axonsoft.internship172.impl.VehicleOwnersProcessorImpl;
+import ro.axonsoft.internship172.model.api.DbVehicleOwnersProcessor;
+import ro.axonsoft.internship172.model.api.RoIdCardParser;
+import ro.axonsoft.internship172.model.api.RoIdCardSeriesJudMapper;
+import ro.axonsoft.internship172.model.api.RoRegPlateParser;
+import ro.axonsoft.internship172.model.api.StreamVehicleOwnersProcessor;
+import ro.axonsoft.internship172.model.api.VehicleOwnersProcessor;
 
 /**
  * Clasa de configurare pentru nivelul de business al aplicatiei

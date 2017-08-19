@@ -6,7 +6,7 @@ import org.immutables.serial.Serial;
 import org.immutables.value.Value;
 import org.immutables.value.Value.Parameter;
 
-import ro.axonsoft.internship172.api.Judet;
+import ro.axonsoft.internship172.model.api.Judet;
 
 /**
  * Clasa model pentru tabela de UNREG_CARS_COUNT_BY_JUD

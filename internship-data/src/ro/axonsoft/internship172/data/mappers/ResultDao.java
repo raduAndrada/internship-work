@@ -5,7 +5,7 @@ import java.util.List;
 import ro.axonsoft.internship172.data.domain.ResultError;
 import ro.axonsoft.internship172.data.domain.ResultMetrics;
 import ro.axonsoft.internship172.data.domain.ResultUnregCarsCountByJud;
-import ro.axonsoft.internship172.model.base.Batch;
+import ro.axonsoft.internship172.model.base.ResultBatch;
 
 /**
  * Mapper pentru trabela de metrice de rezultate
@@ -124,7 +124,7 @@ public interface ResultDao {
 	 *            identificatorul batch-ului
 	 * @return obiectul cu id-ul selectat
 	 */
-	public Batch selectBatchById(Long id);
+	public ResultBatch selectBatchById(Long id);
 
 	/**
 	 * Stergere metrice dupa id

@@ -21,4 +21,8 @@ public interface ResultMetricsDao {
 	Integer countResult(ResultEntityCount count);
 
 	List<ResultEntity> getResult(ResultEntityGet get);
+
+	int deleteResultError(ResultErrorEntityDelete delete);
+
+	int deleteResultUnregCarsCountByJud(ResultUnregCarsCountByJudEntityDelete delete);
 }

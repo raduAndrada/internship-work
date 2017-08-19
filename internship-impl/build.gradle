@@ -1,5 +1,5 @@
 dependencies {
 
-   	compile project(":internship-api")
+   	compile project(":internship-model")
  
 }

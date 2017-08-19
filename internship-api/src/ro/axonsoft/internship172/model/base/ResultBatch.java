@@ -16,9 +16,9 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 @Value.Immutable
 @Value.Modifiable
 @Serial.Version(1)
-@JsonSerialize(as = MdfBatch.class)
-@JsonDeserialize(as = MdfBatch.class)
-public interface Batch {
+@JsonSerialize(as = MdfResultBatch.class)
+@JsonDeserialize(as = MdfResultBatch.class)
+public interface ResultBatch {
 
 	@Value.Parameter
 	@Nullable

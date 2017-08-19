@@ -1,4 +1,4 @@
-package ro.axonsoft.internship172.api;
+package ro.axonsoft.internship172.model.api;
 /**
  * Interfata de parsarea a unei carti de identitate
  * @author intern

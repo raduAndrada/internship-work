@@ -24,17 +24,23 @@ import ro.axonsoft.internship172.data.api.vehicleOwner.VehicleOwnerEntityCount;
 import ro.axonsoft.internship172.data.api.vehicleOwner.VehicleOwnerEntityDelete;
 import ro.axonsoft.internship172.data.api.vehicleOwner.VehicleOwnerEntityGet;
 import ro.axonsoft.internship172.data.api.vehicleOwner.VehicleOwnerEntityUpdate;
-import ro.axonsoft.internship172.model.base.Batch;
-import ro.axonsoft.internship172.model.base.ImtBatch;
-import ro.axonsoft.internship172.model.base.MdfBatch;
+import ro.axonsoft.internship172.model.api.RoIdCardParser;
+import ro.axonsoft.internship172.model.base.ImtResultBatch;
+import ro.axonsoft.internship172.model.base.MdfResultBatch;
 import ro.axonsoft.internship172.model.base.Pagination;
+import ro.axonsoft.internship172.model.base.ResultBatch;
+import ro.axonsoft.internship172.model.base.SortDirection;
 import ro.axonsoft.internship172.model.batch.BatchCreate;
 import ro.axonsoft.internship172.model.batch.BatchCreateResult;
 import ro.axonsoft.internship172.model.batch.BatchGet;
 import ro.axonsoft.internship172.model.batch.BatchGetResult;
+import ro.axonsoft.internship172.model.batch.BatchSortCriterionType;
+import ro.axonsoft.internship172.model.batch.ImtBatchCreate;
 import ro.axonsoft.internship172.model.batch.ImtBatchCreateResult;
 import ro.axonsoft.internship172.model.batch.ImtBatchGetResult;
+import ro.axonsoft.internship172.model.batch.ImtBatchSortCriterion;
 import ro.axonsoft.internship172.model.error.BusinessException;
+import ro.axonsoft.internship172.model.error.ErrorPropertiesBuilder;
 import ro.axonsoft.internship172.model.vehicleOwner.ImtVehicleOwnerBasic;
 import ro.axonsoft.internship172.model.vehicleOwner.ImtVehicleOwnerBasicRecord;
 import ro.axonsoft.internship172.model.vehicleOwner.ImtVehicleOwnerCreateResult;
@@ -44,6 +50,8 @@ import ro.axonsoft.internship172.model.vehicleOwner.ImtVehicleOwnerUpdatePropert
 import ro.axonsoft.internship172.model.vehicleOwner.ImtVehicleOwnerUpdateResult;
 import ro.axonsoft.internship172.model.vehicleOwner.MdfVehicleOwnerBasic;
 import ro.axonsoft.internship172.model.vehicleOwner.MdfVehicleOwnerBasicRecord;
+import ro.axonsoft.internship172.model.vehicleOwner.RoIdCardInvalidErrorSpec;
+import ro.axonsoft.internship172.model.vehicleOwner.RoIdCardTakenErrorSpec;
 import ro.axonsoft.internship172.model.vehicleOwner.VehicleOwnerBasic;
 import ro.axonsoft.internship172.model.vehicleOwner.VehicleOwnerBasicRecord;
 import ro.axonsoft.internship172.model.vehicleOwner.VehicleOwnerCreate;
@@ -63,25 +71,70 @@ public class VehicleOwnerBusinessImpl implements VehicleOwnerBusiness {
 		this.vehicleOwnerDao = vehicleOwnerDao;
 	}
 
+	RoIdCardParser roIdCardParser;
+
+	@Inject
+	public void setRoIdCardParser(final RoIdCardParser roIdCardParser) {
+		this.roIdCardParser = roIdCardParser;
+	}
+
 	@Override
 	public VehicleOwnerCreateResult createVehicleOwner(VehicleOwnerCreate vhoCreate) throws BusinessException {
 		final VehicleOwnerEntity vhoEntity = buildVehicleOwnerEntityForCreate(vhoCreate);
 		if (!checkRoIdCard(vhoEntity)) {
-			throw new BusinessException("Id card already exists!", null);
+			throw new BusinessException("Id card exists!",
+					ErrorPropertiesBuilder.of(RoIdCardTakenErrorSpec.RO_ID_CARD_TAKEN)
+							.var(RoIdCardTakenErrorSpec.Var.RO_ID_CARD, vhoEntity.getRecord().getBasic().getRoIdCard())
+							.build());
 		}
+
+		if (!checkParseRoIdCard(vhoEntity)) {
+			throw new BusinessException("Id card is not valid!",
+					ErrorPropertiesBuilder.of(RoIdCardInvalidErrorSpec.RO_ID_CARD_INVALID)
+							.var(RoIdCardInvalidErrorSpec.Var.RO_ID_CARD_INVALID,
+									vhoEntity.getRecord().getBasic().getRoIdCard())
+							.build());
+		}
+
+		if (!checkBatchExists(vhoEntity)) {
+			final ResultBatch batchEntity = buildBatchForCreate(
+					ImtBatchCreate.builder().batch(ImtResultBatch.builder().build()).build());
+			vehicleOwnerDao.addBatch(batchEntity);
+		}
+
 		vehicleOwnerDao.addVehicleOwner(vhoEntity);
 		return ImtVehicleOwnerCreateResult.builder()
 				.basic(ImtVehicleOwnerBasic.copyOf(vhoEntity.getRecord().getBasic())).build();
 	}
 
+	private boolean checkBatchExists(VehicleOwnerEntity vhoEntity) {
+
+		return vehicleOwnerDao
+				.getBatch(ImtBatchEntityGet.builder()
+						.addSort(ImtBatchSortCriterion.of(BatchSortCriterionType.BATCH_ID, SortDirection.DESC))
+						.criteria(ImtBatchEntityCriteria.builder()
+								.addIdBatchSelect(vhoEntity.getRecord().getBatch().getBatchId()).build())
+						.build())
+				.size() > 0;
+	}
+
+	private boolean checkParseRoIdCard(VehicleOwnerEntity vhoEntity) {
+		try {
+			roIdCardParser.parseIdCard(vhoEntity.getRecord().getBasic().getRoIdCard());
+		} catch (final Exception e) {
+			return false;
+		}
+		return true;
+	}
+
 	@Override
 	public BatchCreateResult createBatch(BatchCreate batchCreate) throws BusinessException {
-		final Batch batchEntity = buildBatchForCreate(batchCreate);
-		if (batchCreate.getBatch().getBatchId() != null) {
+		final ResultBatch batchEntity = buildBatchForCreate(batchCreate);
+		if (batchEntity.getBatchId() != null) {
 			throw new BusinessException("Batch id must be null", null);
 		}
 		vehicleOwnerDao.addBatch(batchEntity);
-		return ImtBatchCreateResult.builder().batch(ImtBatch.copyOf(batchEntity)).build();
+		return ImtBatchCreateResult.builder().batch(ImtResultBatch.copyOf(batchEntity)).build();
 	}
 
 	@Override
@@ -135,7 +188,7 @@ public class VehicleOwnerBusinessImpl implements VehicleOwnerBusiness {
 		final BatchEntityGet batchEntityGet = buildBatchEntityGet(batchGet);
 		final BatchEntityCount batchEntityCount = buildBatchEntityCount(batchGet);
 		final int count = vehicleOwnerDao.countBatch(batchEntityCount);
-		final List<Batch> batches = vehicleOwnerDao.getBatch(batchEntityGet);
+		final List<ResultBatch> batches = vehicleOwnerDao.getBatch(batchEntityGet);
 		return ImtBatchGetResult.builder().list(batches).count(count).pagination(batchGet.getPagination())
 				.pageCount(getPageCount(count, batchGet.getPagination())).build();
 	}
@@ -198,9 +251,8 @@ public class VehicleOwnerBusinessImpl implements VehicleOwnerBusiness {
 		return vhoEntity;
 	}
 
-	private Batch buildBatchForCreate(final BatchCreate batchCreate) {
-		final Batch batchEntity = MdfBatch.create().setBatchId(batchCreate.getBatch().getBatchId());
-		;
+	private ResultBatch buildBatchForCreate(final BatchCreate batchCreate) {
+		final ResultBatch batchEntity = MdfResultBatch.create().setBatchId(null);
 		return batchEntity;
 	}
 

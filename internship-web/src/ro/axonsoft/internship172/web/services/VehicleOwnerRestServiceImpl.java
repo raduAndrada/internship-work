@@ -9,7 +9,7 @@ import ro.axonsoft.internship172.data.exceptions.DatabaseIntegrityViolationExcep
 import ro.axonsoft.internship172.data.exceptions.InvalidDatabaseAccessException;
 import ro.axonsoft.internship172.data.mappers.PageCriteria;
 import ro.axonsoft.internship172.data.services.VehicleOwnerService;
-import ro.axonsoft.internship172.model.base.Batch;
+import ro.axonsoft.internship172.model.base.ResultBatch;
 
 public class VehicleOwnerRestServiceImpl implements VehicleOwnerRestService
 {
@@ -44,7 +44,7 @@ public class VehicleOwnerRestServiceImpl implements VehicleOwnerRestService
     }
 
     @Override
-    public void insertBatch(final Batch batch) {
+    public void insertBatch(final ResultBatch batch) {
         vehicleOwnerService.insertBatch(batch);
 
     }
@@ -55,7 +55,7 @@ public class VehicleOwnerRestServiceImpl implements VehicleOwnerRestService
     }
 
     @Override
-    public Iterable<Batch> selectAllBatches() {
+    public Iterable<ResultBatch> selectAllBatches() {
         return vehicleOwnerService.selectAllBatches();
     }
 
@@ -65,7 +65,7 @@ public class VehicleOwnerRestServiceImpl implements VehicleOwnerRestService
     }
 
     @Override
-    public Batch selectBatchById(final Long id) throws InvalidDatabaseAccessException {
+    public ResultBatch selectBatchById(final Long id) throws InvalidDatabaseAccessException {
         return vehicleOwnerService.selectBatchById(id);
     }
 
@@ -86,7 +86,7 @@ public class VehicleOwnerRestServiceImpl implements VehicleOwnerRestService
     }
 
     @Override
-    public List<Batch> getBatchPage(final PageCriteria pageCriteria) {
+    public List<ResultBatch> getBatchPage(final PageCriteria pageCriteria) {
         return vehicleOwnerService.getBatchPage(pageCriteria);
     }
 

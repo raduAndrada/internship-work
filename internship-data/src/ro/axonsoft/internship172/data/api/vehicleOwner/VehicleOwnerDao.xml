@@ -16,7 +16,7 @@
 				<result column="COMENTARIU" property="comentariu" />
 			</association>
 			<association property="batch" javaType="MdfBatch">
-				<result column="BATCH_ID" property="batchId" />
+				<id column="BATCH_ID" property="batchId" />
 			</association>
 		</association>
 	</resultMap>

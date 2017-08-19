@@ -3,7 +3,7 @@ package ro.axonsoft.internship172.data.mappers;
 import java.util.List;
 
 import ro.axonsoft.internship172.data.domain.VehicleOwner;
-import ro.axonsoft.internship172.model.base.Batch;
+import ro.axonsoft.internship172.model.base.ResultBatch;
 
 /**
  * mapper pentru tabela din baza de date
@@ -37,7 +37,7 @@ public interface VehicleOwnersDao {
 	 *            criteriu de selectie
 	 * @return lista cu batch-uri
 	 */
-	public List<Batch> getBatchPage(PageCriteria pageCriteria);
+	public List<ResultBatch> getBatchPage(PageCriteria pageCriteria);
 
 	/**
 	 * Inserarea unei noi inregistrari
@@ -68,7 +68,7 @@ public interface VehicleOwnersDao {
 	/**
 	 * Metoda de inserare in tabela de batch
 	 */
-	public void insertBatch(Batch batch);
+	public void insertBatch(ResultBatch batch);
 
 	/**
 	 * Selecteaza ultimul id de batch
@@ -82,7 +82,7 @@ public interface VehicleOwnersDao {
 	 * 
 	 * @return
 	 */
-	public List<Batch> selectAllBatches();
+	public List<ResultBatch> selectAllBatches();
 
 	/**
 	 * Selectie de vehicle owner in functie de cartea de identitate
@@ -99,7 +99,7 @@ public interface VehicleOwnersDao {
 	 * @param id identificator unic de cautare in tabela de batch
 	 * @return batch-ul cu id-ul din parametru
 	 */
-	public Batch selectBatchById(Long id);
+	public ResultBatch selectBatchById(Long id);
 
 	/**
 	 * Stergere vehicle owner dupa id

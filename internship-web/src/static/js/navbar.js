@@ -10,7 +10,6 @@ window.onload = function() {
 		if (liNodes[i].id === path){
 			console.log(liNodes[i]);
 			liNodes[i].className += " active-page";
-			liNodes[i].style.color ="Black;";
 		}
 	};
 };

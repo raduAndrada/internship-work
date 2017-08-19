@@ -20,9 +20,9 @@ import org.springframework.web.client.RestTemplate;
 
 import com.google.common.collect.Lists;
 
-import ro.axonsoft.internship172.api.InvalidRoIdCardException;
 import ro.axonsoft.internship172.data.domain.MdfVehicleOwner;
-import ro.axonsoft.internship172.model.base.MdfBatch;
+import ro.axonsoft.internship172.model.api.InvalidRoIdCardException;
+import ro.axonsoft.internship172.model.base.MdfResultBatch;
 
 /**
  * Controller pentru afisarea si interogarea tabelei de intrare
@@ -84,27 +84,11 @@ public class VehicleOwnerController {
 			vehicleOwner.setRoIdCard("Invalid Id Card");
 			return "vehicleOwner";
 		}
+
 		String uri = LOCAL_SERVER;
-		uri += "rest/v1/vehicleOwners/test/";
-		uri += roIdCard;
-		uri += "/";
-		uri += vehicleOwner.getBatchId();
+		uri += "rest/v1/vehicleOwners/insertVehicleOwner";
 
-		final ResponseEntity<Integer> response = restTemplate.getForEntity(uri, Integer.class);
-		final Integer ok = response.getBody();
-
-		if (ok == 0) {
-			uri = LOCAL_SERVER;
-			uri += "rest/v1/vehicleOwners/insertVehicleOwner";
-
-			restTemplate.postForEntity(uri, vehicleOwner, MdfVehicleOwner.class);
-		} else if (ok == -1) {
-			vehicleOwner.setRoIdCard("Invalid Id Card");
-			return "vehicleOwner";
-		} else {
-			vehicleOwner.setBatchId(1L);
-			return "vehicleOwner";
-		}
+		restTemplate.postForEntity(uri, vehicleOwner, MdfVehicleOwner.class);
 
 		return "vehicleOwnerInsertResult";
 	}
@@ -130,7 +114,7 @@ public class VehicleOwnerController {
 		uri += pageSize;
 		uri += "/";
 		uri += currentPage;
-		restTemplate.postForEntity(uri, MdfBatch.create(), MdfBatch.class);
+		restTemplate.postForEntity(uri, MdfResultBatch.create(), MdfResultBatch.class);
 
 		return getBatchListPage(model, currentPage, pageSize);
 	}
@@ -171,10 +155,10 @@ public class VehicleOwnerController {
 
 		String uri = LOCAL_SERVER;
 		uri += "rest/v1/vehicleOwners/getAllBatches";
-		final ResponseEntity<MdfBatch[]> batchResponse = restTemplate.getForEntity(uri, MdfBatch[].class);
+		final ResponseEntity<MdfResultBatch[]> batchResponse = restTemplate.getForEntity(uri, MdfResultBatch[].class);
 		LOG.info("Raspuns returnata" + batchResponse.toString());
-		final MdfBatch[] batchArray = batchResponse.getBody();
-		final List<MdfBatch> batchList = Arrays.asList(batchArray);
+		final MdfResultBatch[] batchArray = batchResponse.getBody();
+		final List<MdfResultBatch> batchList = Arrays.asList(batchArray);
 		LOG.info("Raspuns returnata" + batchList.toString());
 		model.addAttribute("batchList", batchList);
 
@@ -279,10 +263,10 @@ public class VehicleOwnerController {
 		uri += pageSize;
 		uri += "/";
 		uri += currentPage;
-		final ResponseEntity<MdfBatch[]> batchResponse = restTemplate.getForEntity(uri, MdfBatch[].class);
+		final ResponseEntity<MdfResultBatch[]> batchResponse = restTemplate.getForEntity(uri, MdfResultBatch[].class);
 		LOG.info("Raspuns returnat" + batchResponse.toString());
-		final MdfBatch[] batchArray = batchResponse.getBody();
-		final List<MdfBatch> batchList = Arrays.asList(batchArray);
+		final MdfResultBatch[] batchArray = batchResponse.getBody();
+		final List<MdfResultBatch> batchList = Arrays.asList(batchArray);
 		LOG.info("Raspuns returnat" + batchList.toString());
 		model.addAttribute("batchList", batchList);
 		model.addAttribute("pageSize", pageSize);

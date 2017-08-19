@@ -13,7 +13,7 @@ import ro.axonsoft.internship172.data.mappers.ImtVehicleOwnerCriteria;
 import ro.axonsoft.internship172.data.mappers.PageCriteria;
 import ro.axonsoft.internship172.data.mappers.VehicleOwnersDao;
 import ro.axonsoft.internship172.data.services.VehicleOwnerService;
-import ro.axonsoft.internship172.model.base.Batch;
+import ro.axonsoft.internship172.model.base.ResultBatch;
 
 /**
  * Serviciu pentru tabela de inregistrari de intrare aceleasi metode ca si
@@ -51,7 +51,7 @@ public class VehicleOwnerServiceImpl implements VehicleOwnerService {
     }
 
     @Override
-    public void insertBatch(final Batch batch) {
+    public void insertBatch(final ResultBatch batch) {
         vehicleOwnersDao.insertBatch(batch);
     }
 
@@ -90,7 +90,7 @@ public class VehicleOwnerServiceImpl implements VehicleOwnerService {
     }
 
     @Override
-    public Iterable<Batch> selectAllBatches() {
+    public Iterable<ResultBatch> selectAllBatches() {
         return vehicleOwnersDao.selectAllBatches();
     }
 
@@ -100,8 +100,8 @@ public class VehicleOwnerServiceImpl implements VehicleOwnerService {
     }
 
     @Override
-    public Batch selectBatchById(final Long id) throws InvalidDatabaseAccessException{
-        final Batch temp = vehicleOwnersDao.selectBatchById(id);
+    public ResultBatch selectBatchById(final Long id) throws InvalidDatabaseAccessException{
+        final ResultBatch temp = vehicleOwnersDao.selectBatchById(id);
         if (temp == null)
         {
             throw new InvalidDatabaseAccessException("Batch-ul specificat nu exista");
@@ -133,7 +133,7 @@ public class VehicleOwnerServiceImpl implements VehicleOwnerService {
     }
 
     @Override
-    public List<Batch> getBatchPage(final PageCriteria pageCriteria) {
+    public List<ResultBatch> getBatchPage(final PageCriteria pageCriteria) {
         return vehicleOwnersDao.getBatchPage(pageCriteria);
     }
 

@@ -6,7 +6,7 @@ import ro.axonsoft.internship172.data.domain.VehicleOwner;
 import ro.axonsoft.internship172.data.exceptions.DatabaseIntegrityViolationException;
 import ro.axonsoft.internship172.data.exceptions.InvalidDatabaseAccessException;
 import ro.axonsoft.internship172.data.mappers.PageCriteria;
-import ro.axonsoft.internship172.model.base.Batch;
+import ro.axonsoft.internship172.model.base.ResultBatch;
 
 public interface VehicleOwnerRestService {
 
@@ -47,7 +47,7 @@ public interface VehicleOwnerRestService {
         /**
          * Metoda de inserare in tabela de batch
          */
-        public void insertBatch(Batch batch);
+        public void insertBatch(ResultBatch batch);
 
         /**
          * Selecteaza ultimul id de batch
@@ -60,7 +60,7 @@ public interface VehicleOwnerRestService {
          *
          * @return toate batch-urile existente in tabela de BATCH
          */
-        public Iterable<Batch> selectAllBatches();
+        public Iterable<ResultBatch> selectAllBatches();
 
         /**
          * Selectarea unei liste de detinatori de permise in functie de cartea lor de identitate
@@ -69,7 +69,7 @@ public interface VehicleOwnerRestService {
          */
         public Iterable<VehicleOwner> selectVehicleOwnerByRoIdCard(String roIdCard);
 
-        public Batch selectBatchById(Long id) throws InvalidDatabaseAccessException;
+        public ResultBatch selectBatchById(Long id) throws InvalidDatabaseAccessException;
 
         public void deleteVehicleOwnerById(Long id) throws DatabaseIntegrityViolationException;
 
@@ -77,7 +77,7 @@ public interface VehicleOwnerRestService {
 
         public Integer countBatches();
 
-        public List<Batch> getBatchPage(PageCriteria pageCriteria);
+        public List<ResultBatch> getBatchPage(PageCriteria pageCriteria);
 
 
 

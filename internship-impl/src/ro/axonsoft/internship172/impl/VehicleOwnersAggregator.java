@@ -7,7 +7,7 @@ import java.util.Map;
 
 import com.google.common.collect.Maps;
 
-import ro.axonsoft.internship172.api.VehicleOwnerRecord;
+import ro.axonsoft.internship172.model.api.VehicleOwnerRecord;
 
 /**
  * Clasa de agregare care calculeaza rezultatele

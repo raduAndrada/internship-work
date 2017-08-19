@@ -49,7 +49,8 @@
 		RESULT_UNREG_CARS_COUNT_BY_JUD.RESULT_METRICS_ID
 
 		left join
-		RESULT_ERROR on
+		RESULT_ERROR
+		on
 		RESULT_METRICS.RESULT_METRICS_ID =
 		RESULT_ERROR.RESULT_METRICS_ID
 		<where>
@@ -107,7 +108,7 @@
 			<if test="oddToEvenRatio != null">ODD_TO_EVEN_RATIO=#{oddToEvenRatio},</if>
 			<if test="passedRegChangeDueDate != null">PASSED_REG_CHANGE_DUE_DATE=#{passedRegChangeDueDate},
 			</if>
-			<if test="resultProcessTime != null">RESULT_PROCESS_TIME=#{resultProcessTime},</if>
+			<if test="resultProcessTime != null">RESULT_PROCESS_TIME=#{resultProcessTime}</if>
 		</set>
 		<where>
 			<include refid="whereCriteria" />
@@ -120,6 +121,21 @@
 			<include refid="whereCriteria" />
 		</where>
 	</delete>
+
+	<delete id="deleteResultError">
+		delete from RESULT_ERROR
+		<where>
+			<include refid="whereChildTableCriteria" />
+		</where>
+	</delete>
+
+	<delete id="deleteResultUnregCarsCountByJud">
+		delete from RESULT_UNREG_CARS_COUNT_BY_JUD
+		<where>
+			<include refid="whereChildTableCriteria" />
+		</where>
+	</delete>
+
 
 	<select id="countResult" resultType="Integer">
 		select count(*)
@@ -142,6 +158,17 @@
 				test="criteria.idBatchSelect != null and !criteria.idBatchSelect.empty">
 				<foreach item="idBatchSelect" collection="criteria.idBatchSelect"
 					open="and BATCH_ID in (" separator="," close=")">#{idBatchSelect}
+				</foreach>
+			</if>
+		</if>
+	</sql>
+
+	<sql id="whereChildTableCriteria">
+		<if test="criteria != null">
+			<if
+				test="criteria.idResultSelect != null and !criteria.idResultSelect.empty">
+				<foreach item="idResultSelect" collection="criteria.idResultSelect"
+					open="and RESULT_METRICS_ID in (" separator="," close=")">#{idResultSelect}
 				</foreach>
 			</if>
 		</if>

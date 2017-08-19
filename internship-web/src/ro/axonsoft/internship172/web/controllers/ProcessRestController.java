@@ -22,10 +22,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.google.common.collect.Lists;
 
-import ro.axonsoft.internship172.api.DbVehicleOwnersProcessor;
-import ro.axonsoft.internship172.api.Judet;
-import ro.axonsoft.internship172.api.StreamVehicleOwnersProcessor;
-import ro.axonsoft.internship172.api.VehicleOwnersProcessResult;
 import ro.axonsoft.internship172.data.domain.ConcreteResultMetrics;
 import ro.axonsoft.internship172.data.domain.MdfConcreteResultMetrics;
 import ro.axonsoft.internship172.data.domain.MdfResultError;
@@ -33,6 +29,10 @@ import ro.axonsoft.internship172.data.domain.MdfResultMetrics;
 import ro.axonsoft.internship172.data.domain.MdfResultUnregCarsCountByJud;
 import ro.axonsoft.internship172.data.domain.ResultMetrics;
 import ro.axonsoft.internship172.data.exceptions.DatabaseIntegrityViolationException;
+import ro.axonsoft.internship172.model.api.DbVehicleOwnersProcessor;
+import ro.axonsoft.internship172.model.api.Judet;
+import ro.axonsoft.internship172.model.api.StreamVehicleOwnersProcessor;
+import ro.axonsoft.internship172.model.api.VehicleOwnersProcessResult;
 import ro.axonsoft.internship172.web.services.ResultRestService;
 
 /**

@@ -19,17 +19,16 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.google.common.collect.Lists;
 
-import ro.axonsoft.internship172.api.RoIdCardParser;
 import ro.axonsoft.internship172.business.api.vehicleOwner.VehicleOwnerBusiness;
 import ro.axonsoft.internship172.data.domain.ImtVehicleOwner;
 import ro.axonsoft.internship172.data.domain.MdfVehicleOwner;
 import ro.axonsoft.internship172.data.domain.VehicleOwner;
 import ro.axonsoft.internship172.data.exceptions.DatabaseIntegrityViolationException;
 import ro.axonsoft.internship172.data.exceptions.InvalidDatabaseAccessException;
-import ro.axonsoft.internship172.model.base.Batch;
-import ro.axonsoft.internship172.model.base.ImtBatch;
 import ro.axonsoft.internship172.model.base.ImtPagination;
-import ro.axonsoft.internship172.model.base.MdfBatch;
+import ro.axonsoft.internship172.model.base.ImtResultBatch;
+import ro.axonsoft.internship172.model.base.MdfResultBatch;
+import ro.axonsoft.internship172.model.base.ResultBatch;
 import ro.axonsoft.internship172.model.base.SortDirection;
 import ro.axonsoft.internship172.model.batch.BatchCreateResult;
 import ro.axonsoft.internship172.model.batch.BatchGetResult;
@@ -59,14 +58,7 @@ public class VehicleOwnersRestController {
 
 	private static final Logger LOG = LoggerFactory.getLogger(VehicleOwnersRestController.class);
 
-	RoIdCardParser roIdCardParser;
-
 	VehicleOwnerBusiness vhoBusiness;
-
-	@Inject
-	public void setRoIdCardParser(final RoIdCardParser roIdCardParser) {
-		this.roIdCardParser = roIdCardParser;
-	}
 
 	@Inject
 	public void setVhoBusiness(VehicleOwnerBusiness vhoBusiness) {
@@ -105,7 +97,7 @@ public class VehicleOwnersRestController {
 				.basic(ImtVehicleOwnerBasic.builder().regPlate(vehicleOwner.getRegPlate())
 						.roIdCard(vehicleOwner.getRoIdCard()).issueDate(Instant.parse(issueDate))
 						.comentariu(vehicleOwner.getComentariu()).build())
-				.batch(ImtBatch.builder().batchId(vehicleOwner.getBatchId()).build()).build());
+				.batch(ImtResultBatch.builder().batchId(vehicleOwner.getBatchId()).build()).build());
 		LOG.info("inserarea noii inregistrari pe tabela de VEHICLE_OWNER " + vehicleOwner.toString());
 		// vehicleOwnerService.insertVehicleOwner(vehicleOwner);
 		LOG.info("dupa inserare " + vhoCreateResult.toString());
@@ -131,12 +123,12 @@ public class VehicleOwnersRestController {
 	 */
 
 	@RequestMapping(value = "/insertBatch/{pageSize}/{currentPage}", method = RequestMethod.POST)
-	public ResponseEntity<MdfBatch> insertBatchOwner(@RequestBody final MdfBatch batch,
+	public ResponseEntity<MdfResultBatch> insertBatchOwner(@RequestBody final MdfResultBatch batch,
 			@PathVariable("currentPage") final Integer currentPage, @PathVariable("pageSize") final Integer pageSize) {
 		LOG.info("inserarea noii inregistrari pe tabela de BATCH ");
 		final BatchCreateResult batchCreateResult = vhoBusiness
 				.createBatch(ImtBatchCreate.builder().batch(batch).build());
-		return ResponseEntity.ok(MdfBatch.create().setBatchId(batchCreateResult.getBatch().getBatchId()));
+		return ResponseEntity.ok(MdfResultBatch.create().setBatchId(batchCreateResult.getBatch().getBatchId()));
 	}
 
 	/**
@@ -252,7 +244,7 @@ public class VehicleOwnersRestController {
 	 */
 
 	@RequestMapping(value = "/getBatchByPage/{pageSize}/{currentPage}", method = RequestMethod.GET)
-	public @ResponseBody Batch[] getBatchListPage(@PathVariable("pageSize") final int pageSize,
+	public @ResponseBody ResultBatch[] getBatchListPage(@PathVariable("pageSize") final int pageSize,
 			@PathVariable("currentPage") final int currentPage) throws InvalidDatabaseAccessException {
 
 		if (pageSize == 0) {
@@ -263,19 +255,19 @@ public class VehicleOwnersRestController {
 				.addSort(ImtBatchSortCriterion.of(BatchSortCriterionType.BATCH_ID, SortDirection.ASC)).build());
 		final Integer countedBatches = batchGetResult.getCount();
 		final int startIndex = currentPage * pageSize;
-		final List<Batch> batchList = Lists.newArrayList();
+		final List<ResultBatch> batchList = Lists.newArrayList();
 		if (startIndex < countedBatches) {
 			final BatchGetResult batchGetResultTemp = vhoBusiness.getBatches(ImtBatchGet.builder()
 					.addSort(ImtBatchSortCriterion.of(BatchSortCriterionType.BATCH_ID, SortDirection.ASC))
 					.pagination(ImtPagination.builder().offset(new Long(startIndex)).pageSize(pageSize).build())
 					.build());
 			batchGetResultTemp.getList().forEach(e -> {
-				batchList.add(MdfBatch.create().setBatchId(e.getBatchId()));
+				batchList.add(MdfResultBatch.create().setBatchId(e.getBatchId()));
 
 			});
 
 		}
-		final Batch[] resultArray = batchList.toArray(new Batch[batchList.size()]);
+		final ResultBatch[] resultArray = batchList.toArray(new ResultBatch[batchList.size()]);
 		return resultArray;
 	}
 
@@ -330,37 +322,4 @@ public class VehicleOwnersRestController {
 		return tmp;
 	}
 
-	/**
-	 * Verificarea corectitudinii carti de identitate
-	 *
-	 * @param roIdCard
-	 *            string cu cartea de identitate introdusa de utilizator
-	 * @return -1 invalid, 0 valid
-	 */
-	@RequestMapping("/test/{roIdCard}/{batchId}")
-	public @ResponseBody Integer setEvent(@PathVariable("roIdCard") final String roIdCard,
-			@PathVariable("batchId") final Long batchId) {
-		try {
-			final VehicleOwnerGetResult vhoGetResult = vhoBusiness.getVehicleOwners(ImtVehicleOwnerGet
-					.builder().addSort(ImtVehicleOwnerSortCriterion.builder()
-							.criterion(VehicleOwnerSortCriterionType.RO_ID_CARD).direction(SortDirection.ASC).build())
-					.roIdCard(roIdCard).build());
-			LOG.info(vhoGetResult.toString());
-			if (vhoGetResult.getCount() != 0) {
-				return -1;
-			}
-
-			final BatchGetResult batchGetResult = vhoBusiness.getBatches(ImtBatchGet.builder()
-					.addSort(ImtBatchSortCriterion.of(BatchSortCriterionType.BATCH_ID, SortDirection.DESC))
-					.batchId(batchId).pagination(ImtPagination.of(1, 1)).build());
-			LOG.info(batchGetResult.toString());
-			if (batchGetResult.getCount() == 0) {
-				return -2;
-			}
-			roIdCardParser.parseIdCard(roIdCard);
-		} catch (final Exception e) {
-			return -1;
-		}
-		return 0;
-	}
 }
