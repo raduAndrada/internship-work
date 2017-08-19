@@ -1,5 +1,7 @@
 package ro.axonsoft.internship172.model.result;
 
+import java.util.List;
+
 import javax.annotation.Nullable;
 
 import org.immutables.serial.Serial;
@@ -22,4 +24,10 @@ public interface ResultRecord {
 
 	@Nullable
 	ResultBatch getBatch();
+
+	@Nullable
+	List<ResultUnregCarsCountByJudRecord> getUnregCars();
+
+	@Nullable
+	List<ResultErrorRecord> getErrors();
 }

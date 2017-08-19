@@ -20,6 +20,7 @@ import com.google.common.collect.Lists;
 import ro.axonsoft.internship172.business.config.BusinessConfig;
 import ro.axonsoft.internship172.business.impl.base.TimeManager;
 import ro.axonsoft.internship172.configuration.VehicleOwnerBusinessConfiguration;
+import ro.axonsoft.internship172.data.DataConfiguration;
 
 @RunWith(SpringRunner.class)
 @ContextConfiguration(classes = RecrutareBusinessMockTests.Config.class)
@@ -44,7 +45,7 @@ public class RecrutareBusinessMockTests {
 	}
 
 	@SpringBootApplication
-	@Import({ BusinessConfig.class, VehicleOwnerBusinessConfiguration.class })
+	@Import({ DataConfiguration.class, BusinessConfig.class, VehicleOwnerBusinessConfiguration.class })
 	public static class Config extends RecrutareTestsConfigBase {
 
 		private final Deque<Instant> instantsQueue = Lists.newLinkedList();

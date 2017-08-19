@@ -33,17 +33,15 @@ import ro.axonsoft.internship172.model.result.ResultSortCriterionType;
 
 public class ResultMetricsDaoTests extends RecrutareDataTests {
 
-	private static final ResultEntity RES1 = MdfResultEntity.create()
-			.setRecord(MdfResultRecord.create()
-					.setBasic(MdfResultBasic.create().setOddToEvenRatio(100).setPassedRegChangeDueDate(5)
-							.setResultProcessTime(Timestamp.from(Instant.parse("2017-08-02T11:47:00.00Z"))))
-					.setBatch(MdfResultBatch.create().setBatchId(0L)))
-			.setResultMetricsId(6L)
-
-			.addErrors(MdfResultErrorRecord.create().setResultMetricsId(6L).setResultErrorId(0L)
+	private static final ResultEntity RES1 = MdfResultEntity.create().setRecord(MdfResultRecord.create()
+			.setBasic(MdfResultBasic.create().setOddToEvenRatio(100).setPassedRegChangeDueDate(5)
+					.setResultProcessTime(Timestamp.from(Instant.parse("2017-08-02T11:47:00.00Z"))))
+			.setBatch(MdfResultBatch.create().setBatchId(0L))
+			.addError(MdfResultErrorRecord.create().setResultMetricsId(6L).setResultErrorId(0L)
 					.setBasic(MdfResultErrorBasic.create().setType(1).setVehicleOwnerId(1L)))
-			.addUnregCars(MdfResultUnregCarsCountByJudRecord.create().setResultMetricsId(6L).setUnregCarsCountId(0L)
-					.setBasic(MdfResultUnregCarsCountByJudBasic.create().setJudet(Judet.AB).setUnregCarsCount(2)));
+			.addUnregCar(MdfResultUnregCarsCountByJudRecord.create().setResultMetricsId(6L).setUnregCarsCountId(0L)
+					.setBasic(MdfResultUnregCarsCountByJudBasic.create().setJudet(Judet.AB).setUnregCarsCount(2))))
+			.setResultMetricsId(6L);
 
 	static {
 		TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
@@ -62,11 +60,11 @@ public class ResultMetricsDaoTests extends RecrutareDataTests {
 		dbUtil.setIdentity("RESULT_METRICS", "RESULT_METRICS_ID", 6);
 		resultMetricsDao.addResult(MdfResultEntity.create().from(RES1).setResultMetricsId(null));
 
-		dbUtil.setIdentity("RESULT_UNREG_CARS_COUNT_BY_JUD", "UNREG_CARS_COUNT_ID", 0);
-		resultMetricsDao.addUnregCars(RES1.getUnregCars());
+		dbUtil.setIdentity("RESULT_UNREG_CARS_COUNT_BY_JUD", "UNREG_CARS_COUNT_ID", 20);
+		resultMetricsDao.addUnregCars(RES1.getRecord().getUnregCars());
 
-		dbUtil.setIdentity("RESULT_ERROR", "RESULT_ERROR_ID", 0);
-		resultMetricsDao.addErrors(RES1.getErrors());
+		dbUtil.setIdentity("RESULT_ERROR", "RESULT_ERROR_ID", 20);
+		resultMetricsDao.addErrors(RES1.getRecord().getErrors());
 
 	}
 

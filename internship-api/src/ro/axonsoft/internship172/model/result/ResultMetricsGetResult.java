@@ -25,9 +25,4 @@ public interface ResultMetricsGetResult {
 
 	List<ResultRecord> getList();
 
-	@Nullable
-	List<ResultUnregCarsCountByJudRecord> getUnregCars();
-
-	@Nullable
-	List<ResultErrorRecord> getErrors();
 }

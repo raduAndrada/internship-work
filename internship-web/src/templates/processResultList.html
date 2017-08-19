@@ -40,10 +40,7 @@
                             </tr>
                             <tr th:each="processResult,iter  : ${resultMetricsList}">
                             <tr>
-                                <td style="color: black;" class="active" th:text="#{batch.process-result} +': ' + ${processResult.resultMetricsId}"></td>
-                            </tr>
-                            <tr>
-                                <td th:text="#{result-metrics-id} +': ' + ${processResult.resultMetricsId}"></td>
+                                <td style="color: black;" class="active" th:text="#{batch.process-result} "></td>
                             </tr>
                             <tr>
                                 <td th:text="#{result-metrics.odd-to-even-ratio} + ': ' + ${processResult.oddToEvenRatio}" />

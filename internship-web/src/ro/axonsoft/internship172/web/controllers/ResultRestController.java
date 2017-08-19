@@ -13,13 +13,18 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.google.common.collect.Lists;
 
+import ro.axonfost.internship172.business.api.result.ResultBusiness;
 import ro.axonsoft.internship172.data.domain.MdfConcreteResultMetrics;
 import ro.axonsoft.internship172.data.domain.MdfResultError;
 import ro.axonsoft.internship172.data.domain.MdfResultUnregCarsCountByJud;
-import ro.axonsoft.internship172.data.domain.ResultMetrics;
 import ro.axonsoft.internship172.data.exceptions.DatabaseIntegrityViolationException;
 import ro.axonsoft.internship172.data.exceptions.InvalidDatabaseAccessException;
-import ro.axonsoft.internship172.data.mappers.ImtPageCriteria;
+import ro.axonsoft.internship172.model.base.ImtPagination;
+import ro.axonsoft.internship172.model.result.ImtResultGet;
+import ro.axonsoft.internship172.model.result.ResultBasic;
+import ro.axonsoft.internship172.model.result.ResultMetricsDeleteResult;
+import ro.axonsoft.internship172.model.result.ResultMetricsGetResult;
+import ro.axonsoft.internship172.model.result.ResultRecord;
 import ro.axonsoft.internship172.web.services.ResultRestService;
 
 /**
@@ -39,6 +44,13 @@ public class ResultRestController {
 		this.resultService = resultService;
 	}
 
+	ResultBusiness resultBusiness;
+
+	@Inject
+	public void setResultBusiness(ResultBusiness resultBusiness) {
+		this.resultBusiness = resultBusiness;
+	}
+
 	/**
 	 * Selectare rezultat dupa id
 	 *
@@ -47,15 +59,17 @@ public class ResultRestController {
 	 * @return rezultatul cu toate datele
 	 */
 	@RequestMapping(value = "/getResultById/{id}", method = RequestMethod.GET)
-	public @ResponseBody ResultMetrics getResultById(@PathVariable("id") final Long id)
+	public @ResponseBody ResultBasic getResultById(@PathVariable("id") final Long id)
 			throws InvalidDatabaseAccessException {
-		return resultService.selectResultMetricsById(id);
+		return resultBusiness.getResults(ImtResultGet.builder().resultMetricsId(id).build()).getList().get(0)
+				.getBasic();
 	}
 
 	@RequestMapping(value = "/deleteResultById/{id}", method = RequestMethod.POST)
-	public String deleteResultById(@PathVariable("id") final Long id) throws DatabaseIntegrityViolationException {
-		resultService.deleteResult(id);
-		return "Operatia de stergere s-a realizat cu succes";
+	public ResultMetricsDeleteResult deleteResultById(@PathVariable("id") final Long id)
+			throws DatabaseIntegrityViolationException {
+		final ResultMetricsDeleteResult resDeleted = resultBusiness.deleteResult(id);
+		return resDeleted;
 	}
 
 	/**
@@ -81,37 +95,39 @@ public class ResultRestController {
 			throw new InvalidDatabaseAccessException("dimensiunea unei pagini trebuie sa fie mai mare decat 0");
 		}
 
-		final Integer resultsNumber = resultService.countResultMetricsByBatchId(batchId);
+		ResultMetricsGetResult result = null;
+		final Integer resultsNumber = resultBusiness.getResults(ImtResultGet.builder().batchId(batchId).build())
+				.getCount();
 		final int startIndex = currentPage * pageSize;
-		List<ResultMetrics> resultsList = null;
 		if (startIndex < resultsNumber) {
-			resultsList = Lists.newArrayList(
-					resultService.getResultMetricsPage(ImtPageCriteria.of(startIndex, pageSize, batchId)));
+			result = resultBusiness.getResults(ImtResultGet.builder().batchId(batchId).batchId(batchId)
+					.pagination(ImtPagination.builder().offset(new Long(startIndex)).pageSize(pageSize).build())
+					.build());
 		}
-		if (resultsList == null) {
-			throw new InvalidDatabaseAccessException("pagina depaseste datele din baza de date");
-		}
+		System.out.println(result);
 		final List<MdfConcreteResultMetrics> processResultList = Lists.newArrayList();
-		for (final ResultMetrics processResult : resultsList) {
+		for (final ResultRecord processResult : result.getList()) {
 			final List<MdfResultError> resultErrors = Lists.newArrayList();
-			if (processResult.getResultErrors() != null && processResult.getResultErrors().size() != 0) {
-				processResult.getResultErrors().forEach(e -> resultErrors.add(MdfResultError.create().from(e)));
+			if (processResult.getErrors() != null && processResult.getErrors().size() != 0) {
+				processResult.getErrors().forEach(e -> resultErrors.add(MdfResultError.create()
+						.setType(e.getBasic().getType()).setVehicleOwnerId(e.getBasic().getVehicleOwnerId())));
 			}
 			final List<MdfResultUnregCarsCountByJud> resultUnregCarsCountByJud = Lists.newArrayList();
-			if (processResult.getUnregCarsCountByJud() != null && processResult.getUnregCarsCountByJud().size() != 0) {
-				processResult.getUnregCarsCountByJud()
-						.forEach(e -> resultUnregCarsCountByJud.add(MdfResultUnregCarsCountByJud.create().from(e)));
+			if (processResult.getUnregCars() != null && processResult.getUnregCars().size() != 0) {
+				processResult.getUnregCars()
+						.forEach(e -> resultUnregCarsCountByJud.add(MdfResultUnregCarsCountByJud.create()
+								.setUnregCarsCount(e.getBasic().getUnregCarsCount())
+								.setJudet(e.getBasic().getJudet())));
 			}
 
 			final MdfConcreteResultMetrics finalResult = MdfConcreteResultMetrics.create();
 
-			finalResult.setOddToEvenRatio(processResult.getOddToEvenRatio());
-			finalResult.setPassedRegChangeDueDate(processResult.getPassedRegChangeDueDate());
-			finalResult.setResultMetricsId(processResult.getResultMetricsId());
-			finalResult.setBatchId(processResult.getBatchId());
+			finalResult.setOddToEvenRatio(processResult.getBasic().getOddToEvenRatio());
+			finalResult.setPassedRegChangeDueDate(processResult.getBasic().getPassedRegChangeDueDate());
+			finalResult.setBatchId(processResult.getBatch().getBatchId());
 			finalResult.setResultErrors(resultErrors);
 			finalResult.setUnregCarsCountByJud(resultUnregCarsCountByJud);
-			finalResult.setResultProcessTime(processResult.getResultProcessTime());
+			finalResult.setResultProcessTime(processResult.getBasic().getResultProcessTime());
 			processResultList.add(finalResult);
 		}
 
@@ -139,7 +155,8 @@ public class ResultRestController {
 		if (pageSize == 0) {
 			throw new InvalidDatabaseAccessException("dimensiunea unei pagini trebuie sa fie mai mare decat 0");
 		}
-		final Integer resultsCount = resultService.countResultMetricsByBatchId(batchId);
+		final Integer resultsCount = resultBusiness.getResults(ImtResultGet.builder().batchId(batchId).build())
+				.getCount();
 		Integer numOfPages = resultsCount / pageSize;
 		if (resultsCount % pageSize != 0) {
 			numOfPages++;

@@ -160,13 +160,14 @@ public class DbVehicleOwnersProcessorImpl implements DbVehicleOwnersProcessor {
 								.setPassedRegChangeDueDate(metrics.getPassedRegChangeDueDate())
 								.setResultProcessTime(new java.sql.Timestamp(
 										LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli())))
+						.setErrors(resultErrors).setUnregCars(unregCarsCountByJud)
 						.setBatch(MdfResultBatch.create().setBatchId(batchId)))
-				.setResultMetricsId(null)
+				.setResultMetricsId(null);
 
-				.setErrors(resultErrors).setUnregCars(unregCarsCountByJud);
 		try {
-			resBusiness.createResult(ImtResultCreate.builder().basic(RES.getRecord().getBasic()).errors(RES.getErrors())
-					.unregCars(RES.getUnregCars()).batch(RES.getRecord().getBatch()).build());
+			resBusiness.createResult(
+					ImtResultCreate.builder().basic(RES.getRecord().getBasic()).errors(RES.getRecord().getErrors())
+							.unregCars(RES.getRecord().getUnregCars()).batch(RES.getRecord().getBatch()).build());
 		} catch (final DatabaseIntegrityViolationException e) {
 			throw new DatabaseIntegrityViolationException(e);
 		}

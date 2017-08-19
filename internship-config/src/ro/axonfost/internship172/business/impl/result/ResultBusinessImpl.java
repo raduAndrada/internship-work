@@ -10,6 +10,7 @@ import com.google.common.collect.ImmutableSet;
 
 import ro.axonfost.internship172.business.api.result.ResultBusiness;
 import ro.axonsoft.internship172.data.api.result.ImtChildTableCriteria;
+import ro.axonsoft.internship172.data.api.result.ImtResultEntity;
 import ro.axonsoft.internship172.data.api.result.ImtResultEntityCount;
 import ro.axonsoft.internship172.data.api.result.ImtResultEntityCriteria;
 import ro.axonsoft.internship172.data.api.result.ImtResultEntityDelete;
@@ -81,7 +82,7 @@ public class ResultBusinessImpl implements ResultBusiness {
 			ResultEntity resEntity) {
 
 		final List<ResultUnregCarsCountByJudRecord> unregCars = Lists.newArrayList();
-		resEntity.getUnregCars().forEach(e -> {
+		resEntity.getRecord().getUnregCars().forEach(e -> {
 			final ResultUnregCarsCountByJudBasic basic = e.getBasic();
 			unregCars.add(ImtResultUnregCarsCountByJudRecord.builder().resultMetricsId(resEntity.getResultMetricsId())
 					.basic(basic).build());
@@ -91,7 +92,7 @@ public class ResultBusinessImpl implements ResultBusiness {
 
 	private List<ResultErrorRecord> buildResultErrorsForCreate(ResultEntity resEntity) {
 		final List<ResultErrorRecord> errors = Lists.newArrayList();
-		resEntity.getErrors().forEach(e -> {
+		resEntity.getRecord().getErrors().forEach(e -> {
 			final ResultErrorBasic basicError = e.getBasic();
 			errors.add(ImtResultErrorRecord.builder().resultMetricsId(resEntity.getResultMetricsId()).basic(basicError)
 					.build());
@@ -100,13 +101,13 @@ public class ResultBusinessImpl implements ResultBusiness {
 	}
 
 	private ResultEntity buildResultEntityForCreate(ResultCreate resCreate) {
-		final ResultEntity resEntity = MdfResultEntity.create().setErrors(resCreate.getErrors())
-				.setUnregCars(resCreate.getUnregCars())
+		final ResultEntity resEntity = MdfResultEntity.create()
 				.setRecord(MdfResultRecord.create()
 						.setBasic(MdfResultBasic.create().from(resCreate.getBasic())
 								.setOddToEvenRatio(resCreate.getBasic().getOddToEvenRatio())
 								.setPassedRegChangeDueDate(resCreate.getBasic().getPassedRegChangeDueDate())
 								.setResultProcessTime(resCreate.getBasic().getResultProcessTime()))
+						.setErrors(resCreate.getErrors()).setUnregCars(resCreate.getUnregCars())
 						.setBatch(resCreate.getBatch()));
 		return resEntity;
 	}
@@ -212,7 +213,31 @@ public class ResultBusinessImpl implements ResultBusiness {
 		final ResultEntityGet resEntityGet = buildResultEntityGet(resGet);
 		final ResultEntityCount resEntityCount = buildResultEntityCount(resGet);
 		final int count = resDao.countResult(resEntityCount);
-		final List<ResultEntity> results = resDao.getResult(resEntityGet);
+		List<ResultEntity> results = null;
+		if (resGet.getPagination() == null) {
+			results = resDao.getResult(resEntityGet);
+		} else {
+			results = resDao.getResultMetrics(resEntityGet);
+			final List<ResultEntity> resultTemp = Lists.newArrayList();
+			results.forEach(e -> {
+
+				final List<ResultErrorRecord> resultsForErrors = resDao.getResultErrors(ImtResultEntityGet.builder()
+						.criteria(ImtResultEntityCriteria.builder().addIdResultSelect(e.getResultMetricsId()).build())
+						.build());
+
+				final List<ResultUnregCarsCountByJudRecord> unregCars = resDao.getResultUnregCars(ImtResultEntityGet
+						.builder()
+						.criteria(ImtResultEntityCriteria.builder().addIdResultSelect(e.getResultMetricsId()).build())
+						.build());
+				resultTemp.add(ImtResultEntity.builder()
+						.record(ImtResultRecord.builder().basic(e.getRecord().getBasic()).addAllErrors(resultsForErrors)
+								.addAllUnregCars(unregCars).batch(e.getRecord().getBatch()).build())
+						.resultMetricsId(e.getResultMetricsId()).build());
+			});
+
+			results = resultTemp;
+
+		}
 		return ImtResultMetricsGetResult.builder()
 				.list(results.stream().map(ResultEntity::getRecord).map(ImtResultRecord::copyOf)
 						.map(ResultRecord.class::cast)::iterator)

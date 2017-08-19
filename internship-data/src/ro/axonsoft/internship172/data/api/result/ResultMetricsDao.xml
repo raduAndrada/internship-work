@@ -17,27 +17,49 @@
 			<association property="batch" javaType="MdfBatch">
 				<id column="BATCH_ID" property="batchId" />
 			</association>
-		</association>
-		<collection property="unregCars" javaType="ArrayList"
-			ofType="MdfResultUnregCarsCountByJudRecord">
-			<id column="UNREG_CARS_COUNT_ID" property="unregCarsCountId"></id>
-			<result column="RESULT_METRICS_ID" property="resultMetricsId" />
-			<association property="basic" javaType="MdfResultUnregCarsCountByJudBasic">
-				<result column="JUDET" property="judet" />
-				<result column="UNREG_CARS_COUNT" property="unregCarsCount" />
-			</association>
-		</collection>
-		<collection property="errors" javaType="ArrayList"
-			ofType="MdfResultErrorRecord">
-			<id column="RESULT_ERROR_ID" property="resultErrorId"></id>
-			<result column="RESULT_METRICS_ID" property="resultMetricsId" />
-			<association property="basic" javaType="MdfResultErrorBasic">
-				<result column="TYPE" property="type" />
-				<result column="VEHICLE_OWNER_ID" property="vehicleOwnerId" />
-			</association>
-		</collection>
 
+			<collection property="unregCars" javaType="ArrayList"
+				ofType="MdfResultUnregCarsCountByJudRecord">
+				<id column="UNREG_CARS_COUNT_ID" property="unregCarsCountId"></id>
+				<result column="RESULT_METRICS_ID" property="resultMetricsId" />
+				<association property="basic"
+					javaType="MdfResultUnregCarsCountByJudBasic">
+					<result column="JUDET" property="judet" />
+					<result column="UNREG_CARS_COUNT" property="unregCarsCount" />
+				</association>
+			</collection>
+			<collection property="errors" javaType="ArrayList"
+				ofType="MdfResultErrorRecord">
+				<id column="RESULT_ERROR_ID" property="resultErrorId"></id>
+				<result column="RESULT_METRICS_ID" property="resultMetricsId" />
+				<association property="basic" javaType="MdfResultErrorBasic">
+					<result column="TYPE" property="type" />
+					<result column="VEHICLE_OWNER_ID" property="vehicleOwnerId" />
+				</association>
+			</collection>
+		</association>
 	</resultMap>
+	<resultMap id="ResultErrorMap" type="MdfResultErrorRecord">
+		<id column="RESULT_ERROR_ID" property="resultErrorId"></id>
+		<result column="RESULT_METRICS_ID" property="resultMetricsId" />
+		<association property="basic" javaType="MdfResultErrorBasic">
+			<result column="TYPE" property="type" />
+			<result column="VEHICLE_OWNER_ID" property="vehicleOwnerId" />
+		</association>
+	</resultMap>
+
+	<resultMap id="ResultUnregCarsMap" type="MdfResultUnregCarsCountByJudRecord">
+		<id column="UNREG_CARS_COUNT_ID" property="unregCarsCountId"></id>
+		<result column="RESULT_METRICS_ID" property="resultMetricsId" />
+		<association property="basic" javaType="MdfResultUnregCarsCountByJudBasic">
+			<result column="JUDET" property="judet" />
+			<result column="UNREG_CARS_COUNT" property="unregCarsCount" />
+		</association>
+	</resultMap>
+
+
+
+
 
 	<select id="getResult" resultMap="ResultMap">
 		select * <!--distinct RESULT_METRICS_ID, <include refid="resmColumns" /> -->
@@ -60,6 +82,39 @@
 		<include refid="sortCriteria" />
 		<include refid="pagination" />
 	</select>
+
+	<select id="getResultMetrics" resultMap="ResultMap">
+		select distinct RESULT_METRICS_ID,
+		<include refid="resmColumns" />
+		from RESULT_METRICS
+		<where>
+			<include refid="whereCriteria" />
+			<include refid="searchCriteria" />
+		</where>
+		<include refid="sortCriteria" />
+		<include refid="pagination" />
+	</select>
+
+	<select id="getResultErrors" resultMap="ResultErrorMap">
+		select distinct RESULT_ERROR_ID,
+		<include refid="errColumns" />
+		from RESULT_ERROR
+		<where>
+			<include refid="whereChildTableCriteria" />
+		</where>
+
+	</select>
+
+
+	<select id="getResultUnregCars" resultMap="ResultUnregCarsMap">
+		select distinct UNREG_CARS_COUNT_ID,
+		<include refid="unregColumns" />
+		from RESULT_UNREG_CARS_COUNT_BY_JUD
+		<where>
+			<include refid="whereChildTableCriteria" />
+		</where>
+	</select>
+
 
 	<insert id="addResult" useGeneratedKeys='true' keyProperty="resultMetricsId">
 
@@ -157,7 +212,7 @@
 			<if
 				test="criteria.idBatchSelect != null and !criteria.idBatchSelect.empty">
 				<foreach item="idBatchSelect" collection="criteria.idBatchSelect"
-					open="and BATCH_ID in (" separator="," close=")">#{idBatchSelect}
+					open="and RESULT_METRICS.BATCH_ID in (" separator="," close=")">#{idBatchSelect}
 				</foreach>
 			</if>
 		</if>
