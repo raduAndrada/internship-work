@@ -61,7 +61,7 @@
 		<include refid="pagination" />
 	</select>
 
-	<insert id="addResult" keyProperty="resultMetricsId">
+	<insert id="addResult" useGeneratedKeys='true' keyProperty="resultMetricsId">
 
 		insert into RESULT_METRICS (
 		<include refid="resmColumns" />

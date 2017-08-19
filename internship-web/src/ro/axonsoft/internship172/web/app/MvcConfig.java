@@ -39,7 +39,7 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
 
 	/**
 	 * Bean pentru fisiere
-	 * 
+	 *
 	 * @return
 	 */
 	@Bean
@@ -52,7 +52,7 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
 
 	/**
 	 * Bean pentru url-ul curent
-	 * 
+	 *
 	 * @return
 	 */
 	@Bean

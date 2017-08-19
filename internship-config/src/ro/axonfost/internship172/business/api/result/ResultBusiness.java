@@ -1,4 +1,4 @@
-package ro.axonfost.internship172.business.result;
+package ro.axonfost.internship172.business.api.result;
 
 import ro.axonsoft.internship172.model.error.BusinessException;
 import ro.axonsoft.internship172.model.result.ResultCreate;

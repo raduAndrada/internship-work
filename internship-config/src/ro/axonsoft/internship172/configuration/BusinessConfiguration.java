@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Configuration;
 
 import com.google.common.collect.Multimap;
 
-import ro.axonsoft.internship172.data.impl.DbVehicleOwnersProcessorImpl;
+import ro.axonsoft.internship172.business.impl.DbVehicleOwnersProcessorImpl;
 import ro.axonsoft.internship172.data.impl.ResultServiceImpl;
 import ro.axonsoft.internship172.data.impl.VehicleOwnerServiceImpl;
 import ro.axonsoft.internship172.data.services.ResultService;

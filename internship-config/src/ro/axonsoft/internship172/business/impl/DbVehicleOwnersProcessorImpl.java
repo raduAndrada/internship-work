@@ -1,4 +1,4 @@
-package ro.axonsoft.internship172.data.impl;
+package ro.axonsoft.internship172.business.impl;
 
 import java.sql.Date;
 import java.time.LocalDate;
@@ -20,22 +20,17 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
+import ro.axonfost.internship172.business.api.result.ResultBusiness;
+import ro.axonsoft.internship172.data.api.result.MdfResultEntity;
+import ro.axonsoft.internship172.data.api.result.ResultEntity;
 import ro.axonsoft.internship172.data.api.vehicleOwner.ImtVehicleOwnerEntityCount;
 import ro.axonsoft.internship172.data.api.vehicleOwner.ImtVehicleOwnerEntityCriteria;
 import ro.axonsoft.internship172.data.api.vehicleOwner.ImtVehicleOwnerEntityGet;
 import ro.axonsoft.internship172.data.api.vehicleOwner.VehicleOwnerDao;
 import ro.axonsoft.internship172.data.api.vehicleOwner.VehicleOwnerEntity;
 import ro.axonsoft.internship172.data.domain.ImtResultError;
-import ro.axonsoft.internship172.data.domain.ImtResultMetrics;
-import ro.axonsoft.internship172.data.domain.ImtResultUnregCarsCountByJud;
 import ro.axonsoft.internship172.data.domain.ResultError;
-import ro.axonsoft.internship172.data.domain.ResultMetrics;
-import ro.axonsoft.internship172.data.domain.ResultUnregCarsCountByJud;
 import ro.axonsoft.internship172.data.exceptions.DatabaseIntegrityViolationException;
-import ro.axonsoft.internship172.data.mappers.ImtErrorCriteria;
-import ro.axonsoft.internship172.data.mappers.ImtResultUnregCarsCriteria;
-import ro.axonsoft.internship172.data.services.ResultService;
-import ro.axonsoft.internship172.data.services.VehicleOwnerService;
 import ro.axonsoft.internship172.model.api.DbVehicleOwnersProcessor;
 import ro.axonsoft.internship172.model.api.ImtVehicleOwnerRecord;
 import ro.axonsoft.internship172.model.api.InvalidRoIdCardException;
@@ -49,7 +44,17 @@ import ro.axonsoft.internship172.model.api.VehicleOwnerRecord;
 import ro.axonsoft.internship172.model.api.VehicleOwnersMetrics;
 import ro.axonsoft.internship172.model.api.VehicleOwnersProcessor;
 import ro.axonsoft.internship172.model.base.ImtPagination;
+import ro.axonsoft.internship172.model.base.MdfResultBatch;
 import ro.axonsoft.internship172.model.base.SortDirection;
+import ro.axonsoft.internship172.model.result.ImtResultCreate;
+import ro.axonsoft.internship172.model.result.ImtResultErrorBasic;
+import ro.axonsoft.internship172.model.result.ImtResultErrorRecord;
+import ro.axonsoft.internship172.model.result.ImtResultUnregCarsCountByJudBasic;
+import ro.axonsoft.internship172.model.result.ImtResultUnregCarsCountByJudRecord;
+import ro.axonsoft.internship172.model.result.MdfResultBasic;
+import ro.axonsoft.internship172.model.result.MdfResultRecord;
+import ro.axonsoft.internship172.model.result.ResultErrorRecord;
+import ro.axonsoft.internship172.model.result.ResultUnregCarsCountByJudRecord;
 import ro.axonsoft.internship172.model.vehicleOwner.ImtVehicleOwnerSortCriterion;
 import ro.axonsoft.internship172.model.vehicleOwner.VehicleOwnerSortCriterionType;
 
@@ -66,8 +71,13 @@ public class DbVehicleOwnersProcessorImpl implements DbVehicleOwnersProcessor {
 	 */
 	private static final Logger LOG = LoggerFactory.getLogger(DbVehicleOwnersProcessor.class);
 
-	private ResultService resultService;
 	private VehicleOwnerDao vhoDao;
+	private ResultBusiness resBusiness;
+
+	@Inject
+	public void setResDao(ResultBusiness resDao) {
+		this.resBusiness = resDao;
+	}
 
 	/**
 	 * Refolosirea parserelor si a procesorului Rezultatul va fi obtinut de acelasi
@@ -77,15 +87,6 @@ public class DbVehicleOwnersProcessorImpl implements DbVehicleOwnersProcessor {
 	private final RoRegPlateParser roRegPlateParser;
 	private final RoIdCardParser roIdCardParser;
 	private final VehicleOwnersProcessor processor;
-
-	@Inject
-	public void setVehicleOwnersService(final VehicleOwnerService vehicleOwnersService) {
-	}
-
-	@Inject
-	public void setResultService(final ResultService resultService) {
-		this.resultService = resultService;
-	}
 
 	@Inject
 	public void setVehicleOwnerDao(final VehicleOwnerDao vhoDao) {
@@ -109,14 +110,10 @@ public class DbVehicleOwnersProcessorImpl implements DbVehicleOwnersProcessor {
 		 * ca argument pentru a fi procesat clasei wrapper imbricate in aceasta clasa
 		 */
 
-		LOG.info("Procesare ");
-
 		Iterable<VehicleOwnerEntity> vehicleOwnersRecordsIterable = Lists.newArrayList();
 		final Integer vehicleOwnersCount = vhoDao.countVehicleOwner(ImtVehicleOwnerEntityCount.builder()
 				.criteria(ImtVehicleOwnerEntityCriteria.builder().addIdBatchSelect(batchId).build()).build());
-		LOG.info("Procesarea pe pagini");
 		for (int startIndex = 0; startIndex < vehicleOwnersCount; startIndex += pageSize) {
-			LOG.info("Something " + vehicleOwnersCount + " " + startIndex);
 			final List<VehicleOwnerEntity> vehicleOwnersList = vhoDao
 					.getVehicleOwner(ImtVehicleOwnerEntityGet.builder()
 							.sort(ImmutableList.of(ImtVehicleOwnerSortCriterion.builder()
@@ -127,36 +124,49 @@ public class DbVehicleOwnersProcessorImpl implements DbVehicleOwnersProcessor {
 							.pagination(ImtPagination.builder().pageSize(pageSize).offset(new Long(startIndex)).build())
 							.build());
 			vehicleOwnersRecordsIterable = Iterables.concat(vehicleOwnersRecordsIterable, vehicleOwnersList);
-			LOG.info("Procesarea paginii cu " + vehicleOwnersRecordsIterable.toString());
 		}
 
 		final VehicleOwnerRecordIterator recordsIterator = new VehicleOwnerRecordIterator(
 				vehicleOwnersRecordsIterable.iterator());
-		LOG.info("Total de procesare " + vehicleOwnersRecordsIterable.toString());
 		final VehicleOwnersMetrics metrics = processor.process(recordsIterator);
 
-		LOG.info("Trecerea rezultatului in formatul corespunzator ---- ");
-		final List<ResultUnregCarsCountByJud> unregCarsCountByJud = Lists.newArrayList();
+		final List<ResultUnregCarsCountByJudRecord> unregCarsCountByJud = Lists.newArrayList();
 
-		metrics.getUnregCarsCountByJud().forEach((k, v) -> unregCarsCountByJud
-				.add(ImtResultUnregCarsCountByJud.builder().judet(Judet.valueOf(k)).unregCarsCount(v).build()));
+		metrics.getUnregCarsCountByJud()
+				.forEach((k, v) -> unregCarsCountByJud.add(ImtResultUnregCarsCountByJudRecord.builder().basic(
+						ImtResultUnregCarsCountByJudBasic.builder().judet(Judet.valueOf(k)).unregCarsCount(v).build())
+						.build()));
 
-		final List<ResultError> resultErrors = Lists.newArrayList();
+		final List<ResultErrorRecord> resultErrors = Lists.newArrayList();
 
-		recordsIterator.errors.forEach(element -> resultErrors.add(
-				ImtResultError.builder().type(element.getType()).vehicleOwnerId(element.getVehicleOwnerId()).build()));
+		recordsIterator.errors
+				.forEach(
+						element -> resultErrors.add(ImtResultErrorRecord
+								.builder().resultErrorId(null).basic(ImtResultErrorBasic.builder()
+										.type(element.getType()).vehicleOwnerId(element.getVehicleOwnerId()).build())
+								.build()));
 
-		final ResultMetrics resultMetrics = ImtResultMetrics.builder().batchId(batchId).resultMetricsId(null)
-				.oddToEvenRatio(metrics.getOddToEvenRatio()).resultErrors(resultErrors)
-				.unregCarsCountByJud(unregCarsCountByJud).passedRegChangeDueDate(metrics.getPassedRegChangeDueDate())
-				.resultProcessTime(new java.sql.Timestamp(
-						LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()))
-				.build();
+		// final ResultMetrics resultMetrics =
+		// ImtResultMetrics.builder().batchId(batchId).resultMetricsId(null)
+		// .oddToEvenRatio(metrics.getOddToEvenRatio()).resultErrors(resultErrors)
+		// .unregCarsCountByJud(unregCarsCountByJud).passedRegChangeDueDate(metrics.getPassedRegChangeDueDate())
+		// .resultProcessTime(new java.sql.Timestamp(
+		// LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()))
+		// .build();
 
-		LOG.info("Inserarea rezultatului cu errori " + resultMetrics.toString());
+		final ResultEntity RES = MdfResultEntity.create()
+				.setRecord(MdfResultRecord.create()
+						.setBasic(MdfResultBasic.create().setOddToEvenRatio(metrics.getOddToEvenRatio())
+								.setPassedRegChangeDueDate(metrics.getPassedRegChangeDueDate())
+								.setResultProcessTime(new java.sql.Timestamp(
+										LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli())))
+						.setBatch(MdfResultBatch.create().setBatchId(batchId)))
+				.setResultMetricsId(null)
+
+				.setErrors(resultErrors).setUnregCars(unregCarsCountByJud);
 		try {
-			resultService.insertResultMetricsWithErrors(resultMetrics, ImtErrorCriteria.of(),
-					ImtResultUnregCarsCriteria.of());
+			resBusiness.createResult(ImtResultCreate.builder().basic(RES.getRecord().getBasic()).errors(RES.getErrors())
+					.unregCars(RES.getUnregCars()).batch(RES.getRecord().getBatch()).build());
 		} catch (final DatabaseIntegrityViolationException e) {
 			throw new DatabaseIntegrityViolationException(e);
 		}
