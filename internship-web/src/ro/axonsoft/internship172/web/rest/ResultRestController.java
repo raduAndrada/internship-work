@@ -1,4 +1,4 @@
-package ro.axonsoft.internship172.web.controllers;
+package ro.axonsoft.internship172.web.rest;
 
 import java.util.List;
 
@@ -20,12 +20,14 @@ import ro.axonsoft.internship172.data.domain.MdfResultUnregCarsCountByJud;
 import ro.axonsoft.internship172.data.exceptions.DatabaseIntegrityViolationException;
 import ro.axonsoft.internship172.data.exceptions.InvalidDatabaseAccessException;
 import ro.axonsoft.internship172.model.base.ImtPagination;
+import ro.axonsoft.internship172.model.base.SortDirection;
 import ro.axonsoft.internship172.model.result.ImtResultGet;
+import ro.axonsoft.internship172.model.result.ImtResultSortCriterion;
 import ro.axonsoft.internship172.model.result.ResultBasic;
 import ro.axonsoft.internship172.model.result.ResultMetricsDeleteResult;
 import ro.axonsoft.internship172.model.result.ResultMetricsGetResult;
 import ro.axonsoft.internship172.model.result.ResultRecord;
-import ro.axonsoft.internship172.web.services.ResultRestService;
+import ro.axonsoft.internship172.model.result.ResultSortCriterionType;
 
 /**
  * Clasa controller pentru serviciul de rezultate
@@ -36,13 +38,6 @@ import ro.axonsoft.internship172.web.services.ResultRestService;
 @RestController
 @RequestMapping(value = "/rest/v1/results")
 public class ResultRestController {
-
-	ResultRestService resultService;
-
-	@Inject
-	public void setResultRestService(final ResultRestService resultService) {
-		this.resultService = resultService;
-	}
 
 	ResultBusiness resultBusiness;
 
@@ -155,7 +150,8 @@ public class ResultRestController {
 		if (pageSize == 0) {
 			throw new InvalidDatabaseAccessException("dimensiunea unei pagini trebuie sa fie mai mare decat 0");
 		}
-		final Integer resultsCount = resultBusiness.getResults(ImtResultGet.builder().batchId(batchId).build())
+		final Integer resultsCount = resultBusiness.getResults(ImtResultGet.builder().batchId(batchId)
+				.addSort(ImtResultSortCriterion.of(ResultSortCriterionType.BATCH_ID, SortDirection.ASC)).build())
 				.getCount();
 		Integer numOfPages = resultsCount / pageSize;
 		if (resultsCount % pageSize != 0) {

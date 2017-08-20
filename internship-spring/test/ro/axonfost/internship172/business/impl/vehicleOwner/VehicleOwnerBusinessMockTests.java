@@ -21,9 +21,10 @@ import ro.axonsoft.internship172.data.api.vehicleOwner.VehicleOwnerDao;
 import ro.axonsoft.internship172.data.api.vehicleOwner.VehicleOwnerEntity;
 import ro.axonsoft.internship172.data.api.vehicleOwner.VehicleOwnerEntityGet;
 import ro.axonsoft.internship172.data.tests.RecrutareBusinessMockTests;
+import ro.axonsoft.internship172.model.base.Batch;
+import ro.axonsoft.internship172.model.base.ImtBatch;
 import ro.axonsoft.internship172.model.base.ImtResultBatch;
-import ro.axonsoft.internship172.model.base.MdfResultBatch;
-import ro.axonsoft.internship172.model.base.ResultBatch;
+import ro.axonsoft.internship172.model.base.MdfBatch;
 import ro.axonsoft.internship172.model.base.SortDirection;
 import ro.axonsoft.internship172.model.batch.BatchCreateResult;
 import ro.axonsoft.internship172.model.batch.BatchSortCriterionType;
@@ -52,9 +53,9 @@ public class VehicleOwnerBusinessMockTests extends RecrutareBusinessMockTests {
 
 	@Test
 	public void testCreateVehicleOwner_success() throws Exception {
-		final ResultBatch batch = MdfResultBatch.create();
+		final Batch batch = MdfBatch.create();
 
-		given(vhoDao.addBatch(MdfResultBatch.create().from(batch))).willReturn(1);
+		given(vhoDao.addBatch(MdfBatch.create().from(batch))).willReturn(1);
 
 		final BatchCreateResult batchCreateResult = vhoBusiness
 				.createBatch(ImtBatchCreate.builder().batch(ImtResultBatch.builder().build()).build());
@@ -67,12 +68,12 @@ public class VehicleOwnerBusinessMockTests extends RecrutareBusinessMockTests {
 						.setBasic(MdfVehicleOwnerBasic.create().setComentariu("abc")
 								.setIssueDate(Instant.parse("2017-08-03T11:41:00.00Z")).setRegPlate("HD10HXU")
 								.setRoIdCard("KX123456"))
-						.setBatch(ImtResultBatch.builder().batchId(0L).build()));
+						.setBatch(ImtBatch.builder().batchId(0L).build()));
 		given(vhoDao.addVehicleOwner(vhoEntity)).willReturn(1);
 		final VehicleOwnerCreateResult vhoCreateResult = vhoBusiness.createVehicleOwner(ImtVehicleOwnerCreate.builder()
 				.basic(ImtVehicleOwnerBasic.builder().comentariu("ABC").regPlate("HD10HXU").roIdCard("KX123456")
 						.issueDate(Instant.parse("2017-08-03T11:41:00.00Z")).build())
-				.batch(ImtResultBatch.builder().batchId(0L).build()).build());
+				.batch(ImtBatch.builder().batchId(0L).build()).build());
 		assertThat(vhoCreateResult)
 				.isEqualTo(ImtVehicleOwnerCreateResult
 						.builder().basic(ImtVehicleOwnerBasic.builder().comentariu("abc").regPlate("HD10HXU")
@@ -90,7 +91,7 @@ public class VehicleOwnerBusinessMockTests extends RecrutareBusinessMockTests {
 			vhoBusiness.createVehicleOwner(ImtVehicleOwnerCreate.builder()
 					.basic(ImtVehicleOwnerBasic.builder().comentariu("ABC").regPlate("HD10HXU").roIdCard("HD123456")
 							.issueDate(Instant.parse("2017-08-03T11:41:00.00Z")).build())
-					.batch(ImtResultBatch.builder().batchId(0L).build()).build());
+					.batch(ImtBatch.builder().batchId(0L).build()).build());
 			errorProperties = null;
 		} catch (final BusinessException e) {
 			errorProperties = e.getProperties();
@@ -111,7 +112,7 @@ public class VehicleOwnerBusinessMockTests extends RecrutareBusinessMockTests {
 			vhoBusiness.createVehicleOwner(ImtVehicleOwnerCreate.builder()
 					.basic(ImtVehicleOwnerBasic.builder().comentariu("ABC").regPlate("HD0HXU").roIdCard("H13456")
 							.issueDate(Instant.parse("2017-08-03T11:41:00.00Z")).build())
-					.batch(ImtResultBatch.builder().build()).build());
+					.batch(ImtBatch.builder().build()).build());
 			errorProperties = null;
 		} catch (final BusinessException e) {
 			errorProperties = e.getProperties();

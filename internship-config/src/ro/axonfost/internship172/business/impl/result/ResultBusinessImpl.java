@@ -246,8 +246,10 @@ public class ResultBusinessImpl implements ResultBusiness {
 	}
 
 	private ResultEntityCount buildResultEntityCount(ResultGet resGet) {
-		return ImtResultEntityCount.builder().criteria(ImtResultEntityCriteria.builder().idIncl(
-				resGet.getResultMetricsId() != null ? ImmutableSet.of(resGet.getResultMetricsId()) : ImmutableSet.of())
+		return ImtResultEntityCount.builder().criteria(ImtResultEntityCriteria.builder()
+				.idIncl(resGet.getResultMetricsId() != null ? ImmutableSet.of(resGet.getResultMetricsId())
+						: ImmutableSet.of())
+				.idBatchSelect(resGet.getBatchId() != null ? ImmutableSet.of(resGet.getBatchId()) : ImmutableSet.of())
 				.build()).search(resGet.getSearch()).build();
 	}
 

@@ -22,6 +22,8 @@
 	<typeAliases>
 
 		<typeAlias type="ro.axonsoft.internship172.model.base.MdfResultBatch"
+			alias="MdfResultBatch" />
+		<typeAlias type="ro.axonsoft.internship172.model.base.MdfBatch"
 			alias="MdfBatch" />
 		<typeAlias type="ro.axonsoft.internship172.data.domain.MdfVehicleOwner"
 			alias="MdfVehicleOwner" />

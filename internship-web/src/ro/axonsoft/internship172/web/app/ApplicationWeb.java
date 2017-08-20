@@ -11,7 +11,7 @@ import ro.axonsoft.internship172.data.DataConfiguration;
 
 @SpringBootApplication
 @Import({ DataConfiguration.class, BusinessConfiguration.class, ApplicationConfiguration.class,
-		VehicleOwnerBusinessConfiguration.class, MvcConfig.class })
+		VehicleOwnerBusinessConfiguration.class, MvcConfig.class, ThymeleafConfig.class })
 public class ApplicationWeb {
 	public static void main(final String args[]) {
 		SpringApplication.run(ApplicationWeb.class, args);

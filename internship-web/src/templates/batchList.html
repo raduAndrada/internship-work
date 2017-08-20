@@ -5,12 +5,10 @@
 </head>
 <body
 	th:onload="'paginationFunction(\''+${currentPage.get(0)}+ '\',\''+${currentPage.get(3)}+'\');'">
-	<div th:substituteby="layout/navbar :: navbar"></div>
+	<div th:substituteby="layout/navbar :: navbar('view-batches')"></div>
 	<script type="text/javascript" th:src="@{/js/tableSearch.js}"></script>
 	<div class="lightbox">
 		<div class="container">
-			<section layout:fragment="content">
-				<div layout:fragment="content">
 					<div class="container-fluid">
 						<div class="collapse navbar-collapse"
 							id="bs-example-navbar-collapse-1">
@@ -20,30 +18,29 @@
 									aria-expanded="false">Select page size<span class="caret"></span></a>
 									<ul class="dropdown-menu">
 										<li><a
-											th:href="@{/batches/(pageSize=${5},currentPage=${currentPage.get(0)})}">5</a></li>
+											th:href="@{/app/batches/(pageSize=${5},currentPage=${currentPage.get(0)})}">5</a></li>
 										<li><a
-											th:href="@{/batches/(pageSize=${10},currentPage=${currentPage.get(0)})}">10</a></li>
+											th:href="@{/app/batches/(pageSize=${10},currentPage=${currentPage.get(0)})}">10</a></li>
 										<li><a
-											th:href="@{/batches/(pageSize=${15},currentPage=${currentPage.get(0)})}">15</a></li>
+											th:href="@{/app/batches/(pageSize=${15},currentPage=${currentPage.get(0)})}">15</a></li>
 										<li><a
-											th:href="@{/batches/(pageSize=${20},currentPage=${currentPage.get(0)})}">20</a></li>
+											th:href="@{/app/batches/(pageSize=${20},currentPage=${currentPage.get(0)})}">20</a></li>
 									</ul></li>
 							</ul>
-							<ul class="nav navbar-nav">
-								<li class="form-group"><input type="text" id="myInput"
-									class="form-control" onkeyup="tableSearchOneColumn()"
-									placeholder="Search for batch by id" title="Type batch id" /></li>
-								<li><div class="form-group ">
-									<a class="btn btn-default"
-									th:href="@{/insertBatch/(pageSize=${pageSize},currentPage=${currentPage.get(0)})}">
-										<i class="fa fa-plus-square" aria-hidden="true"></i> <span
-										th:text="#{batch.add}"> </span>
+					<ul class="nav navbar-nav">
+						<li class="form-group"><input type="text" id="myInput"
+							class="form-control" onkeyup="tableSearchOneColumn()"
+							placeholder="Search for batch by id" title="Type batch id" /></li>
+						<li><div class="form-group ">
+								<a class="btn btn-default"
+									th:href="@{/app/create-batch/(pageSize=${pageSize},currentPage=${currentPage.get(0)})}">
+									<i class="fa fa-plus-square" aria-hidden="true"></i> <span
+									th:text="#{batch.add}"> </span>
 
 								</a>
-								</div>
-						</li>
-						</ul>
-					</div>
+							</div></li>
+					</ul>
+				</div>
 				</div>
 				<table id="myTable" class="table table-bordered table-hover">
 					<thead>
@@ -61,7 +58,7 @@
 							<td>
 								<div class="btn-group">
 									<a
-										th:href="@{/vehicleOwners/(batchId=${batch.batchId},pageSize=${3},currentPage=${0})}"
+										th:href="@{/app/vehicleOwners/(batchId=${batch.batchId},pageSize=${3},currentPage=${0})}"
 										class="btn btn-large btn-default"> <i class="fa fa-users"
 										aria-hidden="true"></i> <span
 										th:text="#{batch-list.vehicle-owner.view-list}"> </span>
@@ -89,7 +86,7 @@
 							<td>
 								<div class="btn-group">
 									<a class="btn btn-large btn-default"
-										th:href="@{/insertVehicleOwner(batchId=${batch.batchId})}">
+										th:href="@{/app/create(batchId=${batch.batchId})}">
 										<i class="fa fa-user-plus" aria-hidden="true"></i> <span
 										th:text="#{batch-list.vehicle-owner.add-new}"> </span>
 									</a>
@@ -98,8 +95,6 @@
 						</tr>
 					</tbody>
 				</table>
-		</div>
-		</section>
 	</div>
 	<div class="row">
 		<div class="col-md-12 text-center">
@@ -110,16 +105,16 @@
 							th:text="#{vehicle-owners.input-batch.records.no-vehicle-owners}"></p>
 					</li>
 					<li><a id="start" th:text="0"
-						th:href="@{/batches/(,pageSize=${pageSize},currentPage=0)}"></a></li>
+						th:href="@{/app/batches/(pageSize=${pageSize},currentPage=0)}"></a></li>
 					<li><a id="dotsPrev" th:text="..."
-						th:href="@{/batches/(pageSize=${pageSize},currentPage=${currentPage.get(1)})}"></a></li>
+						th:href="@{/app/batches/(pageSize=${pageSize},currentPage=${currentPage.get(1)})}"></a></li>
 					<li th:each="page : ${numberOfPages}"><a href="#"
-						th:href="@{/batches/(pageSize=${pageSize},currentPage=${page})}"
+						th:href="@{/app/batches/(pageSize=${pageSize},currentPage=${page})}"
 						th:text="${page}"></a></li>
 					<li><a id="dotsNext" th:text="..."
-						th:href="@{/batches/(pageSize=${pageSize},currentPage=${currentPage.get(2)})}"></a></li>
+						th:href="@{/app/batches/(pageSize=${pageSize},currentPage=${currentPage.get(2)})}"></a></li>
 					<li><a id="end" th:text="${currentPage.get(3)}"
-						th:href="@{/batches/(pageSize=${pageSize},currentPage=${currentPage.get(3)})}"></a></li>
+						th:href="@{/app/batches/(pageSize=${pageSize},currentPage=${currentPage.get(3)})}"></a></li>
 				</ul>
 			</div>
 		</div>

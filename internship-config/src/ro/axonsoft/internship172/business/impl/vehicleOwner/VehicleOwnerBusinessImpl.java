@@ -25,10 +25,11 @@ import ro.axonsoft.internship172.data.api.vehicleOwner.VehicleOwnerEntityDelete;
 import ro.axonsoft.internship172.data.api.vehicleOwner.VehicleOwnerEntityGet;
 import ro.axonsoft.internship172.data.api.vehicleOwner.VehicleOwnerEntityUpdate;
 import ro.axonsoft.internship172.model.api.RoIdCardParser;
+import ro.axonsoft.internship172.model.base.Batch;
+import ro.axonsoft.internship172.model.base.ImtBatch;
 import ro.axonsoft.internship172.model.base.ImtResultBatch;
-import ro.axonsoft.internship172.model.base.MdfResultBatch;
+import ro.axonsoft.internship172.model.base.MdfBatch;
 import ro.axonsoft.internship172.model.base.Pagination;
-import ro.axonsoft.internship172.model.base.ResultBatch;
 import ro.axonsoft.internship172.model.base.SortDirection;
 import ro.axonsoft.internship172.model.batch.BatchCreate;
 import ro.axonsoft.internship172.model.batch.BatchCreateResult;
@@ -97,7 +98,7 @@ public class VehicleOwnerBusinessImpl implements VehicleOwnerBusiness {
 		}
 
 		if (!checkBatchExists(vhoEntity)) {
-			final ResultBatch batchEntity = buildBatchForCreate(
+			final Batch batchEntity = buildBatchForCreate(
 					ImtBatchCreate.builder().batch(ImtResultBatch.builder().build()).build());
 			vehicleOwnerDao.addBatch(batchEntity);
 		}
@@ -129,12 +130,12 @@ public class VehicleOwnerBusinessImpl implements VehicleOwnerBusiness {
 
 	@Override
 	public BatchCreateResult createBatch(BatchCreate batchCreate) throws BusinessException {
-		final ResultBatch batchEntity = buildBatchForCreate(batchCreate);
+		final Batch batchEntity = buildBatchForCreate(batchCreate);
 		if (batchEntity.getBatchId() != null) {
 			throw new BusinessException("Batch id must be null", null);
 		}
 		vehicleOwnerDao.addBatch(batchEntity);
-		return ImtBatchCreateResult.builder().batch(ImtResultBatch.copyOf(batchEntity)).build();
+		return ImtBatchCreateResult.builder().batch(ImtBatch.copyOf(batchEntity)).build();
 	}
 
 	@Override
@@ -188,7 +189,7 @@ public class VehicleOwnerBusinessImpl implements VehicleOwnerBusiness {
 		final BatchEntityGet batchEntityGet = buildBatchEntityGet(batchGet);
 		final BatchEntityCount batchEntityCount = buildBatchEntityCount(batchGet);
 		final int count = vehicleOwnerDao.countBatch(batchEntityCount);
-		final List<ResultBatch> batches = vehicleOwnerDao.getBatch(batchEntityGet);
+		final List<Batch> batches = vehicleOwnerDao.getBatch(batchEntityGet);
 		return ImtBatchGetResult.builder().list(batches).count(count).pagination(batchGet.getPagination())
 				.pageCount(getPageCount(count, batchGet.getPagination())).build();
 	}
@@ -224,8 +225,10 @@ public class VehicleOwnerBusinessImpl implements VehicleOwnerBusiness {
 	}
 
 	private VehicleOwnerEntityCount buildVehicleOwnerEntityCount(final VehicleOwnerGet vhoGet) {
-		return ImtVehicleOwnerEntityCount.builder().criteria(ImtVehicleOwnerEntityCriteria.builder().roIdCardIncl(
-				vhoGet.getRoIdCard() != null ? ImmutableSet.of(vhoGet.getRoIdCard().toUpperCase()) : ImmutableSet.of())
+		return ImtVehicleOwnerEntityCount.builder().criteria(ImtVehicleOwnerEntityCriteria.builder()
+				.roIdCardIncl(vhoGet.getRoIdCard() != null ? ImmutableSet.of(vhoGet.getRoIdCard().toUpperCase())
+						: ImmutableSet.of())
+				.idBatchSelect(vhoGet.getBatchId() != null ? ImmutableSet.of(vhoGet.getBatchId()) : ImmutableSet.of())
 				.build()).search(vhoGet.getSearch()).build();
 	}
 
@@ -251,8 +254,8 @@ public class VehicleOwnerBusinessImpl implements VehicleOwnerBusiness {
 		return vhoEntity;
 	}
 
-	private ResultBatch buildBatchForCreate(final BatchCreate batchCreate) {
-		final ResultBatch batchEntity = MdfResultBatch.create().setBatchId(null);
+	private Batch buildBatchForCreate(final BatchCreate batchCreate) {
+		final Batch batchEntity = MdfBatch.create().setBatchId(null);
 		return batchEntity;
 	}
 

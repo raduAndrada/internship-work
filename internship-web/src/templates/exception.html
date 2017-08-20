@@ -5,7 +5,7 @@
 </head>
 <body>
     <div class="lightbox">
-        <div th:substituteby="layout/navbar :: navbar"></div>
+        <div th:substituteby="layout/navbar :: navbar('nope')"></div>
         <div class="container">
             <section layout:fragment="content">
                 <h1 th:text="#{error.default-err-msg}"></h1>

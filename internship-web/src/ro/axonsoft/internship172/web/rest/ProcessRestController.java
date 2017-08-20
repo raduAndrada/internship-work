@@ -1,4 +1,4 @@
-package ro.axonsoft.internship172.web.controllers;
+package ro.axonsoft.internship172.web.rest;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -22,18 +22,20 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.google.common.collect.Lists;
 
+import ro.axonfost.internship172.business.api.result.ResultBusiness;
 import ro.axonsoft.internship172.data.domain.ConcreteResultMetrics;
 import ro.axonsoft.internship172.data.domain.MdfConcreteResultMetrics;
 import ro.axonsoft.internship172.data.domain.MdfResultError;
-import ro.axonsoft.internship172.data.domain.MdfResultMetrics;
 import ro.axonsoft.internship172.data.domain.MdfResultUnregCarsCountByJud;
-import ro.axonsoft.internship172.data.domain.ResultMetrics;
 import ro.axonsoft.internship172.data.exceptions.DatabaseIntegrityViolationException;
 import ro.axonsoft.internship172.model.api.DbVehicleOwnersProcessor;
 import ro.axonsoft.internship172.model.api.Judet;
 import ro.axonsoft.internship172.model.api.StreamVehicleOwnersProcessor;
 import ro.axonsoft.internship172.model.api.VehicleOwnersProcessResult;
-import ro.axonsoft.internship172.web.services.ResultRestService;
+import ro.axonsoft.internship172.model.base.SortDirection;
+import ro.axonsoft.internship172.model.result.ImtResultGet;
+import ro.axonsoft.internship172.model.result.ResultRecord;
+import ro.axonsoft.internship172.model.result.ResultSortCriterionType;
 
 /**
  * Controller pentru bean-urile de procesare
@@ -47,7 +49,7 @@ public class ProcessRestController {
 
 	StreamVehicleOwnersProcessor streamProcessor;
 	DbVehicleOwnersProcessor dbProcessor;
-	ResultRestService resultService;
+	ResultBusiness resultBusiness;
 
 	private static final Logger LOG = LoggerFactory.getLogger(ProcessRestController.class);
 
@@ -57,13 +59,13 @@ public class ProcessRestController {
 	}
 
 	@Inject
-	public void setResultRestService(final ResultRestService resultService) {
-		this.resultService = resultService;
+	public void setStreamProcessor(final StreamVehicleOwnersProcessor streamProcessor) {
+		this.streamProcessor = streamProcessor;
 	}
 
 	@Inject
-	public void setStreamProcessor(final StreamVehicleOwnersProcessor streamProcessor) {
-		this.streamProcessor = streamProcessor;
+	public void setResultBusiness(ResultBusiness resultBusiness) {
+		this.resultBusiness = resultBusiness;
 	}
 
 	/**
@@ -134,29 +136,26 @@ public class ProcessRestController {
 
 	@RequestMapping(value = "/db/{batchId}", method = RequestMethod.GET)
 	public @ResponseBody ConcreteResultMetrics dbProcess(@PathVariable("batchId") final Long batchId) {
-		LOG.info("procesarea batch-ului" + batchId);
 		dbProcessor.process(batchId);
-		final List<ResultMetrics> res = resultService.getResultMetricsByBatchId(batchId);
-
-		final ResultMetrics processResultTemp = resultService
-				.selectResultMetricsById(res.get(res.size() - 1).getResultMetricsId());
-		final MdfResultMetrics processResult = MdfResultMetrics.create().from(processResultTemp);
+		final ResultRecord res = resultBusiness.getResults(ImtResultGet.builder().batchId(batchId)
+				.addSort(ResultSortCriterionType.RESULT_PROCESS_TIME, SortDirection.DESC).pagination(1, 1).build())
+				.getList().get(0);
 
 		final List<MdfResultError> resultErrors = Lists.newArrayList();
-		if (processResult.getResultErrors() != null && processResult.getResultErrors().size() != 0) {
-			processResult.getResultErrors().forEach(e -> resultErrors.add(MdfResultError.create().from(e)));
+		if (res.getErrors() != null && res.getErrors().size() != 0) {
+			res.getErrors().forEach(e -> resultErrors.add(MdfResultError.create().setType(e.getBasic().getType())
+					.setVehicleOwnerId(e.getBasic().getVehicleOwnerId())));
 		}
 		final List<MdfResultUnregCarsCountByJud> resultUnregCarsCountByJud = Lists.newArrayList();
-		if (processResult.getUnregCarsCountByJud() != null && processResult.getUnregCarsCountByJud().size() != 0) {
-			processResult.getUnregCarsCountByJud()
-					.forEach(e -> resultUnregCarsCountByJud.add(MdfResultUnregCarsCountByJud.create().from(e)));
+		if (res.getUnregCars() != null && res.getUnregCars().size() != 0) {
+			res.getUnregCars().forEach(e -> resultUnregCarsCountByJud.add(MdfResultUnregCarsCountByJud.create()
+					.setJudet(e.getBasic().getJudet()).setUnregCarsCount(e.getBasic().getUnregCarsCount())));
 		}
 		final MdfConcreteResultMetrics finalResult = MdfConcreteResultMetrics.create();
 
-		finalResult.setOddToEvenRatio(processResult.getOddToEvenRatio());
-		finalResult.setPassedRegChangeDueDate(processResult.getPassedRegChangeDueDate());
-		finalResult.setResultMetricsId(processResult.getResultMetricsId());
-		finalResult.setBatchId(processResult.getBatchId());
+		finalResult.setOddToEvenRatio(res.getBasic().getOddToEvenRatio());
+		finalResult.setPassedRegChangeDueDate(res.getBasic().getPassedRegChangeDueDate());
+		finalResult.setBatchId(res.getBatch().getBatchId());
 		finalResult.setResultErrors(resultErrors);
 		finalResult.setUnregCarsCountByJud(resultUnregCarsCountByJud);
 

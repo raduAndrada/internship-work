@@ -5,14 +5,16 @@ import javax.annotation.Nullable;
 import org.immutables.value.Value;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
-import ro.axonsoft.internship172.model.base.ResultBatch;
+import ro.axonsoft.internship172.model.base.Batch;
 
 @Value.Immutable
-@JsonDeserialize(builder = ImtVehicleOwnerCreate.Builder.class)
+@JsonSerialize(as = ImtVehicleOwnerCreate.class)
+@JsonDeserialize(as = ImtVehicleOwnerCreate.class)
 public interface VehicleOwnerCreate {
 	VehicleOwnerBasic getBasic();
 
 	@Nullable
-	ResultBatch getBatch();
+	Batch getBatch();
 }

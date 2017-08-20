@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org/">
+<head>
+<th:block th:fragment="head">
+	<meta charset="UTF-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<link rel="icon" type="image/png" th:href="@{/img/favicon.png}" />
+	<link rel="stylesheet" type="text/css"
+		th:href="@{/webjars/bootstrap/css/bootstrap.min.css}" />
+	<link rel="stylesheet" type="text/css"
+		th:href="@{/webjars/font-awesome/css/font-awesome.css}" />
+	<script type="text/javascript" th:src="@{/js/jquery.js}"></script>
+	<link rel="stylesheet" type="text/css" th:href="@{/css/navbar.css}" />
+	<link rel="stylesheet" type="text/css" href="../css/full-body.css"
+		th:href="@{/css/full-body.css}" />
+</th:block>
+</head>
+<body>
+
+	<div th:fragment="menu(current)">
+		<div id="sideNav"
+			class="w3-sidebar w3-bar-block w3-card-2 w3-animate-left w3-hide-medium w3-hide-large w3-xlarge"
+			style="display: none">
+			<button class="w3-bar-item w3-button"
+				onclick="navMenu.closeSideNav()">&times;</button>
+			<a th:href="@{/register}" class="w3-bar-item w3-button"
+				th:attrappend="class=${current == 'register' ? ' menu-item-selected' : ''}">Înregistrare</a>
+			<a th:href="@{/requirements}" class="w3-bar-item w3-button"
+				th:attrappend="class=${current == 'requirements' ? ' menu-item-selected' : ''}">Cerințe</a>
+			<a th:href="@{/deliver}" class="w3-bar-item w3-button"
+				th:attrappend="class=${current == 'deliver' ? ' menu-item-selected' : ''}">Trimite</a>
+		</div>
+		<div class="menu w3-bar">
+			<a href="#"
+				class="w3-bar-item w3-button menu-item w3-hide-medium w3-hide-large"
+				onclick="navMenu.toggleSideNav();return false;">&#9776;</a> <img
+				id="logo" class="axon-logo w3-hide-small"
+				th:src="@{/img/AXON_logo_325x65px_3.png}" alt="Axon Soft" /> <a
+				th:href="@{/register}"
+				class="w3-bar-item w3-button menu-item w3-hide-small"
+				th:attrappend="class=${current == 'register' ? ' menu-item-selected' : ''}">Înregistrare</a>
+			<a th:href="@{/requirements}"
+				class="w3-bar-item w3-button menu-item w3-hide-small"
+				th:attrappend="class=${current == 'requirements' ? ' menu-item-selected' : ''}">Cerințe</a>
+			<a th:href="@{/deliver}"
+				class="w3-bar-item w3-button menu-item w3-hide-small"
+				th:attrappend="class=${current == 'deliver' ? ' menu-item-selected' : ''}">Trimite</a>
+			<div class="current-user-menu w3-dropdown-hover w3-right"
+				th:if="${#authorization.expression('isAuthenticated()')}">
+				<button class="w3-button">
+					<!--  <span th:text="${#authentication.principal.fullName}">[USER DISPLAY NAME]</span> -->
+					<i class="fa fa-caret-down"></i>
+				</button>
+				<div class="w3-dropdown-content w3-bar-block w3-border">
+					<button class="w3-bar-item w3-button"
+						onclick="$('form#logoutForm').submit();return false;">Logout</button>
+				</div>
+			</div>
+		</div>
+		<form th:action="@{/logout}" method="POST" id="logoutForm"></form>
+	</div>
+	<div th:fragment="success-messages">
+		<th:block th:each="successMessage : ${successMessages}">
+			<div
+				th:text="#{${successMessage.key}(${#strings.listJoin(successMessage.vars,',')})}"
+				class="alert alert-success"></div>
+		</th:block>
+	</div>
+	<footer>
+		<th:block th:fragment="footer-js">
+			<script type="text/javascript"
+				th:src="@{/webjars/jquery/jquery.min.js}"></script>
+			<script type="text/javascript"
+				th:src="@{/webjars/bootstrap/js/bootstrap.min.js}"></script>
+		</th:block>
+	</footer>
+</body>
+</html>

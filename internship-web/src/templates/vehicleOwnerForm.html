@@ -4,12 +4,12 @@
 <title th:text="#{default-insert-msg}"></title>
 </head>
 <body>
-    <div th:substituteby="layout/navbar :: navbar"></div>
+    <div th:substituteby="layout/navbar :: navbar('insert')"></div>
     <div class="lightbox">
         <div class="container container-table">
             <div class="row vertical-center-row">
                 <h1 th:text="#{default-insert-msg.form}"></h1>
-                <form class="form-horizontal" action="#" th:action="@{/insertVehicleOwner}" th:object="${vehicleOwner}" method="post">
+                <form class="form-horizontal" action="#" th:action="@{/create}" th:object="${vehicleOwner}" method="post">
                     <div class="form-group">
                         <label for="roIdCard" th:text="#{vehicle-owners.input-batch.records.ro-id-card}" class="col-sm-2 control-label"></label>
                         <div class="col-sm-10">

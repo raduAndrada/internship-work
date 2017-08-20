@@ -2,10 +2,16 @@ apply plugin: 'org.springframework.boot'
 
 dependencies {
 
-	compile 'org.springframework.boot:spring-boot-starter-web'
+	compile('org.springframework.boot:spring-boot-starter-web')
 	compile "org.springframework.boot:spring-boot-starter-thymeleaf"
+	compile 'org.thymeleaf.extras:thymeleaf-extras-java8time:2.1.0.RELEASE'
+	
+	compile 'com.fasterxml.jackson.datatype:jackson-datatype-guava:2.8.7'
+	compile 'com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.8.7'
+	compile 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.8.7'
 	
 	compile project(':internship-config')
+	compile project(':internship-model')
 	runtime 'mysql:mysql-connector-java:5.1.42' 
 	
 	runtime 'org.webjars:jquery:3.2.1'

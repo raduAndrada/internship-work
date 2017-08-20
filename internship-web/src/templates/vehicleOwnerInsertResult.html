@@ -4,7 +4,7 @@
 <title th:text="#{default-success-msg}"></title>
 </head>
 <body>
-    <div th:substituteby="layout/navbar :: navbar"></div>
+    <div th:substituteby="layout/navbar :: navbar('insert')"></div>
     <div class="lightbox">
         <div class="container">
             <section layout:fragment="content">

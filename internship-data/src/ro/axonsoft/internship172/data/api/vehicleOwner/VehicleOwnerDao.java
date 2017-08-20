@@ -4,12 +4,12 @@ import java.util.List;
 
 import ro.axonsoft.internship172.data.api.batch.BatchEntityCount;
 import ro.axonsoft.internship172.data.api.batch.BatchEntityGet;
-import ro.axonsoft.internship172.model.base.ResultBatch;
+import ro.axonsoft.internship172.model.base.Batch;
 
 public interface VehicleOwnerDao {
 	int addVehicleOwner(VehicleOwnerEntity vho);
 
-	int addBatch(ResultBatch batch);
+	int addBatch(Batch batch);
 
 	int updateVehicleOwner(VehicleOwnerEntityUpdate update);
 
@@ -19,7 +19,7 @@ public interface VehicleOwnerDao {
 
 	List<VehicleOwnerEntity> getVehicleOwner(VehicleOwnerEntityGet get);
 
-	List<ResultBatch> getBatch(BatchEntityGet get);
+	List<Batch> getBatch(BatchEntityGet get);
 
 	Integer countBatch(BatchEntityCount count);
 }

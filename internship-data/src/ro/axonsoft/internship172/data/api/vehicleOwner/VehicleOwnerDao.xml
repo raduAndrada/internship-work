@@ -41,8 +41,8 @@
 		BATCH_ID
 		from BATCH
 		<where>
-			<include refid="whereCriteria" />
-			<include refid="searchCriteria" />
+			<include refid="whereBatchCriteria" />
+			<include refid="searchBatchCriteria" />
 		</where>
 		<include refid="sortCriteria" />
 		<include refid="pagination" />
@@ -101,8 +101,8 @@
 		select count(*)
 		from BATCH
 		<where>
-			<include refid="whereCriteria" />
-			<include refid="searchCriteria" />
+			<include refid="whereBatchCriteria" />
+			<include refid="searchBatchCriteria" />
 		</where>
 	</select>
 
@@ -118,6 +118,17 @@
 					open="and RO_ID_CARD in (" separator="," close=")">#{roIdCardInclItem}
 				</foreach>
 			</if>
+			<if
+				test="criteria.idBatchSelect != null and !criteria.idBatchSelect.empty">
+				<foreach item="idBatchSelect" collection="criteria.idBatchSelect"
+					open="and BATCH_ID in (" separator="," close=")">#{idBatchSelect}
+				</foreach>
+			</if>
+		</if>
+	</sql>
+	
+		<sql id="whereBatchCriteria">
+		<if test="criteria != null">
 			<if
 				test="criteria.idBatchSelect != null and !criteria.idBatchSelect.empty">
 				<foreach item="idBatchSelect" collection="criteria.idBatchSelect"
@@ -158,6 +169,15 @@
 			or
 			UPPER(COMENTARIU) like
 			UPPER(#{likePattern})
+		</if>
+	</sql>
+	
+		<sql id="searchBatchCriteria">
+		<if test="search != null">
+			<bind name="likePattern" value="'%' + search + '%'" />
+			and
+			BATCH_ID like (#{likePattern})
+
 		</if>
 	</sql>
 

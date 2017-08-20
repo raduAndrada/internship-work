@@ -11,10 +11,6 @@ import org.springframework.context.annotation.Configuration;
 import com.google.common.collect.Multimap;
 
 import ro.axonsoft.internship172.business.impl.DbVehicleOwnersProcessorImpl;
-import ro.axonsoft.internship172.data.impl.ResultServiceImpl;
-import ro.axonsoft.internship172.data.impl.VehicleOwnerServiceImpl;
-import ro.axonsoft.internship172.data.services.ResultService;
-import ro.axonsoft.internship172.data.services.VehicleOwnerService;
 import ro.axonsoft.internship172.impl.RoIdCardParserImpl;
 import ro.axonsoft.internship172.impl.RoIdCardSeriesJudMapperImpl;
 import ro.axonsoft.internship172.impl.RoRegPlateParserImpl;
@@ -77,16 +73,6 @@ public class BusinessConfiguration {
 	@Bean
 	public StreamVehicleOwnersProcessor streamVehicleOwnersProcessor() {
 		return new StreamVehicleOwnersProcessorImpl(roRegPlateParser(), roIdCardParser(), vehicleOwnersProcessor());
-	}
-
-	@Bean
-	public VehicleOwnerService vehicleOwnerService() {
-		return new VehicleOwnerServiceImpl();
-	}
-
-	@Bean
-	public ResultService resultService() {
-		return new ResultServiceImpl();
 	}
 
 	@Bean

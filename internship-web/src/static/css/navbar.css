@@ -3,9 +3,6 @@
 	color: #e8e9fd; /*Sets the text hover color on navbar*/
 }
 
-a:visited {
-	color: #000000;
-}
 
 .navbar-default {
 	background-color: #546f79;
@@ -37,18 +34,9 @@ a:visited {
 	color: #d6d6d6;
 }
 
-.navbar-default .navbar-nav>.active>a, .navbar-default .navbar-nav>.active>a:hover,
-	.navbar-default .navbar-nav>.active>a:focus {
-	color: #000;
-	background: #d65c14;
-}
 
-.navbar-default .navbar-nav>.selected {
-	background: #d65c14;
-	border: 1px solid #888;
-}
 
 .navbar-default .navbar-nav>.active-page
 {
-  background-color:blue;
+  background-color: #63715b;
 }

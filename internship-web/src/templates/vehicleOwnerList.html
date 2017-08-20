@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:include="layout/head :: head">
+<title th:text="#{vehicle-owners.input-batch.records.title}"></title>
+</head>
+<body
+	th:onload="'paginationFunction(\''+${currentPage.get(0)}+ '\',\''+${currentPage.get(3)}+'\');'">
+	<div th:substituteby="layout/navbar :: navbar('nope')"></div>
+	<div class="lightbox">
+		<div class="container">
+			<script type="text/javascript" th:src="@{/js/tableSearch.js}"></script>
+			<section layout:fragment="content">
+				<div layout:fragment="content">
+					<div class="container-fluid">
+						<div class="collapse navbar-collapse"
+							id="bs-example-navbar-collapse-1">
+							<ul class="nav navbar-nav navbar-right">
+								<li class="dropdown"><a href="#" class="dropdown-toggle"
+									data-toggle="dropdown" role="button" aria-haspopup="true"
+									aria-expanded="false">Select page size<span class="caret"></span></a>
+									<ul class="dropdown-menu">
+										<li><a
+											th:href="@{/app/vehicleOwners/(batchId=${batchId},pageSize=${5},currentPage=${currentPage.get(0)})}">5</a></li>
+										<li><a
+											th:href="@{/app/vehicleOwners/(batchId=${batchId},pageSize=${10},currentPage=${currentPage.get(0)})}">10</a></li>
+										<li><a
+											th:href="@{/app/vehicleOwners/(batchId=${batchId},pageSize=${15},currentPage=${currentPage.get(0)})}">15</a></li>
+										<li><a
+											th:href="@{/app/vehicleOwners/(batchId=${batchId},pageSize=${20},currentPage=${currentPage.get(0)})}">20</a></li>
+									</ul></li>
+								<li class="dropdown"><a href="#" class="dropdown-toggle"
+									data-toggle="dropdown" role="button" aria-haspopup="true"
+									aria-expanded="false"> Sort <span class="caret"></span>
+								</a>
+									<ul class="dropdown-menu">
+										<li><a onclick="sortTableDesc(0)"> <span
+												th:text="#{default-sort.id-desc}"> </span>
+										</a></li>
+										<li><a onclick="sortTableDesc(1)"> <span
+												th:text="#{default-sort.id-card-desc}"> </span>
+										</a></li>
+										<li><a onclick="sortTableAsc(0)"> <span
+												th:text="#{default-sort.id-asc}"> </span>
+										</a></li>
+										<li><a onclick="sortTableAsc(1)"> <span
+												th:text="#{default-sort.id-card-asc}"> </span>
+										</a></li>
+									</ul></li>
+							</ul>
+							<ul class="nav navbar-nav">
+								<li class="form-group"><input type="text" id="myInput"
+									class="form-control" onkeyup="tableSearchOneColumn()"
+									placeholder="Search for batch by id" title="Type batch id" /></li>
+							</ul>
+						</div>
+					</div>
+					<table id="myTable" class="table table-bordered table-hover">
+						<thead>
+							<tr>
+								<td th:text="#{vehicle-owners.input-batch.records.id}"></td>
+								<td th:text="#{vehicle-owners.input-batch.records.ro-id-card}"></td>
+								<td th:text="#{vehicle-owners.input-batch.records.issue-date}"></td>
+								<td th:text="#{vehicle-owners.input-batch.records.reg-plate}"></td>
+								<td th:text="#{vehicle-owners.input-batch.records.comentariu}"></td>
+								<td th:text="#{vehicle-owners.input-batch.records.batch-id}"></td>
+							</tr>
+						</thead>
+						<tbody>
+							<tr th:if="${vehicleOwnersList.empty}">
+								<td colspan="4"
+									th:text="#{vehicle-owners.input-batch.records.no-vehicle-owners}"></td>
+							</tr>
+							<tr th:each="vehicleOwner : ${vehicleOwnersList}">
+								<td th:text="${vehicleOwner.vehicleOwnerId}">1</td>
+								<td th:text="${vehicleOwner.roIdCard}"></td>
+								<td th:text="${vehicleOwner.issueDate}"></td>
+								<td th:text="${vehicleOwner.regPlate}"></td>
+								<td th:text="${vehicleOwner.comentariu}"></td>
+								<td th:text="${vehicleOwner.batchId}"></td>
+								<td>
+									<form action="#"
+										th:action="@{'/app/delete/' + ${vehicleOwner.roIdCard}}"
+										th:object="${vehicleOwner}" method="post">
+										<button class="btn btn-default btn-danger" type="submit">
+											<i class="fa fa-trash" aria-hidden="true"></i> <span
+												th:text="#{vehicle-owners.input-batch.records.delete-btn}"></span>
+										</button>
+									</form>
+								</td>
+								<td><a id="update-btn" th:href="@{'/app/'+ ${vehicleOwner.roIdCard}}"
+									class="btn btn-info btn-md "> <i
+										class="fa fa-undo"></i> <span th:text="#{generic.update}">Update</span>
+								</a></td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</section>
+		</div>
+		<div class="row">
+			<div class="col-md-12 text-center">
+				<div class='pagination pagination-centered'>
+					<ul id="pagination" class="pagination">
+						<li th:if="${numberOfPages.empty}">
+							<p colspan="4"
+								th:text="#{vehicle-owners.input-batch.records.no-vehicle-owners}"></p>
+						</li>
+						<li><a id="start" th:text="0"
+							th:href="@{/app/vehicleOwners/(batchId=${batchId},pageSize=${pageSize},currentPage=0)}"></a></li>
+						<li><a id="dotsPrev" th:text="..."
+							th:href="@{/app/vehicleOwners/(batchId=${batchId},pageSize=${pageSize},currentPage=${currentPage.get(1)})}"></a></li>
+						<li th:each="page : ${numberOfPages}"><a href="#"
+							th:href="@{/app/vehicleOwners/(batchId=${batchId},pageSize=${pageSize},currentPage=${page})}"
+							th:text="${page}"></a></li>
+						<li><a id="dotsNext" th:text="..."
+							th:href="@{/app/vehicleOwners/(batchId=${batchId},pageSize=${pageSize},currentPage=${currentPage.get(2)})}"></a></li>
+						<li><a id="end" th:text="${currentPage.get(3)}"
+							th:href="@{/app/vehicleOwners/(batchId=${batchId},pageSize=${pageSize},currentPage=${currentPage.get(3)})}"></a></li>
+					</ul>
+				</div>
+			</div>
+		</div>
+		<div th:substituteby="layout/footer :: footer"></div>
+	</div>
+	<script type="text/javascript" th:src="@{/js/pagination.js}"></script>
+</body>
+</html>

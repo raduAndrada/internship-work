@@ -4,7 +4,7 @@
 <title th:text="#{default-success-msg}"></title>
 </head>
 <body th:onload="'paginationFunction(\''+${currentPage.get(0)}+ '\',\''+${currentPage.get(3)}+'\');'">
-    <div th:substituteby="layout/navbar :: navbar"></div>
+    <div th:substituteby="layout/navbar :: navbar('view-batches')"></div>
     <div class="lightbox">
         <div class="container">
             <script type="text/javascript" th:src="@{/js/tableSearch.js}"></script>
