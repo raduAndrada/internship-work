@@ -23,7 +23,6 @@ import ro.axonsoft.internship172.data.api.vehicleOwner.VehicleOwnerEntityGet;
 import ro.axonsoft.internship172.data.tests.RecrutareBusinessMockTests;
 import ro.axonsoft.internship172.model.base.Batch;
 import ro.axonsoft.internship172.model.base.ImtBatch;
-import ro.axonsoft.internship172.model.base.ImtResultBatch;
 import ro.axonsoft.internship172.model.base.MdfBatch;
 import ro.axonsoft.internship172.model.base.SortDirection;
 import ro.axonsoft.internship172.model.batch.BatchCreateResult;
@@ -58,7 +57,7 @@ public class VehicleOwnerBusinessMockTests extends RecrutareBusinessMockTests {
 		given(vhoDao.addBatch(MdfBatch.create().from(batch))).willReturn(1);
 
 		final BatchCreateResult batchCreateResult = vhoBusiness
-				.createBatch(ImtBatchCreate.builder().batch(ImtResultBatch.builder().build()).build());
+				.createBatch(ImtBatchCreate.builder().batch(ImtBatch.builder().build()).build());
 
 		assertThat(batchCreateResult).isEqualTo(ImtBatchCreateResult.builder().batch(batch).build());
 		System.out.println(vhoBusiness.getBatches(ImtBatchGet.builder()

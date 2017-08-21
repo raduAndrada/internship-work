@@ -1,7 +1,6 @@
 package ro.axonsoft.internship172.web.rest;
 
 import java.sql.Date;
-import java.time.Instant;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -27,11 +26,12 @@ import ro.axonsoft.internship172.data.domain.MdfVehicleOwner;
 import ro.axonsoft.internship172.data.domain.VehicleOwner;
 import ro.axonsoft.internship172.data.exceptions.DatabaseIntegrityViolationException;
 import ro.axonsoft.internship172.data.exceptions.InvalidDatabaseAccessException;
-import ro.axonsoft.internship172.model.base.ImtBatch;
+import ro.axonsoft.internship172.model.base.Batch;
 import ro.axonsoft.internship172.model.base.ImtPagination;
 import ro.axonsoft.internship172.model.base.MdfResultBatch;
 import ro.axonsoft.internship172.model.base.ResultBatch;
 import ro.axonsoft.internship172.model.base.SortDirection;
+import ro.axonsoft.internship172.model.batch.BatchCreate;
 import ro.axonsoft.internship172.model.batch.BatchCreateResult;
 import ro.axonsoft.internship172.model.batch.BatchGetResult;
 import ro.axonsoft.internship172.model.batch.BatchSortCriterionType;
@@ -39,8 +39,6 @@ import ro.axonsoft.internship172.model.batch.ImtBatchCreate;
 import ro.axonsoft.internship172.model.batch.ImtBatchGet;
 import ro.axonsoft.internship172.model.batch.ImtBatchSortCriterion;
 import ro.axonsoft.internship172.model.error.BusinessException;
-import ro.axonsoft.internship172.model.vehicleOwner.ImtVehicleOwnerBasic;
-import ro.axonsoft.internship172.model.vehicleOwner.ImtVehicleOwnerCreate;
 import ro.axonsoft.internship172.model.vehicleOwner.ImtVehicleOwnerGet;
 import ro.axonsoft.internship172.model.vehicleOwner.ImtVehicleOwnerSortCriterion;
 import ro.axonsoft.internship172.model.vehicleOwner.ImtVehicleOwnerUpdate;
@@ -100,7 +98,7 @@ public class VehicleOwnersRestController {
 	}
 
 	@RequestMapping(method = RequestMethod.POST)
-	public ResponseEntity<VehicleOwnerCreateResult> postUser(@RequestBody final VehicleOwnerCreate vhoCreate)
+	public ResponseEntity<VehicleOwnerCreateResult> postVehicleOwner(@RequestBody final VehicleOwnerCreate vhoCreate)
 			throws BusinessException {
 		return ResponseEntity.ok(vhoBusiness.createVehicleOwner(vhoCreate));
 	}
@@ -127,28 +125,33 @@ public class VehicleOwnersRestController {
 	 *            inregistrarea cu datele solicitate
 	 * @return inregistrarea finala
 	 */
-	@RequestMapping(value = "/insertVehicleOwner", method = RequestMethod.POST)
-	@Transactional
-	public ResponseEntity<VehicleOwner> insertVehicleOwner(@RequestBody final MdfVehicleOwner vehicleOwner)
-			throws DatabaseIntegrityViolationException {
-
-		String issueDate = vehicleOwner.getIssueDate().toString();
-		issueDate += "T11:59:59.59Z";
-		final VehicleOwnerCreateResult vhoCreateResult = vhoBusiness.createVehicleOwner(ImtVehicleOwnerCreate.builder()
-				.basic(ImtVehicleOwnerBasic.builder().regPlate(vehicleOwner.getRegPlate())
-						.roIdCard(vehicleOwner.getRoIdCard()).issueDate(Instant.parse(issueDate))
-						.comentariu(vehicleOwner.getComentariu()).build())
-				.batch(ImtBatch.builder().batchId(vehicleOwner.getBatchId()).build()).build());
-		LOG.info("inserarea noii inregistrari pe tabela de VEHICLE_OWNER " + vehicleOwner.toString());
-		LOG.info("dupa inserare " + vhoCreateResult.toString());
-		final VehicleOwner vh = ImtVehicleOwner.builder().batchId(vehicleOwner.getBatchId())
-				.comentariu(vhoCreateResult.getBasic().getComentariu())
-				.issueDate(new Date(vhoCreateResult.getBasic().getIssueDate().toEpochMilli()))
-				.regPlate(vhoCreateResult.getBasic().getRegPlate()).roIdCard(vhoCreateResult.getBasic().getRoIdCard())
-				.build();
-
-		return ResponseEntity.ok(vh);
-	}
+	// @RequestMapping(value = "/insertVehicleOwner", method = RequestMethod.POST)
+	// @Transactional
+	// public ResponseEntity<VehicleOwner> insertVehicleOwner(@RequestBody final
+	// MdfVehicleOwner vehicleOwner)
+	// throws DatabaseIntegrityViolationException {
+	//
+	// String issueDate = vehicleOwner.getIssueDate().toString();
+	// issueDate += "T11:59:59.59Z";
+	// final VehicleOwnerCreateResult vhoCreateResult =
+	// vhoBusiness.createVehicleOwner(ImtVehicleOwnerCreate.builder()
+	// .basic(ImtVehicleOwnerBasic.builder().regPlate(vehicleOwner.getRegPlate())
+	// .roIdCard(vehicleOwner.getRoIdCard()).issueDate(Instant.parse(issueDate))
+	// .comentariu(vehicleOwner.getComentariu()).build())
+	// .batch(ImtBatch.builder().batchId(vehicleOwner.getBatchId()).build()).build());
+	// LOG.info("inserarea noii inregistrari pe tabela de VEHICLE_OWNER " +
+	// vehicleOwner.toString());
+	// LOG.info("dupa inserare " + vhoCreateResult.toString());
+	// final VehicleOwner vh =
+	// ImtVehicleOwner.builder().batchId(vehicleOwner.getBatchId())
+	// .comentariu(vhoCreateResult.getBasic().getComentariu())
+	// .issueDate(new
+	// Date(vhoCreateResult.getBasic().getIssueDate().toEpochMilli()))
+	// .regPlate(vhoCreateResult.getBasic().getRegPlate()).roIdCard(vhoCreateResult.getBasic().getRoIdCard())
+	// .build();
+	//
+	// return ResponseEntity.ok(vh);
+	// }
 
 	/**
 	 * inserarea unui batch nou
@@ -163,12 +166,18 @@ public class VehicleOwnersRestController {
 	 */
 
 	@RequestMapping(value = "/insertBatch/{pageSize}/{currentPage}", method = RequestMethod.POST)
-	public ResponseEntity<ResultBatch> insertBatchOwner(@RequestBody final MdfResultBatch batch,
+	public ResponseEntity<ResultBatch> insertBatchOwner(@RequestBody final Batch batch,
 			@PathVariable("currentPage") final Integer currentPage, @PathVariable("pageSize") final Integer pageSize) {
 		LOG.info("inserarea noii inregistrari pe tabela de BATCH ");
 		final BatchCreateResult batchCreateResult = vhoBusiness
 				.createBatch(ImtBatchCreate.builder().batch(batch).build());
 		return ResponseEntity.ok(MdfResultBatch.create().setBatchId(batchCreateResult.getBatch().getBatchId()));
+	}
+
+	@RequestMapping(path = "/create-batch", method = RequestMethod.POST)
+	public ResponseEntity<BatchCreateResult> postBatch(@RequestBody final BatchCreate batchCreate)
+			throws BusinessException {
+		return ResponseEntity.ok(vhoBusiness.createBatch(batchCreate));
 	}
 
 	/**
@@ -182,16 +191,22 @@ public class VehicleOwnersRestController {
 	 * @throws DatabaseIntegrityViolationException
 	 *             daca id-ul nu este in baza de date
 	 */
-	@RequestMapping(value = "/deleteVehicleOwnerByRoIdCard/{roIdCard}", method = RequestMethod.POST)
-	public ResponseEntity<MdfVehicleOwner> delete(@RequestBody final MdfVehicleOwner vehicleOwner,
-			@PathVariable("roIdCard") final String roIdCard) throws DatabaseIntegrityViolationException {
-
-		final VehicleOwnerDeleteResult vhoDeleteResult = vhoBusiness.deleteVehicleOwner(roIdCard);
-		return ResponseEntity.ok(MdfVehicleOwner.create().setComentariu(vhoDeleteResult.getBasic().getComentariu())
-				.setRegPlate(vhoDeleteResult.getBasic().getRegPlate())
-				.setRoIdCard(vhoDeleteResult.getBasic().getRoIdCard())
-				.setIssueDate(new Date(vhoDeleteResult.getBasic().getIssueDate().getEpochSecond())));
-	}
+	// @RequestMapping(value = "/deleteVehicleOwnerByRoIdCard/{roIdCard}", method =
+	// RequestMethod.POST)
+	// public ResponseEntity<MdfVehicleOwner> delete(@RequestBody final
+	// MdfVehicleOwner vehicleOwner,
+	// @PathVariable("roIdCard") final String roIdCard) throws
+	// DatabaseIntegrityViolationException {
+	//
+	// final VehicleOwnerDeleteResult vhoDeleteResult =
+	// vhoBusiness.deleteVehicleOwner(roIdCard);
+	// return
+	// ResponseEntity.ok(MdfVehicleOwner.create().setComentariu(vhoDeleteResult.getBasic().getComentariu())
+	// .setRegPlate(vhoDeleteResult.getBasic().getRegPlate())
+	// .setRoIdCard(vhoDeleteResult.getBasic().getRoIdCard())
+	// .setIssueDate(new
+	// Date(vhoDeleteResult.getBasic().getIssueDate().getEpochSecond())));
+	// }
 
 	@RequestMapping(path = "/{roIdCard}", method = RequestMethod.DELETE)
 	public ResponseEntity<VehicleOwnerDeleteResult> deleteUser(@PathVariable final String roIdCard)

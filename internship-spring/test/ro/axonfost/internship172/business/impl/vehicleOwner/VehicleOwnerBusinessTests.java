@@ -18,7 +18,6 @@ import ro.axonsoft.internship172.data.tests.RecrutareBusinessTests;
 import ro.axonsoft.internship172.data.tests.TestDbUtil;
 import ro.axonsoft.internship172.model.base.ImtBatch;
 import ro.axonsoft.internship172.model.base.ImtPagination;
-import ro.axonsoft.internship172.model.base.ImtResultBatch;
 import ro.axonsoft.internship172.model.base.SortDirection;
 import ro.axonsoft.internship172.model.batch.BatchCreateResult;
 import ro.axonsoft.internship172.model.batch.BatchGetResult;
@@ -61,7 +60,7 @@ public class VehicleOwnerBusinessTests extends RecrutareBusinessTests {
 	public void testCreateUserOnEmptyDatabase() throws Exception {
 		dbUtil.setIdentity(BATCH_TN, BATCH_ID_CLM_NAME, 6);
 		final BatchCreateResult batchCreateResult = vhoBusiness
-				.createBatch(ImtBatchCreate.builder().batch(ImtResultBatch.builder().build()).build());
+				.createBatch(ImtBatchCreate.builder().batch(ImtBatch.builder().build()).build());
 
 		assertThat(batchCreateResult)
 				.isEqualTo(ImtBatchCreateResult.builder().batch(ImtBatch.builder().build()).build());

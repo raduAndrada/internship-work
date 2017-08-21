@@ -27,7 +27,6 @@ import ro.axonsoft.internship172.data.api.vehicleOwner.VehicleOwnerEntityUpdate;
 import ro.axonsoft.internship172.model.api.RoIdCardParser;
 import ro.axonsoft.internship172.model.base.Batch;
 import ro.axonsoft.internship172.model.base.ImtBatch;
-import ro.axonsoft.internship172.model.base.ImtResultBatch;
 import ro.axonsoft.internship172.model.base.MdfBatch;
 import ro.axonsoft.internship172.model.base.Pagination;
 import ro.axonsoft.internship172.model.base.SortDirection;
@@ -99,7 +98,7 @@ public class VehicleOwnerBusinessImpl implements VehicleOwnerBusiness {
 
 		if (!checkBatchExists(vhoEntity)) {
 			final Batch batchEntity = buildBatchForCreate(
-					ImtBatchCreate.builder().batch(ImtResultBatch.builder().build()).build());
+					ImtBatchCreate.builder().batch(ImtBatch.builder().build()).build());
 			vehicleOwnerDao.addBatch(batchEntity);
 		}
 

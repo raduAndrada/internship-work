@@ -27,13 +27,15 @@
 							placeholder="Search for batch by id" title="Type batch id" /></li>
 
 					</ul>
-					
+
 				</div>
 			</form>
-			<a
-				th:href="@{/app/create-batch/(pageSize=${pageSize},currentPage=${batchListForm.page})}"
-				th:title="#{batch.add}" class="btn btn-md btn-default"><i
-				class="fa fa-plus"></i></a>
+			<form th:action="@{/app/create-batch}" method="post">
+				<button type="submit" th:title="#{batch.add}"
+					class="btn btn-md btn-default">
+					<i class="fa fa-plus"></i>
+				</button>
+			</form>
 		</div>
 		<div class="container-fluid nav navbar-nav navbar-right">
 			<div class="btn-group">
