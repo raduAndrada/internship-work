@@ -17,25 +17,29 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.google.common.collect.Lists;
 
 import ro.axonfost.internship172.business.api.result.ResultBusiness;
-import ro.axonsoft.internship172.data.domain.ConcreteResultMetrics;
-import ro.axonsoft.internship172.data.domain.MdfConcreteResultMetrics;
-import ro.axonsoft.internship172.data.domain.MdfResultError;
-import ro.axonsoft.internship172.data.domain.MdfResultUnregCarsCountByJud;
 import ro.axonsoft.internship172.data.exceptions.DatabaseIntegrityViolationException;
 import ro.axonsoft.internship172.model.api.DbVehicleOwnersProcessor;
 import ro.axonsoft.internship172.model.api.Judet;
 import ro.axonsoft.internship172.model.api.StreamVehicleOwnersProcessor;
 import ro.axonsoft.internship172.model.api.VehicleOwnersProcessResult;
+import ro.axonsoft.internship172.model.base.ImtBatch;
 import ro.axonsoft.internship172.model.base.SortDirection;
+import ro.axonsoft.internship172.model.result.ImtResultBasic;
+import ro.axonsoft.internship172.model.result.ImtResultErrorBasic;
+import ro.axonsoft.internship172.model.result.ImtResultErrorRecord;
 import ro.axonsoft.internship172.model.result.ImtResultGet;
+import ro.axonsoft.internship172.model.result.ImtResultRecord;
+import ro.axonsoft.internship172.model.result.ImtResultUnregCarsCountByJudBasic;
+import ro.axonsoft.internship172.model.result.ImtResultUnregCarsCountByJudRecord;
+import ro.axonsoft.internship172.model.result.ResultErrorRecord;
 import ro.axonsoft.internship172.model.result.ResultRecord;
 import ro.axonsoft.internship172.model.result.ResultSortCriterionType;
+import ro.axonsoft.internship172.model.result.ResultUnregCarsCountByJudRecord;
 
 /**
  * Controller pentru bean-urile de procesare
@@ -44,8 +48,13 @@ import ro.axonsoft.internship172.model.result.ResultSortCriterionType;
  *
  */
 @RestController
-@RequestMapping(value = "/rest/v1/processing")
+@RequestMapping(value = "/v1/processing")
 public class ProcessRestController {
+
+	public static final String URL_PROCESS_CSV_SERIAL = "/csv/java-serial";
+	public static final String URL_PROCESS_CSV_JSON = "/csv/json";
+	public static final String BATCH_PATH = "{batchId}";
+	public static final String URL_DB_PROCESS = "/db/" + BATCH_PATH;
 
 	StreamVehicleOwnersProcessor streamProcessor;
 	DbVehicleOwnersProcessor dbProcessor;
@@ -79,7 +88,7 @@ public class ProcessRestController {
 	 *             stream-ul este invalid
 	 */
 
-	@RequestMapping(value = "/csv/java-serial", method = RequestMethod.POST)
+	@RequestMapping(value = URL_PROCESS_CSV_SERIAL, method = RequestMethod.POST)
 	public void csvProcess(final InputStream in, final OutputStream out) throws Exception {
 		streamProcessor.process(in, out);
 	}
@@ -94,34 +103,34 @@ public class ProcessRestController {
 	 *             fisier-ul de intrare, invalid
 	 */
 
-	@RequestMapping(value = "/csv/json", method = RequestMethod.POST)
-	public ResponseEntity<MdfConcreteResultMetrics> csvProcess(final InputStream in) throws Exception {
+	@RequestMapping(value = URL_PROCESS_CSV_JSON, method = RequestMethod.POST)
+	public ResponseEntity<ResultRecord> csvProcess(final InputStream in) throws Exception {
 		final ByteArrayOutputStream bout = new ByteArrayOutputStream();
 		streamProcessor.process(in, bout);
 		final ObjectInputStream objIn = new ObjectInputStream(new ByteArrayInputStream(bout.toByteArray()));
 		final VehicleOwnersProcessResult resultTmp = (VehicleOwnersProcessResult) objIn.readObject();
-		final MdfConcreteResultMetrics res = MdfConcreteResultMetrics.create();
-		res.setBatchId(0L);
-		res.setOddToEvenRatio(resultTmp.getMetrics().getOddToEvenRatio());
-		res.setPassedRegChangeDueDate(resultTmp.getMetrics().getPassedRegChangeDueDate());
-		final List<MdfResultError> errors = Lists.newArrayList();
-		final List<MdfResultUnregCarsCountByJud> unregCars = Lists.newArrayList();
+
+		final List<ResultErrorRecord> errors = Lists.newArrayList();
+		final List<ResultUnregCarsCountByJudRecord> unregCars = Lists.newArrayList();
 		resultTmp.getErrors().forEach(e -> {
 			final Integer typeTmp = e.getType();
-			final MdfResultError error = MdfResultError.create();
-			error.setType(typeTmp);
-			error.setResultMetricsId(Long.valueOf(e.getLine()));
+			final ResultErrorRecord error = ImtResultErrorRecord.builder().basic(
+					ImtResultErrorBasic.builder().type(typeTmp).vehicleOwnerId(Long.valueOf(e.getLine())).build())
+					.build();
 			errors.add(error);
 		});
 		for (final Map.Entry<String, Integer> entry : resultTmp.getMetrics().getUnregCarsCountByJud().entrySet()) {
-			final MdfResultUnregCarsCountByJud unregCar = MdfResultUnregCarsCountByJud
-					.create(Judet.valueOf(entry.getKey()), entry.getValue(), 0L, 0L);
+			final ResultUnregCarsCountByJudRecord unregCar = ImtResultUnregCarsCountByJudRecord.builder()
+					.basic(ImtResultUnregCarsCountByJudBasic.builder().judet(Judet.valueOf(entry.getKey()))
+							.unregCarsCount(entry.getValue()).build())
+					.build();
 			unregCars.add(unregCar);
 		}
-		res.setResultErrors(errors);
-		res.setResultProcessTime(new java.sql.Timestamp(System.currentTimeMillis()));
-		res.setUnregCarsCountByJud(unregCars);
-		res.setResultMetricsId(0L);
+
+		final ResultRecord res = ImtResultRecord.builder().batch(ImtBatch.of(0L))
+				.basic(ImtResultBasic.builder().oddToEvenRatio(resultTmp.getMetrics().getOddToEvenRatio())
+						.passedRegChangeDueDate(resultTmp.getMetrics().getPassedRegChangeDueDate()).build())
+				.addAllErrors(errors).addAllUnregCars(unregCars).build();
 
 		return ResponseEntity.ok(res);
 	}
@@ -134,32 +143,14 @@ public class ProcessRestController {
 	 * @return ....
 	 */
 
-	@RequestMapping(value = "/db/{batchId}", method = RequestMethod.GET)
-	public @ResponseBody ConcreteResultMetrics dbProcess(@PathVariable("batchId") final Long batchId) {
+	@RequestMapping(value = URL_DB_PROCESS, method = RequestMethod.POST)
+	public ResponseEntity<ResultRecord> dbProcess(@PathVariable("batchId") final Long batchId) {
 		dbProcessor.process(batchId);
 		final ResultRecord res = resultBusiness.getResults(ImtResultGet.builder().batchId(batchId)
 				.addSort(ResultSortCriterionType.RESULT_PROCESS_TIME, SortDirection.DESC).pagination(1, 1).build())
 				.getList().get(0);
+		return ResponseEntity.ok(res);
 
-		final List<MdfResultError> resultErrors = Lists.newArrayList();
-		if (res.getErrors() != null && res.getErrors().size() != 0) {
-			res.getErrors().forEach(e -> resultErrors.add(MdfResultError.create().setType(e.getBasic().getType())
-					.setVehicleOwnerId(e.getBasic().getVehicleOwnerId())));
-		}
-		final List<MdfResultUnregCarsCountByJud> resultUnregCarsCountByJud = Lists.newArrayList();
-		if (res.getUnregCars() != null && res.getUnregCars().size() != 0) {
-			res.getUnregCars().forEach(e -> resultUnregCarsCountByJud.add(MdfResultUnregCarsCountByJud.create()
-					.setJudet(e.getBasic().getJudet()).setUnregCarsCount(e.getBasic().getUnregCarsCount())));
-		}
-		final MdfConcreteResultMetrics finalResult = MdfConcreteResultMetrics.create();
-
-		finalResult.setOddToEvenRatio(res.getBasic().getOddToEvenRatio());
-		finalResult.setPassedRegChangeDueDate(res.getBasic().getPassedRegChangeDueDate());
-		finalResult.setBatchId(res.getBatch().getBatchId());
-		finalResult.setResultErrors(resultErrors);
-		finalResult.setUnregCarsCountByJud(resultUnregCarsCountByJud);
-
-		return finalResult;
 	}
 
 	@ExceptionHandler({ DatabaseIntegrityViolationException.class })

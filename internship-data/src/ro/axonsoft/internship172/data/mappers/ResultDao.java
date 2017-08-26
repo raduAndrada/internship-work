@@ -5,7 +5,7 @@ import java.util.List;
 import ro.axonsoft.internship172.data.domain.ResultError;
 import ro.axonsoft.internship172.data.domain.ResultMetrics;
 import ro.axonsoft.internship172.data.domain.ResultUnregCarsCountByJud;
-import ro.axonsoft.internship172.model.base.ResultBatch;
+import ro.axonsoft.internship172.model.base.Batch;
 
 /**
  * Mapper pentru trabela de metrice de rezultate
@@ -66,8 +66,8 @@ public interface ResultDao {
 	public List<ResultError> selectResultErrorByMetricsId(Long id);
 
 	/**
-	 * Selectarea unei liste din tabela de masini neinregistrate in functie de
-	 * id-ul rezultatului de care apartin
+	 * Selectarea unei liste din tabela de masini neinregistrate in functie de id-ul
+	 * rezultatului de care apartin
 	 *
 	 * @param id
 	 *            cheia dupa care se face cautarea
@@ -78,14 +78,14 @@ public interface ResultDao {
 	/**
 	 * Selectarea tuturor rezultatelor din baza de date
 	 *
-	 * @return o lista cu toate datele din tabela RESULT_METRICS impreuna cu
-	 *         lista de erori si de masini neinregistrate
+	 * @return o lista cu toate datele din tabela RESULT_METRICS impreuna cu lista
+	 *         de erori si de masini neinregistrate
 	 */
 	public List<ResultMetrics> selectAllResultMetrics();
 
 	/**
 	 * Metoda de update pentru rezultate
-	 * 
+	 *
 	 * @param resultMetrics
 	 *            metricea de updatat
 	 */
@@ -94,7 +94,7 @@ public interface ResultDao {
 
 	/**
 	 * Update pentru tabela de masini neinregistrate
-	 * 
+	 *
 	 * @param resultUnregCarsCountByJud
 	 */
 
@@ -102,7 +102,7 @@ public interface ResultDao {
 
 	/**
 	 * Update pentru tabela de erori
-	 * 
+	 *
 	 * @param resultError
 	 *            eroare de updatat
 	 */
@@ -110,7 +110,7 @@ public interface ResultDao {
 
 	/**
 	 * Lista cu metricele rezultat in functie de id-ul de batch
-	 * 
+	 *
 	 * @param id
 	 *            batch-id-ul dupa care se face selectia
 	 * @return lista metricelor rezultat cu acest batch id
@@ -119,44 +119,52 @@ public interface ResultDao {
 
 	/**
 	 * Selctie batch in functie de id
-	 * 
+	 *
 	 * @param id
 	 *            identificatorul batch-ului
 	 * @return obiectul cu id-ul selectat
 	 */
-	public ResultBatch selectBatchById(Long id);
+	public Batch selectBatchById(Long id);
 
 	/**
 	 * Stergere metrice dupa id
-	 * 
+	 *
 	 * @param id
 	 *            identificatorul de selectie al stergerii
 	 */
 	public void deleteResultErrosByMetricsId(Long id);
-	
+
 	/**
-	 * Stergere rezultat din tabela de masini neinregistrate 
-	 * @param id identificato unic de recunoasterea inregistrari
+	 * Stergere rezultat din tabela de masini neinregistrate
+	 * 
+	 * @param id
+	 *            identificato unic de recunoasterea inregistrari
 	 */
 
 	public void deleteResultUnregCarsCountByMetricsId(Long id);
 
 	/**
 	 * Sterge rezultat in functie de id-ul metricei
-	 * @param id cheia primara din tabela metricelor rezultat
+	 * 
+	 * @param id
+	 *            cheia primara din tabela metricelor rezultat
 	 */
 	public void deleteResultMetricsById(Long id);
 
 	/**
 	 * Numara datele inregistrate in tabela de metrici rezultat
-	 * @param identificatorul de batch pentru rezultatele cautate
+	 * 
+	 * @param identificatorul
+	 *            de batch pentru rezultatele cautate
 	 * @return
 	 */
 	public Integer countResultMetricsByBatchId(Long id);
 
 	/**
-	 * Paginare 
-	 * @param pageCriteria criteriu de selectie
+	 * Paginare
+	 * 
+	 * @param pageCriteria
+	 *            criteriu de selectie
 	 * @return pagina selectata
 	 */
 	public List<ResultMetrics> getResultMetricsPage(PageCriteria pageCriteria);

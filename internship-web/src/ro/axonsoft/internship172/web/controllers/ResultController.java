@@ -1,34 +1,44 @@
 package ro.axonsoft.internship172.web.controllers;
 
-import static com.google.common.base.Preconditions.checkArgument;
-
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
-import java.util.List;
+import java.util.Optional;
+
+import javax.inject.Inject;
 
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.ui.ModelMap;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.HttpMessageConverterExtractor;
 import org.springframework.web.client.RequestCallback;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.util.UriComponentsBuilder;
 
-import com.google.common.collect.Lists;
+import com.google.common.collect.ImmutableList;
 
-import ro.axonsoft.internship172.data.domain.MdfConcreteResultMetrics;
+import ro.axonsoft.internship172.model.result.ResultMetricsGetResult;
+import ro.axonsoft.internship172.model.result.ResultRecord;
+import ro.axonsoft.internship172.web.model.ResultListForm;
 import ro.axonsoft.internship172.web.rest.ProcessRestController;
+import ro.axonsoft.internship172.web.rest.util.RestUrlResolver;
 
 /**
  * Controller pentru procesare sau obtinere rezutlate
@@ -37,11 +47,47 @@ import ro.axonsoft.internship172.web.rest.ProcessRestController;
  *
  */
 @Controller
-@RequestMapping("/process")
+@RequestMapping(ResultController.URL_BASE)
 public class ResultController {
-	private static final Logger LOG = LoggerFactory.getLogger(ProcessRestController.class);
+	public static final String URL_BASE = "/results";
+	private static final String URL_RESULT = "/result/";
+	private static final String URL_PROCESS = "/process/";
+	private static final String URL_FILE_UPLOAD = "/file-upload";
 
-	private static final String LOCAL_SERVER = LocalHostInit.initLocalHost();
+	private static final String BATCH_ID = "batchId";
+	private static final String DB_PROCESS_PATH = "processing/db/";
+
+	private static final String RESULT_METRICS_ID = "resultMetricsId";
+	private static final String RESULT_METRICS_ID_PATH = "/{resultMetricsId}";
+	private static final String BATCH_ID_PATH = "/{batchId}";
+	private static final String DELETE_PATH = "/delete/" + RESULT_METRICS_ID;
+	private static final String PAGE_SIZE = "pageSize";
+	private static final String PAGE = "page";
+	private static final String SEARCH = "search";
+	private static final String RESULT_LIST = "resultList";
+	private static final String PAGE_COUNT = "pageCount";
+	private static final String RESULT_DETAILS_VIEW = "result-details";
+	private static final String FILE_UPLOAD_DETAILS_VIEW = "file-upload-details";
+	private static final String RESULT_LIST_VIEW = "result-list";
+	private static final String REDIRECT_LIST = "redirect:" + URL_BASE + URL_RESULT;
+
+	private static final ObjectError GENERIC_ERROR = new ObjectError(RESULT_LIST, new String[] { "generic.tech-error" },
+			null, "A technical error has occured");
+
+	private static final String RESULT_URI = "results";
+	public static final String PROCESS_CSV_JSON_URI = "processing/csv/json";
+
+	@Inject
+	private RestTemplate restTemplate;
+	@Inject
+	private RestUrlResolver restUrlResolver;
+
+	@ModelAttribute("resultListForm")
+	public ResultListForm getResultListForm() {
+		return new ResultListForm();
+	}
+
+	private static final Logger LOG = LoggerFactory.getLogger(ProcessRestController.class);
 
 	/**
 	 * Metoda de procesare pentru inregistrarile din baza de date
@@ -52,22 +98,14 @@ public class ResultController {
 	 *            identificatorul pentru care se realizeaza procesarea
 	 * @return numele template-ului pe care se afiseaza rezulatele
 	 */
-	@GetMapping("/databaseProcess/")
-	public String processSelectedBatch(final Model model, @RequestParam("batchId") final Long batchId) {
+	@RequestMapping(value = URL_PROCESS, method = RequestMethod.GET)
+	public String processSelectedBatch(@RequestParam("batchId") final Long batchId, final ModelMap modelMap) {
 
-		final RestTemplate restTemplate = new RestTemplate();
-		String uri = LOCAL_SERVER + "rest/v1/processing/db/";
-		uri += batchId;
+		final ResponseEntity<ResultRecord> resultRecord = restTemplate.postForEntity(
+				restUrlResolver.resolveRestUri(DB_PROCESS_PATH, batchId.toString()), null, ResultRecord.class);
+		modelMap.addAttribute("processResult", resultRecord.getBody());
 
-		// apeleaza metoda de get de pe controller-ul de rest
-		// care proceseaza batch-ul si returneaza rezultatul
-		final ResponseEntity<MdfConcreteResultMetrics> temp = restTemplate.getForEntity(uri,
-				MdfConcreteResultMetrics.class);
-		final MdfConcreteResultMetrics processResult = temp.getBody();
-		LOG.info("rezultatul primit  este:" + processResult.toString());
-		model.addAttribute("processResult", processResult);
-
-		return "processResult";
+		return RESULT_DETAILS_VIEW;
 	}
 
 	/**
@@ -83,96 +121,61 @@ public class ResultController {
 	 *            pagina curenta
 	 * @return numele template-ului pe care se afiseaza lista
 	 */
-	@GetMapping("/results/")
-	public String getResultPage(final Model model, @RequestParam("batchId") final Long batchId,
-			@RequestParam("pageSize") final Integer pageSize, @RequestParam("currentPage") final Integer currentPage)
-
-	{
-
-		final RestTemplate restTemplate = new RestTemplate();
-		String uri = LOCAL_SERVER + "rest/v1/results/getResultsByPage/";
-		uri += batchId;
-		uri += "/";
-		uri += pageSize;
-		uri += "/";
-		uri += currentPage;
-
-
-		final ResponseEntity<MdfConcreteResultMetrics[]> temp = restTemplate.getForEntity(uri,
-				MdfConcreteResultMetrics[].class);
-		final MdfConcreteResultMetrics[] processResultArray = temp.getBody();
-		LOG.info("rezultatul primit  este:" + processResultArray.toString());
-		final List<MdfConcreteResultMetrics> processResultList = Arrays.asList(processResultArray);
-		model.addAttribute("resultMetricsList", processResultList);
-		model.addAttribute("pageSize", pageSize);
-		model.addAttribute("batchId", batchId);
-
-		uri = LOCAL_SERVER + "rest/v1/results/";
-		uri += "getNumberOfPages/";
-		uri += batchId;
-		uri += "/";
-		uri += pageSize;
-
-		final ResponseEntity<Integer> numberOfPages = restTemplate.getForEntity(uri, Integer.class);
-
-		//calcule pentru paginare
-		final List<Integer> numOfPagesList = Lists.newArrayList();
-		Integer numOfPages = numberOfPages.getBody().intValue();
-		int startFrom = currentPage - 2;
-		Integer dotsPrev = currentPage - 3;
-		Integer dotsNext = currentPage + 4;
-
-		if (dotsPrev < 0) {
-			dotsPrev = 0;
+	@RequestMapping(value = BATCH_ID_PATH, method = RequestMethod.GET)
+	public String listResults(@ModelAttribute final ResultListForm resultListForm, final BindingResult bindingResult,
+			final ModelMap modelMap, @PathVariable(BATCH_ID) Long batchId) {
+		ResponseEntity<ResultMetricsGetResult> resultGetResult = null;
+		try {
+			final UriComponentsBuilder uriBuilder = UriComponentsBuilder
+					.fromUri(restUrlResolver.resolveRestUri(RESULT_URI)).queryParam(BATCH_ID, batchId)
+					.queryParam(PAGE_SIZE, Optional.ofNullable(resultListForm.getPageSize()).orElse(10))
+					.queryParam(PAGE, Optional.ofNullable(resultListForm.getPage()).orElse(1))
+					.queryParam(SEARCH, resultListForm.getSearch());
+			LOG.info(uriBuilder.toString());
+			resultGetResult = restTemplate.getForEntity(uriBuilder.build().toUri(), ResultMetricsGetResult.class);
+		} catch (final Exception e) {
+			LOG.error("Failed to fetch result list", e);
+			bindingResult.addError(GENERIC_ERROR);
 		}
-		if (startFrom < 0) {
-			startFrom = 0;
-		}
-		int endWith = currentPage + 3;
-		if (endWith > numOfPages) {
-			endWith = numOfPages;
-		}
-		if (dotsNext > numOfPages) {
-			dotsNext = numOfPages;
-		}
-		for (int i = startFrom; i < endWith; i++) {
-			numOfPagesList.add(i);
-		}
-		model.addAttribute("numberOfPages", numOfPagesList);
 
-		numOfPages--;
-		final List<Integer> currentPageList = Lists.newArrayList(currentPage, dotsPrev, dotsNext, numOfPages);
-
-		model.addAttribute("currentPage", currentPageList);
-
-		return "processResultList";
+		if (resultGetResult != null && resultGetResult.getStatusCode() == HttpStatus.OK) {
+			modelMap.put(RESULT_LIST, resultGetResult.getBody().getList());
+			modelMap.put(PAGE_COUNT, resultGetResult.getBody().getPageCount());
+			modelMap.put(PAGE_SIZE, resultGetResult.getBody().getPagination().getPageSize());
+		} else {
+			modelMap.put(RESULT_LIST, ImmutableList.of());
+			modelMap.put(PAGE_COUNT, 0);
+			modelMap.put(PAGE_SIZE, 10);
+		}
+		return RESULT_LIST_VIEW;
 	}
 
 	/**
 	 * Template pentru incarcarea unui fisier
-	 * @param model modelul
+	 *
+	 * @param model
+	 *            modelul
 	 * @return template-ul
 	 */
-	@GetMapping("/fileUpload")
+	@GetMapping(URL_FILE_UPLOAD)
 	public String listUploadedFiles(final Model model) {
-
-		return "fileUpload";
+		return FILE_UPLOAD_DETAILS_VIEW;
 	}
 
 	/**
 	 * Metoda de post pentru procesarea unui fisier
-	 * @param file fisier-ul incarcat de utilizator
-	 * @param model template-ul pe care va fi adaugat rezultatul
+	 *
+	 * @param file
+	 *            fisier-ul incarcat de utilizator
+	 * @param model
+	 *            template-ul pe care va fi adaugat rezultatul
 	 * @return
 	 */
-	@PostMapping("/fileUpload")
+	@PostMapping(URL_FILE_UPLOAD)
 	public String handleFileUpload(@RequestParam("file") final MultipartFile file, final Model model) {
-		final RestTemplate restTemplate = new RestTemplate();
-		String uri = LOCAL_SERVER + "rest/v1/processing";
-		uri += "/csv/json";
 
 		try {
-		    //metoda de transmitere a unui inputStream prin restTemplate
+			// metoda de transmitere a unui inputStream prin restTemplate
 			final InputStream fis = file.getInputStream();
 			final RequestCallback requestCallback = request -> {
 				request.getHeaders().add("Content-type", "application/octet-stream");
@@ -182,24 +185,26 @@ public class ResultController {
 			final SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
 			requestFactory.setBufferRequestBody(false);
 			restTemplate.setRequestFactory(requestFactory);
-			final HttpMessageConverterExtractor<MdfConcreteResultMetrics> responseExtractor = new HttpMessageConverterExtractor<>(
-					MdfConcreteResultMetrics.class, restTemplate.getMessageConverters());
-			final MdfConcreteResultMetrics tmp = restTemplate.execute(uri, HttpMethod.POST, requestCallback,
-					responseExtractor);
+			final HttpMessageConverterExtractor<ResultRecord> responseExtractor = new HttpMessageConverterExtractor<>(
+					ResultRecord.class, restTemplate.getMessageConverters());
+			final ResultRecord tmp = restTemplate.execute(restUrlResolver.resolveRestUri(PROCESS_CSV_JSON_URI),
+					HttpMethod.POST, requestCallback, responseExtractor);
 			model.addAttribute("processResult", tmp);
-			return "processResult";
+			return RESULT_DETAILS_VIEW;
 
 		} catch (IllegalStateException | IOException e) {
 
 		}
-		return "processResult";
+		return RESULT_DETAILS_VIEW;
 
 	}
 
 	/**
 	 * Metoda pentru definirea unui template custom in cazul aparitiei unei erori
+	 *
 	 * @param model
-	 * @param exception orice exceptie ar putea aparea
+	 * @param exception
+	 *            orice exceptie ar putea aparea
 	 * @return template-ul
 	 */
 	@ExceptionHandler({ Exception.class })
@@ -210,19 +215,6 @@ public class ResultController {
 		}
 		model.addAttribute(exception.getClass().toString() + msg);
 		return "exception";
-	}
-
-	/**
-	 * Initializare string-ului de prefix pentru metodele de pe rest
-	 * @author intern
-	 *
-	 */
-	private static class LocalHostInit {
-		private static String initLocalHost() {
-			final String props = System.getProperty("ro.axonsoft.internship.local_server");
-			checkArgument(props != null, "Serverul local nu poate fi null");
-			return props;
-		}
 	}
 
 }

@@ -76,7 +76,7 @@
 					<td>
 						<div class="btn-group">
 							<a class="btn btn-large btn-default"
-								th:href="@{/process/databaseProcess/(batchId=${batch.batchId})}">
+								th:href="@{/results/process/(batchId=${batch.batchId})}">
 								<i class="fa fa-step-forward" aria-hidden="true"></i> <span
 								th:text="#{default-process-msg}"></span>
 							</a>
@@ -85,7 +85,7 @@
 					<td>
 						<div class="btn-group">
 							<a class="btn btn-large btn-default"
-								th:href="@{/process/results/(batchId=${batch.batchId},pageSize=${3},currentPage=${0})}">
+								th:href="@{'/results/' + ${batch.batchId}}">
 								<i class="fa fa-history" aria-hidden="true"></i> <span
 								th:text="#{batch.process-result.past}"> </span>
 							</a>

@@ -10,7 +10,7 @@ import org.immutables.value.Value;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
-import ro.axonsoft.internship172.model.base.ResultBatch;
+import ro.axonsoft.internship172.model.base.Batch;
 
 @Value.Immutable
 @Value.Modifiable
@@ -23,7 +23,7 @@ public interface ResultRecord {
 	ResultBasic getBasic();
 
 	@Nullable
-	ResultBatch getBatch();
+	Batch getBatch();
 
 	@Nullable
 	List<ResultUnregCarsCountByJudRecord> getUnregCars();

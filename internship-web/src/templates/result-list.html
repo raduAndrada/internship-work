@@ -1,0 +1,155 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:include="layout/head :: head">
+<title th:text="#{default-success-msg}"></title>
+</head>
+<body>
+	<div th:substituteby="layout/navbar :: navbar('view-batches')"></div>
+	<div class="lightbox">
+		<div class="container">
+			<script type="text/javascript" th:src="@{/js/tableSearch.js}"></script>
+			<script type="text/javascript" th:src="@{/js/result.js}"></script>
+				<script type="text/javascript" th:src="@{/js/tableSearch.js}"></script>
+				<div th:replace="layout/frg::success-messages"></div>
+				<div class="rc-filter-container">
+					<form th:object="${resultListForm}">
+						<th:block th:if="${#fields.hasErrors('global')}">
+							<div class="alert alert-danger"
+								th:each="err : ${#fields.errors('global')}" th:text="${err}">Generic
+								Error</div>
+						</th:block>
+						<input type="hidden" th:field="*{pageSize}" /> <input
+							type="hidden" th:field="*{page}" />
+						<div class="pull-left">
+							<ul class="nav navbar-nav">
+								<li class="form-group"><input type="text" id="myInput"
+									class="form-control" onkeyup="tableSearchOneColumn()"
+									placeholder="Search for batch by id" title="Type batch id" /></li>
+
+							</ul>
+
+						</div>
+					</form>
+				</div>
+				<div class="container-fluid nav navbar-nav navbar-right">
+					<div class="btn-group">
+						<button class="btn btn-primary btn-md dropdown-toggle"
+							type="button" data-toggle="dropdown" aria-haspopup="true"
+							aria-expanded="false">
+							<span th:text="#{generic.pagination}"></span> <span class="caret"></span>
+						</button>
+						<ul class="dropdown-menu"
+							th:with="strList = ${ {1, 2, 5, 10, 20, 50, 100} }">
+							<li th:classappend="${pageSize == s} ? active"
+								th:each="s : ${strList}"><a th:text="${s}"
+								th:href="@{${@currentUrlWithoutParam.apply('page,pageSize,search')}(page=${pageIndex},pageSize=${s},search=${resultListForm.search})}"></a>
+
+							</li>
+						</ul>
+					</div>
+				</div>
+				<table id="myTable" class="table table-bordered table-hover">
+					<tbody>
+						<tr th:each="processResult,iter  : ${resultList}">
+						<tr>
+							<td style="color: black;" class="active"
+								th:text="#{batch.process-result} "></td>
+						</tr>
+						<tr>
+							<td
+								th:text="#{result-metrics.odd-to-even-ratio} + ': ' + ${processResult.basic.oddToEvenRatio}" />
+						</tr>
+						<tr>
+							<td
+								th:text="#{result-metrics.passed-reg-due-date} + ': ' + ${processResult.basic.passedRegChangeDueDate}" />
+						</tr>
+						<tr>
+							<td
+								th:text="#{result-metrics.result-process-time} + ': ' + ${processResult.basic.resultProcessTime}" />
+						</tr>
+						<tr>
+							<td
+								th:text="#{batch-list.vehicle-owner.batch-id} + ': ' + ${processResult.batch.batchId}" />
+						</tr>
+						<tr>
+							<td>
+								<button type="button" class="btn btn-default"
+									th:onclick="'showUnregCars(\''+${iter.index}+ '\');'">
+									<i class="fa fa-expand" aria-hidden="true"></i> <span
+										th:text="#{btn-show} +' '+ #{result-metrics.unreg-cars}"></span>
+
+								</button>
+								<div th:id="'unregTable' + ${iter.index}" style="display: none">
+									<table style="color: black;"
+										class="table table-bordered table-hover">
+										<thead>
+											<tr>
+												<td th:text="#{result-metrics.unreg-cars}"></td>
+											</tr>
+										</thead>
+										<tbody id="unregCarsTabId">
+											<tr th:if="${processResult.unregCars.size() == 0}">
+												<td th:text="#{result-metrics.no-unreg-cars}" colspan="4"></td>
+											</tr>
+											<tr th:each="car : ${processResult.unregCars}">
+												<td
+													th:text="#{result-metrics.unreg-cars.judet}+' :' + ${car.basic.judet}">1</td>
+												<td
+													th:text="#{result-metrics.unreg-cars.count}+' :' + ${car.basic.unregCarsCount}"></td>
+											</tr>
+										</tbody>
+									</table>
+								</div>
+
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<button type="button" class="btn btn-default"
+									th:onclick="'showErrors(\''+${iter.index}+ '\');'">
+									<i class="fa fa-expand" aria-hidden="true"></i> <span
+										th:text="#{btn-show} +' '+ #{result-metrics.result-error}"></span>
+								</button>
+								<div th:id="'errorTable' + ${iter.index}" style="display: none">
+									<table style="color: black;"
+										class="table table-bordered table-hover">
+										<thead>
+											<tr>
+												<td th:text="#{result-metrics.result-error}"></td>
+											</tr>
+										</thead>
+										<tbody>
+											<tr th:if="${processResult.errors.size() == 0}">
+												<td colspan="4" th:text="#{result-metrics.no-errors}"></td>
+											</tr>
+											<tr th:each="error : ${processResult.errors}">
+												<td
+													th:text="#{result-metrics.result-error.type}+' :' + ${error.basic.type}">1</td>
+												<td
+													th:text="#{result-metrics.result-error.vehicle-owner-id}+' :'+ ${error.basic.vehicleOwnerId}"></td>
+											</tr>
+										</tbody>
+									</table>
+								</div>
+							</td>
+						</tr>
+						</tr>
+					</tbody>
+				</table>
+
+
+		</div>
+		<div class="text-center">
+			<ul class="pagination" th:if="${pageCount > 0}">
+				<li th:each="pageIndex: ${#numbers.sequence(1, pageCount)}"
+					th:classappend="${resultListForm.page == pageIndex} ? active">
+					<a
+					th:href="@{${@currentUrlWithoutParam.apply('page,pageSize,search')}(page=${pageIndex},pageSize=${resultListForm.pageSize},search=${resultListForm.search})}"
+					th:text="${pageIndex}">1</a>
+				</li>
+			</ul>
+		</div>
+	</div>
+	<th:block th:replace="layout/frg::footer-js"></th:block>
+</body>
+</html>

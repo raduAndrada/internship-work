@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:include="layout/head :: head">
+<title th:text="#{vehicle-owners.input-batch.records.title}"></title>
+</head>
+<body>
+	<div th:substituteby="layout/navbar :: navbar('nope')"></div>
+	<div class="lightbox">
+		<div class="container">
+			<script type="text/javascript" th:src="@{/js/tableSearch.js}"></script>
+			<div th:replace="layout/frg::success-messages"></div>
+			<div class="rc-filter-container">
+				<form th:object="${vehicleOwnerListForm}">
+					<th:block th:if="${#fields.hasErrors('global')}">
+						<div class="alert alert-danger"
+							th:each="err : ${#fields.errors('global')}" th:text="${err}">Generic
+							Error</div>
+					</th:block>
+					<input type="hidden" th:field="*{pageSize}" /> <input
+						type="hidden" th:field="*{page}" />
+					<div class="pull-left">
+						<ul class="nav navbar-nav">
+							<li class="form-group"><input type="text" id="myInput"
+								class="form-control" onkeyup="tableSearchOneColumn()"
+								placeholder="Search for batch by id" title="Type batch id" /></li>
+
+						</ul>
+
+					</div>
+				</form>
+			</div>
+			<div class="container-fluid nav navbar-nav navbar-right">
+				<div class="btn-group">
+					<button class="btn btn-primary btn-md dropdown-toggle"
+						type="button" data-toggle="dropdown" aria-haspopup="true"
+						aria-expanded="false">
+						<span th:text="#{generic.pagination}"></span> <span class="caret"></span>
+					</button>
+					<ul class="dropdown-menu"
+						th:with="strList = ${ {1, 2, 5, 10, 20, 50, 100} }">
+						<li th:classappend="${pageSize == s} ? active"
+							th:each="s : ${strList}"><a th:text="${s}"
+							th:href="@{${@currentUrlWithoutParam.apply('page,pageSize,search')}(page=${pageIndex},pageSize=${s},search=${vehicleOwnerListForm.search})}"></a>
+
+						</li>
+					</ul>
+				</div>
+			</div>
+			<table id="myTable" class="table table-bordered table-hover">
+				<thead>
+					<tr>
+						<td th:text="#{vehicle-owners.input-batch.records.id}"></td>
+						<td th:text="#{vehicle-owners.input-batch.records.ro-id-card}"></td>
+						<td th:text="#{vehicle-owners.input-batch.records.issue-date}"></td>
+						<td th:text="#{vehicle-owners.input-batch.records.reg-plate}"></td>
+						<td th:text="#{vehicle-owners.input-batch.records.comentariu}"></td>
+						<td th:text="#{vehicle-owners.input-batch.records.batch-id}"></td>
+					</tr>
+				</thead>
+				<tbody>
+					<tr th:each="vehicleOwner : ${vehicleOwnerList}">
+						<td th:text="${vehicleOwner.basic.roIdCard}"></td>
+						<td th:text="${vehicleOwner.basic.issueDate}"></td>
+						<td th:text="${vehicleOwner.basic.regPlate}"></td>
+						<td th:text="${vehicleOwner.basic.comentariu}"></td>
+						<td th:text="${vehicleOwner.batch.batchId}"></td>
+						<td>
+							<form action="#"
+								th:action="@{'/app/delete/' + ${vehicleOwner.basic.roIdCard}}"
+								th:object="${vehicleOwner}" method="post">
+								<button class="btn btn-default btn-danger" type="submit">
+									<i class="fa fa-trash" aria-hidden="true"></i> <span
+										th:text="#{vehicle-owners.input-batch.records.delete-btn}"></span>
+								</button>
+							</form>
+						</td>
+						<td><a id="update-btn"
+							th:href="@{'/app/'+ ${vehicleOwner.basic.roIdCard}}"
+							class="btn btn-info btn-md "> <i class="fa fa-undo"></i> <span
+								th:text="#{generic.update}">Update</span>
+						</a></td>
+					</tr>
+				</tbody>
+			</table>
+
+			<div class="text-center">
+				<ul class="pagination" th:if="${pageCount > 0}">
+					<li th:each="pageIndex: ${#numbers.sequence(1, pageCount)}"
+						th:classappend="${vehicleOwnerListForm.page == pageIndex} ? active">
+						<a
+						th:href="@{${@currentUrlWithoutParam.apply('page,pageSize,search')}(page=${pageIndex},pageSize=${vehicleOwnerListForm.pageSize},search=${vehicleOwnerListForm.search})}"
+						th:text="${pageIndex}">1</a>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</div>
+	<th:block th:replace="layout/frg::footer-js"></th:block>
+</body>
+</html>

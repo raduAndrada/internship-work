@@ -44,7 +44,7 @@ import ro.axonsoft.internship172.model.api.VehicleOwnerRecord;
 import ro.axonsoft.internship172.model.api.VehicleOwnersMetrics;
 import ro.axonsoft.internship172.model.api.VehicleOwnersProcessor;
 import ro.axonsoft.internship172.model.base.ImtPagination;
-import ro.axonsoft.internship172.model.base.MdfResultBatch;
+import ro.axonsoft.internship172.model.base.MdfBatch;
 import ro.axonsoft.internship172.model.base.SortDirection;
 import ro.axonsoft.internship172.model.result.ImtResultCreate;
 import ro.axonsoft.internship172.model.result.ImtResultErrorBasic;
@@ -146,14 +146,6 @@ public class DbVehicleOwnersProcessorImpl implements DbVehicleOwnersProcessor {
 										.type(element.getType()).vehicleOwnerId(element.getVehicleOwnerId()).build())
 								.build()));
 
-		// final ResultMetrics resultMetrics =
-		// ImtResultMetrics.builder().batchId(batchId).resultMetricsId(null)
-		// .oddToEvenRatio(metrics.getOddToEvenRatio()).resultErrors(resultErrors)
-		// .unregCarsCountByJud(unregCarsCountByJud).passedRegChangeDueDate(metrics.getPassedRegChangeDueDate())
-		// .resultProcessTime(new java.sql.Timestamp(
-		// LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()))
-		// .build();
-
 		final ResultEntity RES = MdfResultEntity.create()
 				.setRecord(MdfResultRecord.create()
 						.setBasic(MdfResultBasic.create().setOddToEvenRatio(metrics.getOddToEvenRatio())
@@ -161,7 +153,7 @@ public class DbVehicleOwnersProcessorImpl implements DbVehicleOwnersProcessor {
 								.setResultProcessTime(new java.sql.Timestamp(
 										LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli())))
 						.setErrors(resultErrors).setUnregCars(unregCarsCountByJud)
-						.setBatch(MdfResultBatch.create().setBatchId(batchId)))
+						.setBatch(MdfBatch.create().setBatchId(batchId)))
 				.setResultMetricsId(null);
 
 		try {

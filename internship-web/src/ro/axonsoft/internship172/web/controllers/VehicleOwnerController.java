@@ -1,10 +1,6 @@
 package ro.axonsoft.internship172.web.controllers;
 
-import static com.google.common.base.Preconditions.checkArgument;
-
 import java.time.Instant;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 
 import javax.inject.Inject;
@@ -33,9 +29,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
 
-import ro.axonsoft.internship172.data.domain.MdfVehicleOwner;
 import ro.axonsoft.internship172.model.base.ImtBatch;
 import ro.axonsoft.internship172.model.batch.BatchCreate;
 import ro.axonsoft.internship172.model.batch.BatchGetResult;
@@ -47,9 +41,11 @@ import ro.axonsoft.internship172.model.vehicleOwner.ImtVehicleOwnerCreate;
 import ro.axonsoft.internship172.model.vehicleOwner.ImtVehicleOwnerUpdateProperties;
 import ro.axonsoft.internship172.model.vehicleOwner.VehicleOwnerBasicRecord;
 import ro.axonsoft.internship172.model.vehicleOwner.VehicleOwnerCreate;
+import ro.axonsoft.internship172.model.vehicleOwner.VehicleOwnerGetResult;
 import ro.axonsoft.internship172.web.model.BatchListForm;
 import ro.axonsoft.internship172.web.model.ImtSuccessMessage;
 import ro.axonsoft.internship172.web.model.VehicleOwnerForm;
+import ro.axonsoft.internship172.web.model.VehicleOwnerListForm;
 import ro.axonsoft.internship172.web.rest.util.RestUrlResolver;
 
 /**
@@ -70,7 +66,6 @@ public class VehicleOwnerController {
 	private static final String CREATE_PATH = "/create";
 	private static final String CREATE_PATH_BATCH = "/create-batch";
 	private static final String RO_ID_CARD_PATH = "/{roIdCard}";
-	private static final String ID_PATH = "/{id}";
 	private static final String DELETE_PATH = "/delete/" + RO_ID_CARD_PATH;
 	private static final String MODE = "mode";
 	private static final String CREATE_MODE = "create";
@@ -91,6 +86,7 @@ public class VehicleOwnerController {
 	private static final String REDIRECT_LIST = "redirect:" + URL_BASE + URL_BATCHES;
 
 	private static final String VEHICLE_OWNER_URI = "vehicleOwners";
+	private static final String VEHICLE_OWNER_BATCH_LIST_URI = "vehicleOwners/batches";
 	private static final String VEHICLE_OWNER_BATCH_CREATE_URI = "vehicleOwners/create-batch";
 
 	private static final ObjectError GENERIC_ERROR = new ObjectError(VEHICLE_OWNER_FORM,
@@ -98,7 +94,6 @@ public class VehicleOwnerController {
 
 	private static final Logger LOG = LoggerFactory.getLogger(VehicleOwnerController.class);
 
-	private static final String LOCAL_SERVER = LocalHostInit.initLocalHost();
 	@Inject
 	private RestTemplate restTemplate;
 	@Inject
@@ -115,7 +110,7 @@ public class VehicleOwnerController {
 		ResponseEntity<BatchGetResult> batchGetResult = null;
 		try {
 			final UriComponentsBuilder uriBuilder = UriComponentsBuilder
-					.fromUri(restUrlResolver.resolveRestUri(VEHICLE_OWNER_URI))
+					.fromUri(restUrlResolver.resolveRestUri(VEHICLE_OWNER_BATCH_LIST_URI))
 					.queryParam(PAGE_SIZE, Optional.ofNullable(batchListForm.getPageSize()).orElse(10))
 					.queryParam(PAGE, Optional.ofNullable(batchListForm.getPage()).orElse(1))
 					.queryParam(SEARCH, batchListForm.getSearch());
@@ -348,66 +343,35 @@ public class VehicleOwnerController {
 	 */
 
 	@GetMapping(URL_VEHICLE_OWNERS)
-	public String getVehicleOwnersListByBatchId(final Model model, @RequestParam("batchId") final Long batchId,
-			@RequestParam("pageSize") final Integer pageSize, @RequestParam("currentPage") final Integer currentPage) {
+	public String getVehicleOwnersListByBatchId(@ModelAttribute final VehicleOwnerListForm vehicleOwnerListForm,
+			final BindingResult bindingResult, final ModelMap modelMap) {
 		final RestTemplate restTemplate = new RestTemplate();
-		;
 
-		String uri = LOCAL_SERVER;
-		uri += "v1/vehicleOwners/getVehicleOwnersByPage/" + batchId;
-		uri += "/";
-		uri += pageSize;
-		uri += "/";
-		uri += currentPage;
-
-		final ResponseEntity<MdfVehicleOwner[]> vehicleOwnerResponse = restTemplate.getForEntity(uri,
-				MdfVehicleOwner[].class);
-		LOG.info("Raspuns returnat ca entitate" + vehicleOwnerResponse.toString());
-		final MdfVehicleOwner[] vehicleOwnersArray = vehicleOwnerResponse.getBody();
-		final List<MdfVehicleOwner> vehicleOwnersList = Arrays.asList(vehicleOwnersArray);
-		LOG.info("Raspuns returnat ca lista" + vehicleOwnersList.toString());
-		model.addAttribute("vehicleOwnersList", vehicleOwnersList);
-		model.addAttribute("pageSize", pageSize);
-		model.addAttribute("batchId", batchId);
-		uri = LOCAL_SERVER;
-		uri += "v1/vehicleOwners/";
-		uri += "getNumberOfPages/";
-		uri += batchId;
-		uri += "/";
-		uri += pageSize;
-
-		final ResponseEntity<Integer> numberOfPages = restTemplate.getForEntity(uri, Integer.class);
-
-		Integer numOfPages = numberOfPages.getBody().intValue();
-		final List<Integer> numOfPagesList = Lists.newArrayList();
-		int startFrom = currentPage - 2;
-		Integer dotsPrev = currentPage - 3;
-		Integer dotsNext = currentPage + 4;
-		if (dotsPrev < 0) {
-			dotsPrev = 0;
+		ResponseEntity<VehicleOwnerGetResult> vehicleOwnerGetResult = null;
+		try {
+			final UriComponentsBuilder uriBuilder = UriComponentsBuilder
+					.fromUri(restUrlResolver.resolveRestUri(VEHICLE_OWNER_URI))
+					.queryParam(PAGE_SIZE, Optional.ofNullable(vehicleOwnerListForm.getPageSize()).orElse(10))
+					.queryParam(PAGE, Optional.ofNullable(vehicleOwnerListForm.getPage()).orElse(1))
+					.queryParam(SEARCH, vehicleOwnerListForm.getSearch());
+			LOG.info(uriBuilder.toString());
+			vehicleOwnerGetResult = restTemplate.getForEntity(uriBuilder.build().toUri(), VehicleOwnerGetResult.class);
+		} catch (final Exception e) {
+			LOG.error("Failed to fetch users list", e);
+			bindingResult.addError(GENERIC_ERROR);
 		}
-		if (startFrom < 0) {
-			startFrom = 0;
-		}
-		int endWith = currentPage + 3;
-		if (endWith > numOfPages) {
-			endWith = numOfPages;
-		}
-		if (dotsNext > numOfPages) {
-			dotsNext = numOfPages;
-		}
-		for (int i = startFrom; i < endWith; i++) {
-			numOfPagesList.add(i);
-		}
-		model.addAttribute("numberOfPages", numOfPagesList);
+		LOG.error(vehicleOwnerGetResult.toString());
 
-		numOfPages--;
-		final List<Integer> currentPageList = Lists.newArrayList(currentPage, dotsPrev, dotsNext, numOfPages);
-
-		model.addAttribute("currentPage", currentPageList);
-
-		model.addAttribute("numberOfPages", numOfPagesList);
-		return VEHICLE_OWNER_LIST;
+		if (vehicleOwnerGetResult != null && vehicleOwnerGetResult.getStatusCode() == HttpStatus.OK) {
+			modelMap.put(VEHICLE_OWNER_LIST, vehicleOwnerGetResult.getBody().getList());
+			modelMap.put(PAGE_COUNT, vehicleOwnerGetResult.getBody().getPageCount());
+			modelMap.put(PAGE_SIZE, vehicleOwnerGetResult.getBody().getPagination().getPageSize());
+		} else {
+			modelMap.put(VEHICLE_OWNER_LIST, ImmutableList.of());
+			modelMap.put(PAGE_COUNT, 0);
+			modelMap.put(PAGE_SIZE, 10);
+		}
+		return VEHICLE_OWNER_LIST_VIEW;
 	}
 
 	/**
@@ -581,11 +545,4 @@ public class VehicleOwnerController {
 		return "exception";
 	}
 
-	private static class LocalHostInit {
-		private static String initLocalHost() {
-			final String props = System.getProperty("ro.axonsoft.internship.local_server");
-			checkArgument(props != null, "Serverul local nu poate fi null");
-			return props;
-		}
-	}
 }

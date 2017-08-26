@@ -20,7 +20,7 @@ import ro.axonsoft.internship172.data.tests.RecrutareDataTests;
 import ro.axonsoft.internship172.data.tests.TestDbUtil;
 import ro.axonsoft.internship172.model.api.Judet;
 import ro.axonsoft.internship172.model.base.ImtPagination;
-import ro.axonsoft.internship172.model.base.MdfResultBatch;
+import ro.axonsoft.internship172.model.base.MdfBatch;
 import ro.axonsoft.internship172.model.base.SortDirection;
 import ro.axonsoft.internship172.model.result.ImtResultSortCriterion;
 import ro.axonsoft.internship172.model.result.MdfResultBasic;
@@ -36,7 +36,7 @@ public class ResultMetricsDaoTests extends RecrutareDataTests {
 	private static final ResultEntity RES1 = MdfResultEntity.create().setRecord(MdfResultRecord.create()
 			.setBasic(MdfResultBasic.create().setOddToEvenRatio(100).setPassedRegChangeDueDate(5)
 					.setResultProcessTime(Timestamp.from(Instant.parse("2017-08-02T11:47:00.00Z"))))
-			.setBatch(MdfResultBatch.create().setBatchId(0L))
+			.setBatch(MdfBatch.create().setBatchId(0L))
 			.addError(MdfResultErrorRecord.create().setResultMetricsId(6L).setResultErrorId(0L)
 					.setBasic(MdfResultErrorBasic.create().setType(1).setVehicleOwnerId(1L)))
 			.addUnregCar(MdfResultUnregCarsCountByJudRecord.create().setResultMetricsId(6L).setUnregCarsCountId(0L)

@@ -3,7 +3,7 @@ package ro.axonsoft.internship172.data.mappers;
 import java.util.List;
 
 import ro.axonsoft.internship172.data.domain.VehicleOwner;
-import ro.axonsoft.internship172.model.base.ResultBatch;
+import ro.axonsoft.internship172.model.base.Batch;
 
 /**
  * mapper pentru tabela din baza de date
@@ -32,12 +32,12 @@ public interface VehicleOwnersDao {
 
 	/**
 	 * Selectie pagina de batch
-	 * 
+	 *
 	 * @param pageCriteria
 	 *            criteriu de selectie
 	 * @return lista cu batch-uri
 	 */
-	public List<ResultBatch> getBatchPage(PageCriteria pageCriteria);
+	public List<Batch> getBatchPage(PageCriteria pageCriteria);
 
 	/**
 	 * Inserarea unei noi inregistrari
@@ -58,7 +58,7 @@ public interface VehicleOwnersDao {
 
 	/**
 	 * Numararea inregistrarilor din tabela de vehicle owner
-	 * 
+	 *
 	 * @param id
 	 *            batch-ul dupa care se face selectia
 	 * @return numarul de inregistrari cu batch-ul acesta
@@ -68,7 +68,7 @@ public interface VehicleOwnersDao {
 	/**
 	 * Metoda de inserare in tabela de batch
 	 */
-	public void insertBatch(ResultBatch batch);
+	public void insertBatch(Batch batch);
 
 	/**
 	 * Selecteaza ultimul id de batch
@@ -79,36 +79,40 @@ public interface VehicleOwnersDao {
 
 	/**
 	 * Lista cu toate batch-urile existente
-	 * 
+	 *
 	 * @return
 	 */
-	public List<ResultBatch> selectAllBatches();
+	public List<Batch> selectAllBatches();
 
 	/**
 	 * Selectie de vehicle owner in functie de cartea de identitate
-	 * 
+	 *
 	 * @param roIdCard
 	 *            cartea de identitate
-	 * @return lista cu toti detinatorii de permis cu aceasta carte de
-	 *         identitate
+	 * @return lista cu toti detinatorii de permis cu aceasta carte de identitate
 	 */
 	public List<VehicleOwner> selectVehicleOwnerByRoIdCard(String roIdCard);
 
 	/**
 	 * Selectie batch dupa id
-	 * @param id identificator unic de cautare in tabela de batch
+	 *
+	 * @param id
+	 *            identificator unic de cautare in tabela de batch
 	 * @return batch-ul cu id-ul din parametru
 	 */
-	public ResultBatch selectBatchById(Long id);
+	public Batch selectBatchById(Long id);
 
 	/**
 	 * Stergere vehicle owner dupa id
-	 * @param id identificator de selectie in tabela de vehicle owners
+	 *
+	 * @param id
+	 *            identificator de selectie in tabela de vehicle owners
 	 */
 	public void deleteVehicleOwnerById(Long id);
 
 	/**
 	 * Numararea batch-urilor existente
+	 *
 	 * @return numarul de batch-uri existente
 	 */
 	public Integer countBatches();

@@ -10,11 +10,11 @@
 
 			<h1 th:text="#{default-success-msg}"></h1>
 			<p
-				th:text="#{result-metrics.odd-to-even-ratio} + ': ' + ${processResult.oddToEvenRatio}" />
+				th:text="#{result-metrics.odd-to-even-ratio} + ': ' + ${processResult.basic.oddToEvenRatio}" />
 			<p
-				th:text="#{result-metrics.passed-reg-due-date} + ': ' + ${processResult.passedRegChangeDueDate}" />
+				th:text="#{result-metrics.passed-reg-due-date} + ': ' + ${processResult.basic.passedRegChangeDueDate}" />
 			<p
-				th:text="#{batch-list.vehicle-owner.batch-id} + ': ' + ${processResult.batchId}" />
+				th:text="#{batch-list.vehicle-owner.batch-id} + ': ' + ${processResult.batch.batchId}" />
 			<table class="table table-bordered table-hover">
 				<thead>
 					<tr>
@@ -22,14 +22,14 @@
 					</tr>
 				</thead>
 				<tbody>
-					<tr th:if="${processResult.unregCarsCountByJud.size() ==0}">
+					<tr th:if="${processResult.unregCars.size() ==0}">
 						<td th:text="#{result-metrics.no-unreg-cars}" colspan="4"></td>
 					</tr>
-					<tr th:each="unregCarsByJud : ${processResult.unregCarsCountByJud}">
+					<tr th:each="car : ${processResult.unregCars}">
 						<td
-							th:text="#{result-metrics.unreg-cars.judet}+' :' + ${unregCarsByJud.judet}">1</td>
+							th:text="#{result-metrics.unreg-cars.judet}+' :' + ${car.basic.judet}">1</td>
 						<td
-							th:text="#{result-metrics.unreg-cars.count}+' :' + ${unregCarsByJud.unregCarsCount}"></td>
+							th:text="#{result-metrics.unreg-cars.count}+' :' + ${car.basic.unregCarsCount}"></td>
 					</tr>
 				</tbody>
 			</table>
@@ -40,14 +40,14 @@
 					</tr>
 				</thead>
 				<tbody>
-					<tr th:if="${processResult.resultErrors.size() ==0}">
+					<tr th:if="${processResult.errors.size() ==0}">
 						<td colspan="4" th:text="#{result-metrics.no-errors}"></td>
 					</tr>
-					<tr th:each="error : ${processResult.resultErrors}">
+					<tr th:each="error : ${processResult.errors}">
 						<td
-							th:text="#{result-metrics.result-error.type}+' :' + ${error.type}">1</td>
+							th:text="#{result-metrics.result-error.type}+' :' + ${error.basic.type}">1</td>
 						<td
-							th:text="#{result-metrics.result-error.vehicle-owner-id}+' :'+ ${error.vehicleOwnerId}"></td>
+							th:text="#{result-metrics.result-error.vehicle-owner-id}+' :'+ ${error.basic.vehicleOwnerId}"></td>
 					</tr>
 				</tbody>
 			</table>

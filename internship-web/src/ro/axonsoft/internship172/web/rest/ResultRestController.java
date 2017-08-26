@@ -4,10 +4,13 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -28,6 +31,7 @@ import ro.axonsoft.internship172.model.result.ResultMetricsDeleteResult;
 import ro.axonsoft.internship172.model.result.ResultMetricsGetResult;
 import ro.axonsoft.internship172.model.result.ResultRecord;
 import ro.axonsoft.internship172.model.result.ResultSortCriterionType;
+import ro.axonsoft.internship172.web.rest.util.RestUtil;
 
 /**
  * Clasa controller pentru serviciul de rezultate
@@ -36,7 +40,7 @@ import ro.axonsoft.internship172.model.result.ResultSortCriterionType;
  *
  */
 @RestController
-@RequestMapping(value = "/rest/v1/results")
+@RequestMapping(value = "v1/results")
 public class ResultRestController {
 
 	ResultBusiness resultBusiness;
@@ -80,6 +84,22 @@ public class ResultRestController {
 	 * @throws InvalidDatabaseAccessException
 	 *             daca id-ul de batch e invalid
 	 */
+
+	@RequestMapping(method = RequestMethod.GET)
+	@Transactional
+	public ResponseEntity<ResultMetricsGetResult> getResults(@RequestParam final Long batchId,
+			@RequestParam(defaultValue = "1") final Integer page,
+			@RequestParam(defaultValue = "20") final Integer pageSize,
+			@RequestParam(defaultValue = "RESULT_PROCESS_TIME:ASC") final List<String> sort,
+			@RequestParam(value = "search", required = false) final String search) {
+
+		final ResultMetricsGetResult resGetResult = resultBusiness.getResults(ImtResultGet.builder().batchId(batchId)
+				.pagination(ImtPagination.of(page, pageSize)).sort(RestUtil.parseSort(sort,
+						ResultSortCriterionType.class, (x, y) -> ImtResultSortCriterion.of(x, y)))
+				.search(search).build());
+		System.out.println(resGetResult.toString());
+		return ResponseEntity.ok(resGetResult);
+	}
 
 	@RequestMapping(value = "/getResultsByPage/{batchId}/{pageSize}/{currentPage}", method = RequestMethod.GET)
 	public @ResponseBody MdfConcreteResultMetrics[] getAllResultsPage(@PathVariable("batchId") final Long batchId,

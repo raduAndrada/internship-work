@@ -20,8 +20,8 @@ import ro.axonsoft.internship172.data.api.result.ResultEntity;
 import ro.axonsoft.internship172.data.tests.RecrutareBusinessTests;
 import ro.axonsoft.internship172.data.tests.TestDbUtil;
 import ro.axonsoft.internship172.model.api.Judet;
-import ro.axonsoft.internship172.model.base.ImtResultBatch;
-import ro.axonsoft.internship172.model.base.MdfResultBatch;
+import ro.axonsoft.internship172.model.base.ImtBatch;
+import ro.axonsoft.internship172.model.base.MdfBatch;
 import ro.axonsoft.internship172.model.base.SortDirection;
 import ro.axonsoft.internship172.model.result.ImtResultBasic;
 import ro.axonsoft.internship172.model.result.ImtResultCreate;
@@ -63,7 +63,7 @@ public class ResultBusinessTests extends RecrutareBusinessTests {
 					.setBasic(MdfResultErrorBasic.create().setType(1).setVehicleOwnerId(1L)))
 			.addUnregCar(MdfResultUnregCarsCountByJudRecord.create().setResultMetricsId(6L).setUnregCarsCountId(20L)
 					.setBasic(MdfResultUnregCarsCountByJudBasic.create().setJudet(Judet.AB).setUnregCarsCount(2)))
-			.setBatch(MdfResultBatch.create().setBatchId(6L))).setResultMetricsId(6L);
+			.setBatch(MdfBatch.create().setBatchId(6L))).setResultMetricsId(6L);
 
 	@Test
 	@DatabaseSetup(value = "ResultBusinessTests-01-i.xml", type = DatabaseOperation.TRUNCATE_TABLE)
@@ -73,10 +73,9 @@ public class ResultBusinessTests extends RecrutareBusinessTests {
 		dbUtil.setIdentity(UNREG_CARS_TN, UNREG_CARS_ID_CLM_NAME, 20);
 		dbUtil.setIdentity(ERR_TN, ERR_ID_CLM_NAME, 20);
 		pushInstant(Instant.parse("2017-08-03T11:41:00.00Z"));
-		final ResultMetricsCreateResult resCreateResult = resBusiness
-				.createResult(ImtResultCreate.builder().basic(RES1.getRecord().getBasic())
-						.errors(RES1.getRecord().getErrors()).unregCars(RES1.getRecord().getUnregCars())
-						.batch(ImtResultBatch.builder().batchId(6L).build()).build());
+		final ResultMetricsCreateResult resCreateResult = resBusiness.createResult(ImtResultCreate.builder()
+				.basic(RES1.getRecord().getBasic()).errors(RES1.getRecord().getErrors())
+				.unregCars(RES1.getRecord().getUnregCars()).batch(ImtBatch.builder().batchId(6L).build()).build());
 		assertThat(resCreateResult)
 				.isEqualTo(ImtResultMetricsCreateResult.builder()
 						.basic(ImtResultBasic.builder().oddToEvenRatio(100).passedRegChangeDueDate(5)
@@ -104,7 +103,7 @@ public class ResultBusinessTests extends RecrutareBusinessTests {
 								.setUnregCarsCountId(0L)
 								.setBasic(MdfResultUnregCarsCountByJudBasic.create().setJudet(Judet.AB)
 										.setUnregCarsCount(2)))
-						.batch(ImtResultBatch.builder().batchId(0L).build()).build())
+						.batch(ImtBatch.builder().batchId(0L).build()).build())
 				.build());
 
 	}
