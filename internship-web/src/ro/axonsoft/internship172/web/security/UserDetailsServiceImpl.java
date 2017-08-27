@@ -15,7 +15,7 @@ import org.springframework.web.client.RestTemplate;
 
 import com.google.common.collect.ImmutableList;
 
-import ro.axonsoft.internship172.model.api.VehicleOwnerRecord;
+import ro.axonsoft.internship172.model.user.UserRecord;
 import ro.axonsoft.internship172.web.util.RestUrlResolver;
 
 public class UserDetailsServiceImpl implements UserDetailsService {
@@ -40,8 +40,8 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
 	@Override
 	public UserDetails loadUserByUsername(final String username) throws UsernameNotFoundException {
-		final ResponseEntity<VehicleOwnerRecord> user = restTemplate
-				.getForEntity(restUrlResolver.resolveRestUri(USER_REMEMBER_ME_URI, username), VehicleOwnerRecord.class);
+		final ResponseEntity<UserRecord> user = restTemplate
+				.getForEntity(restUrlResolver.resolveRestUri(USER_REMEMBER_ME_URI, username), UserRecord.class);
 		if (user.getStatusCode().equals(HttpStatus.OK)) {
 			return new User(username, "****", ImmutableList.of(new SimpleGrantedAuthority("ADMIN")));
 		} else {
