@@ -6,6 +6,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import ro.axonsoft.internship172.business.impl.DbVehicleOwnersProcessorImpl;
+import ro.axonsoft.internship172.business.impl.base.SystemClockTimeManager;
+import ro.axonsoft.internship172.business.impl.base.TimeManager;
 import ro.axonsoft.internship172.impl.RoIdCardParserImpl;
 import ro.axonsoft.internship172.impl.RoIdCardSeriesJudMapperImpl;
 import ro.axonsoft.internship172.impl.RoRegPlateParserImpl;

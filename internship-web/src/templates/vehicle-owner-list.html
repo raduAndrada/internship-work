@@ -1,9 +1,11 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head th:include="layout/head :: head">
+<head>
+<meta charset="UTF-8" />
+<th:block th:replace="layout/frg::head"></th:block>
 <title th:text="#{vehicle-owners.input-batch.records.title}"></title>
 </head>
-<body>
+<body class="rc-body">
 	<div th:substituteby="layout/navbar :: navbar('nope')"></div>
 	<div class="lightbox">
 		<div class="container">
@@ -54,6 +56,8 @@
 						<td th:text="#{vehicle-owners.input-batch.records.reg-plate}"></td>
 						<td th:text="#{vehicle-owners.input-batch.records.comentariu}"></td>
 						<td th:text="#{vehicle-owners.input-batch.records.batch-id}"></td>
+						<td></td>
+						<td></td>
 					</tr>
 				</thead>
 				<tbody>

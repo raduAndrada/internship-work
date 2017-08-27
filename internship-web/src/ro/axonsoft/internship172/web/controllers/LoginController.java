@@ -13,28 +13,28 @@ import org.springframework.web.bind.annotation.RequestParam;
 @Controller
 public class LoginController {
 
-    private static final String LOGIN_VIEW = "login";
-    private static final String LOGIN_REDIRECT = "redirect:/candidates";
+	private static final String LOGIN_VIEW = "login";
+	private static final String LOGIN_REDIRECT = "redirect:/app/home";
 
-    private static final Logger LOG = LoggerFactory.getLogger(LoginController.class);
+	private static final Logger LOG = LoggerFactory.getLogger(LoginController.class);
 
-    @RequestMapping
-    public String login() {
-         String view = LOGIN_VIEW;
-        if (SecurityContextHolder.getContext().getAuthentication()!=null && SecurityContextHolder.getContext().getAuthentication() != null &&
-                SecurityContextHolder.getContext().getAuthentication().getPrincipal() != null)
-        {
-            if (SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof UserDetails) {
-                view = LOGIN_REDIRECT;
-            }
+	@RequestMapping
+	public String login() {
+		String view = LOGIN_VIEW;
+		if (SecurityContextHolder.getContext().getAuthentication() != null
+				&& SecurityContextHolder.getContext().getAuthentication() != null
+				&& SecurityContextHolder.getContext().getAuthentication().getPrincipal() != null) {
+			if (SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof UserDetails) {
+				view = LOGIN_REDIRECT;
+			}
 
-        }
-        return view;
-    }
+		}
+		return view;
+	}
 
-    @RequestMapping(method = RequestMethod.POST)
-    public String login(@RequestParam final String username, @RequestParam final String password) {
-        return LOGIN_VIEW;
-    }
+	@RequestMapping(method = RequestMethod.POST)
+	public String login(@RequestParam final String username, @RequestParam final String password) {
+		return LOGIN_VIEW;
+	}
 
 }

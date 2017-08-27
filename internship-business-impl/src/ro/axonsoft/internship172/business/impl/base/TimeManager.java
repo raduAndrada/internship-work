@@ -1,4 +1,4 @@
-package ro.axonsoft.internship172.rest.configuration;
+package ro.axonsoft.internship172.business.impl.base;
 
 import java.time.Instant;
 

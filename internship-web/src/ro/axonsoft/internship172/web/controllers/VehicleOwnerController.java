@@ -17,7 +17,6 @@ import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.Errors;
 import org.springframework.validation.ObjectError;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -380,25 +379,6 @@ public class VehicleOwnerController {
 			redirectAttributes.addAttribute(RO_ID_CARD, ownerForm.getRoIdCard());
 			return REDIRECT_VEHICLE_OWNER_DETAILS_UPDATE;
 		}
-	}
-
-	/**
-	 * Exceptiile care pot aparea
-	 *
-	 * @param model
-	 *            pe care adaugam
-	 * @param exception
-	 * @return
-	 */
-	@ExceptionHandler({ Exception.class })
-	public String vehicleOwnerExceptionsHandling(final Model model, final Exception exception) {
-		String msg = " ";
-		if (exception.getMessage() != null) {
-			msg += exception.getMessage();
-		}
-		model.addAttribute("error", exception.getClass().toString() + msg);
-		exception.printStackTrace();
-		return "exception";
 	}
 
 }

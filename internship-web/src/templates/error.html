@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8" />
+<th:block th:replace="layout/frg::head"></th:block>
+<title>AxonSoft Internship</title>
+</head>
+<body class="rc-body">
+    <div class="container lightbox">
+        <div class="text-center container logo">
+            <img th:src="@{/img/AXON_logo_325x65px_3.png}" />
+        </div>
+        <div class="row text-center">
+            <div class="col-md-12">
+                <div class="error-template">
+                    <th:block th:if="${errorCode}">
+                        <h1>Oops!</h1>
+                        <h2 th:text="${errorCode}"></h2>
+                    </th:block>
+                    <div th:if="${message}" class="error-details w3-container w3-card-4 submit_work-success w3-red">
+                        <h4 th:text="#{${message}}"></h4>
+                    </div>
+                    <div th:if="${success}" class="w3-container w3-card-4 submit_work-success" th:text="${success}"></div>
+                    <div class="error-actions">
+                        <th:block th:if="${previousPage}">
+                            <a th:href="@{${previousPage}}" class="btn btn-primary btn-lg"><i class="fa fa-undo" aria-hidden="true"></i>
+                                <span th:text="#{error.return}"> Înapoi</span> </a>
+                            <a href="mailto:alexandru.deac@axonsoft.ro" class="btn btn-default btn-lg"> <i class="fa fa-envelope"
+                                aria-hidden="true"></i> <span th:text="#{error.contact}">Contact</span>
+                            </a>
+                        </th:block>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <th:block th:replace="layout/frg::footer-js"></th:block>
+</body>
+</html>

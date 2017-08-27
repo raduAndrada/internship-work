@@ -18,7 +18,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	protected void configure(final HttpSecurity http) throws Exception {
 		http.exceptionHandling().and().authorizeRequests().antMatchers("/webjars/**").permitAll().antMatchers("/css/**")
 				.permitAll().antMatchers("/js/**").permitAll().antMatchers("/login/**").permitAll()
-				.antMatchers("/error/**").permitAll().antMatchers("/img/**").permitAll().antMatchers("/**")
+				.antMatchers("/error/**").permitAll().antMatchers("/images/**").permitAll().antMatchers("/**")
 				.authenticated().and().formLogin().loginPage("/login").permitAll().and().logout().and().rememberMe()
 				.key("remember-me").rememberMeCookieName("remember-me").rememberMeParameter("remember-me")
 				.tokenValiditySeconds(86400);

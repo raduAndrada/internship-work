@@ -10,11 +10,7 @@ import org.springframework.context.annotation.Configuration;
 
 import com.google.common.collect.Multimap;
 
-import ro.axonfost.internship172.business.api.result.ResultBusiness;
-import ro.axonfost.internship172.business.impl.result.ResultBusinessImpl;
-import ro.axonsoft.internship172.business.api.vehicleOwner.VehicleOwnerBusiness;
 import ro.axonsoft.internship172.business.impl.DbVehicleOwnersProcessorImpl;
-import ro.axonsoft.internship172.business.impl.vehicleOwner.VehicleOwnerBusinessImpl;
 import ro.axonsoft.internship172.impl.RoIdCardParserImpl;
 import ro.axonsoft.internship172.impl.RoIdCardSeriesJudMapperImpl;
 import ro.axonsoft.internship172.impl.RoRegPlateParserImpl;
@@ -83,7 +79,5 @@ public class BusinessConfiguration {
 	public DbVehicleOwnersProcessor dbVehicleOwnersProcessor() {
 		return new DbVehicleOwnersProcessorImpl(roRegPlateParser(), roIdCardParser(), vehicleOwnersProcessor());
 	}
-
-
 
 }

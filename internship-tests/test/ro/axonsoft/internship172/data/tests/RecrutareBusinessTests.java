@@ -25,10 +25,10 @@ import com.github.springtestdbunit.annotation.DbUnitConfiguration;
 import com.github.springtestdbunit.dataset.ReplacementDataSetLoader;
 import com.google.common.collect.Lists;
 
+import ro.axonsoft.internship172.business.impl.base.TimeManager;
 import ro.axonsoft.internship172.rest.configuration.BusinessConfig;
 import ro.axonsoft.internship172.rest.configuration.BusinessConfigurationForRest;
 import ro.axonsoft.internship172.rest.configuration.DataConfiguration;
-import ro.axonsoft.internship172.rest.configuration.TimeManager;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = { RecrutareBusinessTests.Config.class }, webEnvironment = WebEnvironment.NONE)

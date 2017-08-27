@@ -13,7 +13,6 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -22,7 +21,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.google.common.collect.Lists;
 
 import ro.axonfost.internship172.business.api.result.ResultBusiness;
-import ro.axonsoft.internship172.data.exceptions.DatabaseIntegrityViolationException;
 import ro.axonsoft.internship172.model.api.DbVehicleOwnersProcessor;
 import ro.axonsoft.internship172.model.api.Judet;
 import ro.axonsoft.internship172.model.api.StreamVehicleOwnersProcessor;
@@ -151,11 +149,6 @@ public class ProcessRestController {
 				.getList().get(0);
 		return ResponseEntity.ok(res);
 
-	}
-
-	@ExceptionHandler({ DatabaseIntegrityViolationException.class })
-	public String vehicleOwnerExceptionsHandling(final Exception exception) throws Exception {
-		throw exception;
 	}
 
 }

@@ -20,5 +20,4 @@ public class BusinessConfigurationForRest {
 	public ResultBusiness resultBusiness() {
 		return new ResultBusinessImpl();
 	}
-
 }

@@ -22,12 +22,11 @@
 					<li th:classappend="${activeTab == 'home' ? ' active-page' : ''}"><a
 						class="nav-link" th:href="@{/app/home}">Home</a></li>
 					<li th:classappend="${activeTab == 'insert' ? ' active-page' : ''}"><a
-						class="nav-link" 
-						th:text="#{default-insert-msg}" th:href="@{/app/create}"></a></li>
+						class="nav-link" th:text="#{default-insert-msg}"
+						th:href="@{/app/create}"></a></li>
 					<li
 						th:classappend="${activeTab == 'view-batches' ? ' active-page' : ''}"><a
-						th:text="#{default-view-batch}"
-						th:href="@{/app/batches/}"></a></li>
+						th:text="#{default-view-batch}" th:href="@{/app/batches/}"></a></li>
 					<li
 						th:classappend="${activeTab == 'file-upload' ? ' active-page' : ''}"><a
 						class="nav-link" id="/process/fileUpload" th:text="#{file-upload}"
@@ -49,6 +48,19 @@
 										color="black">EN</font>
 								</a></li>
 							</th:block>
+						</ul></li>
+					<li class="dropdown"><a href="#" class="dropdown-toggle"
+						data-toggle="dropdown" role="button" aria-haspopup="true"
+						aria-expanded="false"> <span
+							th:text="${#authentication.principal.username}"></span> <span
+							class="caret"></span></a>
+						<ul class="dropdown-menu">
+                        <li>
+                            <form method="post" th:action="@{/logout}">
+                                <button type="submit" class="btn btn-lgt btn-link" th:text="#{navbar.logout}">
+                                </button>
+                            </form>
+                        </li>
 						</ul></li>
 				</ul>
 			</div>
