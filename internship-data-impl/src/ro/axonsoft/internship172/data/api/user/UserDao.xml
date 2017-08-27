@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
+
+<mapper namespace="ro.axonsoft.internship172.data.api.user.UserDao">  
+   
+   <resultMap id="UserMap" type="MdfUserEntity"> 
+           <id column="ID" property="id" />   
+           <result column="PASSWD" property="password"/>
+           <association property="record" javaType="MdfUserRecord" >
+               <association property="basic" javaType="MdfUser" notNullColumn="USRNM">
+                    <result column="USRNM" property="username"/>
+                    <result column="F_NM" property="firstName"/>
+                    <result column="L_NM" property="lastName"/>
+                    <result column="EMAIL" property="email"/>
+               </association>
+           </association>
+   </resultMap>
+                            
+   <select id="getUser" resultMap="UserMap">
+        select distinct
+            ID, 
+            <include refid="usrColumns"/>
+        from USR
+        <where>
+            <include refid="whereCriteria"/>
+            <include refid="searchCriteria"/> 
+        </where> 
+        <include refid="sortCriteria"/>
+        <include refid="pagination"/>
+   </select>                         
+               
+   <insert id="addUser" keyProperty="id">
+        insert into USR (
+            <include refid="usrColumns"/> 
+        ) VALUES (
+            #{record.basic.firstName}, #{record.basic.lastName}, #{record.basic.username}, #{record.basic.email}, #{password}
+        ) 
+   </insert>            
+
+    <update id="updateUser">
+        update USR
+        <set>
+            <if test = "firstName != null">F_NM=#{firstName},</if>
+            <if test = "lastName != null">L_NM=#{lastName},</if>
+            <if test = "email != null">EMAIL=#{email},</if>
+            <if test = "password != null">PASSWD=#{password}</if>
+        </set>
+        <where>    
+            <include refid="whereCriteria"/>
+        </where>
+    </update>
+        
+    <delete id="deleteUser">
+        delete from USR
+        <where>
+            <include refid="whereCriteria"/>
+         </where>
+    </delete>
+    
+    <select id="countUser" resultType="Integer">
+        select count(*)
+        from USR
+        <where>
+            <include refid="whereCriteria"/>
+            <include refid="searchCriteria"/>
+         </where>
+    </select>
+    
+    <sql id="whereCriteria">
+        <if test="criteria != null">
+            <if test="criteria.idIncl != null and !criteria.idIncl.empty">
+                <foreach item="idInclItem" collection="criteria.idIncl" open="and ID in (" separator="," close=")">#{idInclItem}</foreach>
+            </if>
+            <if test="criteria.usernameIncl != null and !criteria.usernameIncl.empty">
+                <foreach item="usrnmInclItem" collection="criteria.usernameIncl" open="and USRNM in (" separator="," close=")">#{usrnmInclItem}</foreach>
+            </if>
+         </if>         
+    </sql>
+            
+    <sql id="sortCriteria">
+        <if test="sort.size() > 0">
+            order by 
+            <foreach item="sortItem" index="index" collection="sort" separator=",">
+                ${sortItem.criterion} ${sortItem.direction}
+            </foreach>
+        </if>
+    </sql>        
+    
+    <sql id="pagination">
+        <if test="pagination != null">
+            limit #{pagination.pageSize}
+            offset #{pagination.offset}       
+        </if>
+    </sql>
+
+    <sql id="searchCriteria">
+        <if test="search != null">
+            <bind name="likePattern" value="'%' + search + '%'" />
+            and  
+            UPPER(USRNM) like UPPER(#{likePattern})
+            or
+            UPPER(F_NM) like UPPER(#{likePattern})
+            or 
+            UPPER(L_NM) like UPPER(#{likePattern})
+            or 
+            UPPER(EMAIL) like UPPER(#{likePattern})
+        </if> 
+    </sql>
+    
+    <sql id="usrColumns">
+        F_NM, L_NM, USRNM, EMAIL, PASSWD
+    </sql>
+    
+</mapper>
+
+

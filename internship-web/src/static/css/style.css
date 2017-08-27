@@ -214,8 +214,8 @@ label.form-invalid:after {
 }
 
 .profile-img {
-    width: 150px;
-    height: 96px;
+    width: 75px;
+    height: 56px;
     margin: 0 auto 10px;
     display: block;
     -moz-border-radius: 50%;

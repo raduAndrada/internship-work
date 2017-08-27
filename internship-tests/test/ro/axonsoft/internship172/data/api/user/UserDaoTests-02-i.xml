@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dataset>
+	<USR ID="0" USRNM="andrei" EMAIL="andrei.morar@axonsoft.ro" F_NM="Andrei"
+		L_NM="MORAR" PASSWD="andreipass" />
+	<USR ID="1" USRNM="alex" EMAIL="alexandru.deac@axonsoft.ro" F_NM="Alexandru"
+		L_NM="DEAC" PASSWD="alexpass" />
+</dataset>

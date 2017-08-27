@@ -44,6 +44,16 @@ create table VEHICLE_OWNER (
   BATCH_ID integer not null
   );
 
+drop table USR if exists;
+
+create table USR (
+	ID numeric identity,
+	USRNM varchar(50) not null,
+	F_NM varchar(100) not null,
+	L_NM varchar(100) not null,
+	EMAIL varchar(300) not null,
+	PASSWD varchar(50) not null,
+);
 
 
 
