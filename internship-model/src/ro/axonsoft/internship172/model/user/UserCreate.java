@@ -10,9 +10,10 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 @JsonDeserialize(builder = ImtUserCreate.Builder.class)
 public interface UserCreate {
 
-    User getBasic();
+	@Nullable
+	User getBasic();
 
-    @Nullable
-    String getPassword();
+	@Nullable
+	String getPassword();
 
 }

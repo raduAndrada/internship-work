@@ -33,3 +33,11 @@ spring:
       max-active: 2
       test-on-borrow: true
   
+logging:
+  level:
+    root: ERROR
+    org.springframework: ERROR
+    ro.axonsoft.internship172:
+      rest.configuration.RestResponseEntityExceptionHandler: ERROR
+      data: ERROR
+  

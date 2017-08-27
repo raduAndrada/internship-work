@@ -23,5 +23,8 @@ public interface UserGet {
 	String getUsername();
 
 	@Nullable
+	String getPassoword();
+
+	@Nullable
 	String getSearch();
 }
