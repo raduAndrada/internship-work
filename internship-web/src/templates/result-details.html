@@ -1,7 +1,9 @@
 <!DOCTYPE HTML>
 <html xmlns:th="http://www.thymeleaf.org">
-<head th:include="layout/head :: head">
-<title th:text="#{default-success-msg}"></title>
+<head>
+<meta charset="UTF-8" />
+<th:block th:replace="layout/frg::head"></th:block>
+<title><th:block th:text="#{app.name}"></th:block> :: <th:block th:text="#{file-process.process}"></th:block><th:block></th:block></title>
 </head>
 <body>
 	<div th:substituteby="layout/navbar :: navbar('view-batches')"></div>
@@ -53,7 +55,7 @@
 			</table>
 
 		</div>
-		<div th:substituteby="layout/footer :: footer"></div>
+		 <th:block th:replace="layout/frg::footer-js"></th:block>
 	</div>
 </body>
 </html>

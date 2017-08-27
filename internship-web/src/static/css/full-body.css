@@ -51,10 +51,11 @@ body, html {
     background-color: #d4cc73;
 }
 
-.container {
-    color: white;
+.pre-scrollable {
+	 max-height: 1000px;
+    overflow-y: scroll;
+   
 }
-
 .container form {
     color: black;
 }

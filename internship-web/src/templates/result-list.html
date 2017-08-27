@@ -1,7 +1,10 @@
 <!DOCTYPE HTML>
 <html xmlns:th="http://www.thymeleaf.org">
-<head th:include="layout/head :: head">
-<title th:text="#{default-success-msg}"></title>
+<head>
+<meta charset="UTF-8" />
+<th:block th:replace="layout/frg::head"></th:block>
+<title><th:block th:text="#{app.name}"></th:block> :: <th:block
+		th:text="#{file-process.process}"></th:block><th:block></th:block></title>
 </head>
 <body>
 	<div th:substituteby="layout/navbar :: navbar('view-batches')"></div>
@@ -9,46 +12,46 @@
 		<div class="container">
 			<script type="text/javascript" th:src="@{/js/tableSearch.js}"></script>
 			<script type="text/javascript" th:src="@{/js/result.js}"></script>
-				<script type="text/javascript" th:src="@{/js/tableSearch.js}"></script>
-				<div th:replace="layout/frg::success-messages"></div>
-				<div class="rc-filter-container">
-					<form th:object="${resultListForm}">
-						<th:block th:if="${#fields.hasErrors('global')}">
-							<div class="alert alert-danger"
-								th:each="err : ${#fields.errors('global')}" th:text="${err}">Generic
-								Error</div>
-						</th:block>
-						<input type="hidden" th:field="*{pageSize}" /> <input
-							type="hidden" th:field="*{page}" />
-						<div class="pull-left">
-							<ul class="nav navbar-nav">
-								<li class="form-group"><input type="text" id="myInput"
-									class="form-control" onkeyup="tableSearchOneColumn()"
-									placeholder="Search for batch by id" title="Type batch id" /></li>
+			<div th:replace="layout/frg::success-messages"></div>
+			<div class="rc-filter-container">
+				<form th:object="${resultListForm}">
+					<th:block th:if="${#fields.hasErrors('global')}">
+						<div class="alert alert-danger"
+							th:each="err : ${#fields.errors('global')}" th:text="${err}">Generic
+							Error</div>
+					</th:block>
+					<input type="hidden" th:field="*{pageSize}" /> <input
+						type="hidden" th:field="*{page}" />
+					<div class="pull-left">
+						<ul class="nav navbar-nav">
+							<li class="form-group"><input type="text" id="myInput"
+								class="form-control" onkeyup="tableSearchOneColumn()"
+								placeholder="Search for batch by id" title="Type batch id" /></li>
 
-							</ul>
-
-						</div>
-					</form>
-				</div>
-				<div class="container-fluid nav navbar-nav navbar-right">
-					<div class="btn-group">
-						<button class="btn btn-primary btn-md dropdown-toggle"
-							type="button" data-toggle="dropdown" aria-haspopup="true"
-							aria-expanded="false">
-							<span th:text="#{generic.pagination}"></span> <span class="caret"></span>
-						</button>
-						<ul class="dropdown-menu"
-							th:with="strList = ${ {1, 2, 5, 10, 20, 50, 100} }">
-							<li th:classappend="${pageSize == s} ? active"
-								th:each="s : ${strList}"><a th:text="${s}"
-								th:href="@{${@currentUrlWithoutParam.apply('page,pageSize,search')}(page=${pageIndex},pageSize=${s},search=${resultListForm.search})}"></a>
-
-							</li>
 						</ul>
+
 					</div>
+				</form>
+			</div>
+			<div class="container-fluid nav navbar-nav navbar-right">
+				<div class="btn-group">
+					<button class="btn btn-primary btn-md dropdown-toggle"
+						type="button" data-toggle="dropdown" aria-haspopup="true"
+						aria-expanded="false">
+						<span th:text="#{generic.pagination}"></span> <span class="caret"></span>
+					</button>
+					<ul class="dropdown-menu"
+						th:with="strList = ${ {1, 2, 5, 10, 20, 50, 100} }">
+						<li th:classappend="${pageSize == s} ? active"
+							th:each="s : ${strList}"><a th:text="${s}"
+							th:href="@{${@currentUrlWithoutParam.apply('page,pageSize,search')}(page=${resultListForm.page},pageSize=${s},search=${resultListForm.search})}"></a>
+
+						</li>
+					</ul>
 				</div>
-				<table id="myTable" class="table table-bordered table-hover">
+			</div>
+			<div class="container pre-scrollable">
+				<table id="myTable" class="table table-bordered table-hover ">
 					<tbody>
 						<tr th:each="processResult,iter  : ${resultList}">
 						<tr>
@@ -73,7 +76,7 @@
 						</tr>
 						<tr>
 							<td>
-								<button type="button" class="btn btn-default"
+								<button type="button" class="btn btn-info"
 									th:onclick="'showUnregCars(\''+${iter.index}+ '\');'">
 									<i class="fa fa-expand" aria-hidden="true"></i> <span
 										th:text="#{btn-show} +' '+ #{result-metrics.unreg-cars}"></span>
@@ -105,7 +108,7 @@
 						</tr>
 						<tr>
 							<td>
-								<button type="button" class="btn btn-default"
+								<button type="button" class="btn btn-info"
 									th:onclick="'showErrors(\''+${iter.index}+ '\');'">
 									<i class="fa fa-expand" aria-hidden="true"></i> <span
 										th:text="#{btn-show} +' '+ #{result-metrics.result-error}"></span>
@@ -136,20 +139,35 @@
 						</tr>
 					</tbody>
 				</table>
-
-
+			</div>
 		</div>
+
 		<div class="text-center">
 			<ul class="pagination" th:if="${pageCount > 0}">
-				<li th:each="pageIndex: ${#numbers.sequence(1, pageCount)}"
+				<li th:if="${start == true}"><a
+					th:href="@{${@currentUrlWithoutParam.apply('page,pageSize,search')}(page=${1},pageSize=${resultListForm.pageSize},search=${resultListForm.search})}"
+					th:text="${1}"> </a></li>
+
+				<li th:if="${dotsPrev == true}"><a
+					th:href="@{${@currentUrlWithoutParam.apply('page,pageSize,search')}(page=${resultListForm.page-2},pageSize=${resultListForm.pageSize},search=${resultListForm.search})}">...</a>
+				</li>
+				<li th:each="pageIndex: ${#numbers.sequence(startIndex, endIndex)}"
 					th:classappend="${resultListForm.page == pageIndex} ? active">
 					<a
 					th:href="@{${@currentUrlWithoutParam.apply('page,pageSize,search')}(page=${pageIndex},pageSize=${resultListForm.pageSize},search=${resultListForm.search})}"
 					th:text="${pageIndex}">1</a>
 				</li>
+				<li th:if="${dotsNext == true}"><a
+					th:href="@{${@currentUrlWithoutParam.apply('page,pageSize,search')}(page=${resultListForm.page+4},pageSize=${resultListForm.pageSize},search=${resultListForm.search})}">...</a>
+				</li>
+				<li th:if="${end == true}"><a
+					th:href="@{${@currentUrlWithoutParam.apply('page,pageSize,search')}(page=${pageCount},pageSize=${resultListForm.pageSize},search=${resultListForm.search})}"
+					th:text="${pageCount}"> </a></li>
 			</ul>
 		</div>
 	</div>
+
+
 	<th:block th:replace="layout/frg::footer-js"></th:block>
 </body>
 </html>

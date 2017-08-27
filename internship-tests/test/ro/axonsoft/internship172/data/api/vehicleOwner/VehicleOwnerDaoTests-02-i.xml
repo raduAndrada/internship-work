@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dataset>
+
+	<!-- date din tabela de detinatori de permise -->
+	<VEHICLE_OWNER VEHICLE_OWNER_ID="0" 
+		RO_ID_CARD="KX636141" REG_PLATE="CJ84ADC" ISSUE_DATE="2017-08-02 11:47:00.0"
+		COMENTARIU="000" BATCH_ID="0"/>
+	<!-- date din tabela de detinatori de permise -->
+	<VEHICLE_OWNER VEHICLE_OWNER_ID="1" 
+		RO_ID_CARD="KX636142" REG_PLATE="CJ84ADD" ISSUE_DATE="2017-08-02 11:47:00.0"
+		COMENTARIU="000" BATCH_ID="0"/>
+</dataset>

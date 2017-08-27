@@ -1,0 +1,4 @@
+dependencies {
+	compile project(':internship-business-api')
+	compile project(':internship-data-impl')
+}

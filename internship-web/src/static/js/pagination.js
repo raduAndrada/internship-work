@@ -45,22 +45,6 @@ function paginationFunction(currentPage, numberOfPages) {
 
     }
     ;
-    var pages = [];
 
-    var countARef = 0;
-    for (var j = 0; j < allVals; j++) {
-        var crtARef = liNodes[j].getElementsByTagName("A").item(0);
-        if (crtARef !== null) {
-            pages.push(crtARef);
-            countARef++;
-        }
-        ;
-    }
-    ;
-    for (var i = 0; i < countARef; i++) {
-        if (currentPage === pages[i].innerHTML) {
-            pages[i].style.color = "Black";
-        }
-    }
 }
 

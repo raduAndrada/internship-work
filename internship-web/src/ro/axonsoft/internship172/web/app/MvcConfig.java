@@ -30,7 +30,7 @@ import com.fasterxml.jackson.datatype.guava.GuavaModule;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
-import ro.axonsoft.internship172.web.rest.util.RestServiceResponseErrorHandler;
+import ro.axonsoft.internship172.web.util.RestServiceResponseErrorHandler;
 
 /**
  * Clasa de configurare pentru modulul de web
@@ -39,7 +39,7 @@ import ro.axonsoft.internship172.web.rest.util.RestServiceResponseErrorHandler;
  *
  */
 @Configuration
-@ComponentScan({ "ro.axonsoft.internship172.web.controllers", "ro.axonsoft.internship172.web.rest" })
+@ComponentScan({ "ro.axonsoft.internship172.web.controllers", "ro.axonsoft.internship172.web.util" })
 public class MvcConfig extends WebMvcConfigurerAdapter {
 
 	@Override

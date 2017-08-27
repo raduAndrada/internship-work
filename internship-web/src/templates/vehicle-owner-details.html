@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8" />
 <th:block th:replace="layout/frg::head"></th:block>
-<title><th:block th:text="#{app.name}"></th:block> :: <th:block th:if="${mode == 'create'}" th:text="#{users.create}"></th:block><th:block
-        th:if="${mode == 'update'}" th:text="#{users.update}"></th:block></title>
+<title><th:block th:text="#{app.name}"></th:block> :: <th:block th:if="${mode == 'create'}" th:text="#{vehicle-owner.create}"></th:block><th:block
+        th:if="${mode == 'update'}" th:text="#{vehicle-owners.update}"></th:block></title>
 </head>
 <body>
    <div th:substituteby="layout/navbar :: navbar('insert')"></div>

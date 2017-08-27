@@ -11,6 +11,7 @@
 	<link rel="stylesheet" type="text/css"
 		th:href="@{/webjars/font-awesome/css/font-awesome.css}" />
 	<script type="text/javascript" th:src="@{/js/jquery.js}"></script>
+	<script type="text/javascript" th:src="@{/js/tableSearch.js}"></script>
 	<link rel="stylesheet" type="text/css" th:href="@{/css/navbar.css}" />
 	<link rel="stylesheet" type="text/css" href="../css/full-body.css"
 		th:href="@{/css/full-body.css}" />
@@ -69,6 +70,12 @@
 	</div>
 	<footer>
 		<th:block th:fragment="footer-js">
+		<div class="container">
+            <p>
+                Built with a lot of effort by <a
+                    href="https://github.com/raduAndrada">Andrada</a>.
+            </p>
+        </div>
 			<script type="text/javascript"
 				th:src="@{/webjars/jquery/jquery.min.js}"></script>
 			<script type="text/javascript"

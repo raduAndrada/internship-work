@@ -1,7 +1,9 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head th:include="layout/head :: head">
-<title th:text="#{batch-list.vehicle-owner.list}"></title>
+<head>
+<meta charset="UTF-8" />
+<th:block th:replace="layout/frg::head"></th:block>
+<title><th:block th:text="#{app.name}"></th:block> :: <th:block th:text="#{file-process.process}"></th:block><th:block></th:block></title>
 </head>
 <body>
 	<div th:substituteby="layout/navbar :: navbar('file-upload')"></div>
@@ -17,7 +19,7 @@
 								class="col-sm-2 control-label"></label></td>
 							<td>
 								<div class="col-sm-10">
-									<label class="custom-file-upload btn btn-default"> <input id="file"
+									<label class="custom-file-upload btn btn-info"> <input id="file"
 										type="file" name="file" 
 										style="display: none;" /><span  th:text="#{browse}"></span> <i class="fa fa-paperclip"
 										aria-hidden="true"></i>
@@ -44,7 +46,7 @@
 
 		</div>
 	</div>
-	<div th:substituteby="layout/footer :: footer"></div>
+	 <th:block th:replace="layout/frg::footer-js"></th:block>
 </body>
 </html>
 

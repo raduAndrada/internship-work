@@ -46,7 +46,7 @@ import ro.axonsoft.internship172.web.model.BatchListForm;
 import ro.axonsoft.internship172.web.model.ImtSuccessMessage;
 import ro.axonsoft.internship172.web.model.VehicleOwnerForm;
 import ro.axonsoft.internship172.web.model.VehicleOwnerListForm;
-import ro.axonsoft.internship172.web.rest.util.RestUrlResolver;
+import ro.axonsoft.internship172.web.util.RestUrlResolver;
 
 /**
  * Controller pentru afisarea si interogarea tabelei de intrare
@@ -66,13 +66,20 @@ public class VehicleOwnerController {
 	private static final String CREATE_PATH = "/create";
 	private static final String CREATE_PATH_BATCH = "/create-batch";
 	private static final String RO_ID_CARD_PATH = "/{roIdCard}";
-	private static final String DELETE_PATH = "/delete/" + RO_ID_CARD_PATH;
+	private static final String DELETE_PATH = "/delete" + RO_ID_CARD_PATH;
 	private static final String MODE = "mode";
 	private static final String CREATE_MODE = "create";
 	private static final String UPDATE_MODE = "update";
 	private static final String PAGE_SIZE = "pageSize";
 	private static final String PAGE = "page";
 	private static final String SEARCH = "search";
+	private static final String START = "start";
+	private static final String END = "end";
+	private static final String START_INDEX = "startIndex";
+	private static final String END_INDEX = "endIndex";
+	private static final String DOTS_NEXT = "dotsNext";
+	private static final String DOTS_PREV = "dotsPrev";
+
 	private static final String BATCH_LIST = "batchList";
 	private static final String VEHICLE_OWNER_LIST = "vehicleOwnerList";
 	private static final String PAGE_COUNT = "pageCount";
@@ -120,15 +127,35 @@ public class VehicleOwnerController {
 			LOG.error("Failed to fetch users list", e);
 			bindingResult.addError(GENERIC_ERROR);
 		}
+		final Integer currentPage = (batchListForm.getPage() != null) ? batchListForm.getPage() : 1;
+		final Integer startIndex = (currentPage - 3 > 1) ? currentPage : 1;
+		final boolean start = (startIndex > 3) ? true : false;
+		final boolean dotsPrev = (startIndex > 4) ? true : false;
+		final Integer endIndex = (currentPage + 3 < batchGetResult.getBody().getPageCount() ? currentPage + 3
+				: batchGetResult.getBody().getPageCount());
+		final boolean end = (currentPage < batchGetResult.getBody().getPageCount() - 3 ? true : false);
+		final boolean dotsNext = (currentPage < batchGetResult.getBody().getPageCount() - 4 ? true : false);
 
 		if (batchGetResult != null && batchGetResult.getStatusCode() == HttpStatus.OK) {
 			modelMap.put(BATCH_LIST, batchGetResult.getBody().getList());
 			modelMap.put(PAGE_COUNT, batchGetResult.getBody().getPageCount());
 			modelMap.put(PAGE_SIZE, batchGetResult.getBody().getPagination().getPageSize());
+			modelMap.put(START, start);
+			modelMap.put(END, end);
+			modelMap.put(START_INDEX, startIndex);
+			modelMap.put(END_INDEX, endIndex);
+			modelMap.put(DOTS_NEXT, dotsNext);
+			modelMap.put(DOTS_PREV, dotsPrev);
 		} else {
 			modelMap.put(BATCH_LIST, ImmutableList.of());
 			modelMap.put(PAGE_COUNT, 0);
 			modelMap.put(PAGE_SIZE, 10);
+			modelMap.put(START, start);
+			modelMap.put(END, end);
+			modelMap.put(START_INDEX, startIndex);
+			modelMap.put(END_INDEX, endIndex);
+			modelMap.put(DOTS_NEXT, dotsNext);
+			modelMap.put(DOTS_PREV, dotsPrev);
 		}
 		return BATCH_LIST_VIEW;
 	}
@@ -176,93 +203,6 @@ public class VehicleOwnerController {
 		return save(mode, ownerForm, bindingResult, modelMap, redirectAttributes);
 	}
 
-	/**
-	 * Metoda de inserare in baza de date
-	 *
-	 * @param model
-	 *            resursa pe care se adauga un obiect de tip vehicle owner
-	 * @return numele template-ului folosit
-	 */
-	// @GetMapping(CREATE_PATH)
-	// public String vehicleOwnerForm(final Model model,
-	// @RequestParam(value = "batchId", required = false) final Long batchId) {
-	// final RestTemplate restTemplate = new RestTemplate();
-	//
-	// String uri = LOCAL_SERVER;
-	// uri += "v1/vehicleOwners/getVehicleOwner";
-	// final MdfVehicleOwner vehicleOwner = restTemplate.getForObject(uri,
-	// MdfVehicleOwner.class);
-	// boolean showBatchField = false;
-	// if (batchId == null) {
-	// showBatchField = true;
-	// } else {
-	// vehicleOwner.setBatchId(batchId);
-	// showBatchField = false;
-	// }
-	// model.addAttribute("vehicleOwner", vehicleOwner);
-	// model.addAttribute("showBatchField", showBatchField);
-	// return VEHICLE_OWNER_FORM;
-	//
-	// }
-
-	/**
-	 * Metoda post pentru metoda de mai sus
-	 *
-	 * @param vehicleOwner
-	 *            obiectul returnat de pe model care trebuie salvat in baza de date
-	 * @return numele template-ului pe care se afiseaza un rezultat
-	 * @throws InvalidRoIdCardException
-	 *             cartea de identitate specificata poate fi invalida-> arunca
-	 *             exceptie
-	 */
-	// @PostMapping(CREATE_PATH)
-	// public String vehicleOwnerSubmit(@ModelAttribute("vehicleOwner") final
-	// MdfVehicleOwner vehicleOwner)
-	// throws InvalidRoIdCardException {
-	// final RestTemplate restTemplate = new RestTemplate();
-	// vehicleOwner.setVehicleOwnerId(null);
-	// final String roIdCard = vehicleOwner.getRoIdCard();
-	// if (roIdCard == null || roIdCard.isEmpty()) {
-	// vehicleOwner.setRoIdCard("Invalid Id Card");
-	// return "vehicleOwner";
-	// }
-	//
-	// String uri = LOCAL_SERVER;
-	// uri += "v1/vehicleOwners/insertVehicleOwner";
-	//
-	// restTemplate.postForEntity(uri, vehicleOwner, MdfVehicleOwner.class);
-	//
-	// return "vehicleOwnerInsertResult";
-	// }
-
-	/**
-	 * Mapare pentru inserarea unui batch
-	 *
-	 * @param model
-	 * @param pageSize
-	 *            dimensiunea paginii in momentul inserarii
-	 * @param currentPage
-	 *            pagina pe care se aflta utilizatorul
-	 * @return lista
-	 */
-	// @GetMapping(CREATE_PATH_BATCH)
-	// public String insertBatch(final Model model, @RequestParam("pageSize") final
-	// Integer pageSize,
-	// @RequestParam("currentPage") final Integer currentPage) {
-	// final RestTemplate restTemplate = new RestTemplate();
-	//
-	// String uri = LOCAL_SERVER;
-	// uri += "v1/vehicleOwners/insertBatch";
-	// uri += "/";
-	// uri += pageSize;
-	// uri += "/";
-	// uri += currentPage;
-	// restTemplate.postForEntity(uri, MdfResultBatch.create(),
-	// MdfResultBatch.class);
-	//
-	// return getBatchListPage(model, currentPage, pageSize);
-	// }
-
 	@RequestMapping(path = CREATE_PATH_BATCH, method = RequestMethod.POST)
 	public String postBatchCreate(final ModelMap modelMap, final RedirectAttributes redirectAttributes) {
 
@@ -271,7 +211,7 @@ public class VehicleOwnerController {
 			LOG.info(batchCreate.toString());
 			restTemplate.postForLocation(restUrlResolver.resolveRestUri(VEHICLE_OWNER_BATCH_CREATE_URI), batchCreate);
 			redirectAttributes.addFlashAttribute("successMessages", ImmutableList.of(ImtSuccessMessage.builder()
-					.key(String.format("vehicle-owners.%s.success", "")).vars("batch").build()));
+					.key(String.format("vehicle-owners.success", "")).vars("batch").build()));
 		} catch (final BusinessException e) {
 			LOG.debug(String.format("Business error while creating new batch"), e);
 
@@ -280,33 +220,8 @@ public class VehicleOwnerController {
 		// return save(mode, ownerForm, bindingResult, modelMap, redirectAttributes);
 	}
 
-	/**
-	 * Metoda de stergere a unei inregistrari
-	 *
-	 * @param vehicleOwnerId
-	 *            identificatorul dupa care se face stergerea
-	 * @param vehicleOwner
-	 *            inregistrarea stearsa
-	 * @return numele de template-ului de afisare
-	 */
-	// @PostMapping(DELETE_PATH)
-	// public String vehicleOwnerDelete(@PathVariable("roIdCard") final String
-	// roIdCard,
-	// @ModelAttribute("vehicleOwner") final MdfVehicleOwner vehicleOwner) {
-	// final RestTemplate restTemplate = new RestTemplate();
-	// LOG.info("se sterge " + vehicleOwner.toString());
-	//
-	// String uri = LOCAL_SERVER;
-	// uri += "v1/vehicleOwners/deleteVehicleOwnerByRoIdCard";
-	// uri += "/";
-	// uri += roIdCard;
-	//
-	// restTemplate.postForEntity(uri, vehicleOwner, MdfVehicleOwner.class);
-	// return "deleteVehicleOwner";
-	// }
-
 	@RequestMapping(path = DELETE_PATH, method = RequestMethod.POST)
-	public String postDelete(@RequestParam final String roIdCard, final ModelMap modelMap,
+	public String postDelete(@PathVariable final String roIdCard, final ModelMap modelMap,
 			final RedirectAttributes redirectAttributes) {
 		final VehicleOwnerForm ownerForm = new VehicleOwnerForm();
 		final Errors errors = new BeanPropertyBindingResult(ownerForm, VEHICLE_OWNER_FORM);
@@ -360,97 +275,38 @@ public class VehicleOwnerController {
 			LOG.error("Failed to fetch users list", e);
 			bindingResult.addError(GENERIC_ERROR);
 		}
-		LOG.error(vehicleOwnerGetResult.toString());
+		final Integer currentPage = (vehicleOwnerListForm.getPage() != null) ? vehicleOwnerListForm.getPage() : 1;
+		final Integer startIndex = (currentPage - 3 > 1) ? currentPage : 1;
+		final boolean start = (startIndex > 3) ? true : false;
+		final boolean dotsPrev = (startIndex > 4) ? true : false;
+		final Integer endIndex = (currentPage + 3 < vehicleOwnerGetResult.getBody().getPageCount() ? currentPage + 3
+				: vehicleOwnerGetResult.getBody().getPageCount());
+		final boolean end = (currentPage < vehicleOwnerGetResult.getBody().getPageCount() - 3 ? true : false);
+		final boolean dotsNext = (currentPage < vehicleOwnerGetResult.getBody().getPageCount() - 4 ? true : false);
 
 		if (vehicleOwnerGetResult != null && vehicleOwnerGetResult.getStatusCode() == HttpStatus.OK) {
 			modelMap.put(VEHICLE_OWNER_LIST, vehicleOwnerGetResult.getBody().getList());
 			modelMap.put(PAGE_COUNT, vehicleOwnerGetResult.getBody().getPageCount());
 			modelMap.put(PAGE_SIZE, vehicleOwnerGetResult.getBody().getPagination().getPageSize());
+			modelMap.put(START, start);
+			modelMap.put(END, end);
+			modelMap.put(START_INDEX, startIndex);
+			modelMap.put(END_INDEX, endIndex);
+			modelMap.put(DOTS_NEXT, dotsNext);
+			modelMap.put(DOTS_PREV, dotsPrev);
 		} else {
 			modelMap.put(VEHICLE_OWNER_LIST, ImmutableList.of());
 			modelMap.put(PAGE_COUNT, 0);
 			modelMap.put(PAGE_SIZE, 10);
+			modelMap.put(START, start);
+			modelMap.put(END, end);
+			modelMap.put(START_INDEX, startIndex);
+			modelMap.put(END_INDEX, endIndex);
+			modelMap.put(DOTS_NEXT, dotsNext);
+			modelMap.put(DOTS_PREV, dotsPrev);
 		}
 		return VEHICLE_OWNER_LIST_VIEW;
 	}
-
-	/**
-	 * Afisarea tuturor batch-urilor
-	 *
-	 * @param model
-	 *            modelul pe care se adauga lista
-	 * @param currentPage
-	 *            pagina curenta default - 0
-	 * @param pageSize
-	 *            dimensiunea unei pagini
-	 * @return lista cu batch-urile
-	 */
-
-	// public String getBatchListPage(final Model model,
-	// @RequestParam("currentPage") final Integer currentPage,
-	// @RequestParam("pageSize") final Integer pageSize) {
-	// final RestTemplate restTemplate = new RestTemplate();
-	// String uri = LOCAL_SERVER;
-	// uri += "v1/vehicleOwners/getBatchByPage";
-	// uri += "/";
-	// uri += pageSize;
-	// uri += "/";
-	// uri += currentPage;
-	// final ResponseEntity<MdfResultBatch[]> batchResponse =
-	// restTemplate.getForEntity(uri, MdfResultBatch[].class);
-	// LOG.info("Raspuns returnat" + batchResponse.toString());
-	// final MdfResultBatch[] batchArray = batchResponse.getBody();
-	// final List<MdfResultBatch> batchList = Arrays.asList(batchArray);
-	// LOG.info("Raspuns returnat" + batchList.toString());
-	// model.addAttribute("batchList", batchList);
-	// model.addAttribute("pageSize", pageSize);
-	//
-	// uri = LOCAL_SERVER + "v1/vehicleOwners";
-	// uri += "/getNumberOfPagesForBatch";
-	// uri += "/";
-	// uri += pageSize;
-	//
-	// final ResponseEntity<Integer> numberOfPages = restTemplate.getForEntity(uri,
-	// Integer.class);
-	//
-	// final List<Integer> numOfPagesList = Lists.newArrayList();
-	// Integer numOfPages = numberOfPages.getBody().intValue();
-	// int startFrom = currentPage - 2;
-	// Integer dotsPrev = currentPage - 3;
-	// Integer dotsNext = currentPage + 4;
-	// if (dotsPrev < 0) {
-	// dotsPrev = 0;
-	// }
-	// if (startFrom < 0) {
-	// startFrom = 0;
-	// }
-	// int endWith = currentPage + 3;
-	// if (endWith > numOfPages) {
-	// endWith = numOfPages;
-	// }
-	// if (dotsNext > numOfPages) {
-	// dotsNext = numOfPages;
-	// }
-	// for (int i = startFrom; i < endWith; i++) {
-	// numOfPagesList.add(i);
-	// }
-	// model.addAttribute("numberOfPages", numOfPagesList);
-	//
-	// numOfPages--;
-	// final List<Integer> currentPageList = Lists.newArrayList(currentPage,
-	// dotsPrev, dotsNext, numOfPages, pageSize);
-	//
-	// model.addAttribute("currentPage", currentPageList);
-	//
-	// return BATCH_LIST;
-	// }
-
-	/**
-	 * Pagina de home
-	 *
-	 * @param model
-	 * @return
-	 */
 
 	@GetMapping(HOME)
 	public String getHomePage(final Model model) {

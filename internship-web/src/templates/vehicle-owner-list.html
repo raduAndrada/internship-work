@@ -40,7 +40,7 @@
 						th:with="strList = ${ {1, 2, 5, 10, 20, 50, 100} }">
 						<li th:classappend="${pageSize == s} ? active"
 							th:each="s : ${strList}"><a th:text="${s}"
-							th:href="@{${@currentUrlWithoutParam.apply('page,pageSize,search')}(page=${pageIndex},pageSize=${s},search=${vehicleOwnerListForm.search})}"></a>
+							th:href="@{${@currentUrlWithoutParam.apply('page,pageSize,search')}(page=${vehicleOwnerListForm.page},pageSize=${s},search=${vehicleOwnerListForm.search})}"></a>
 
 						</li>
 					</ul>
@@ -49,7 +49,6 @@
 			<table id="myTable" class="table table-bordered table-hover">
 				<thead>
 					<tr>
-						<td th:text="#{vehicle-owners.input-batch.records.id}"></td>
 						<td th:text="#{vehicle-owners.input-batch.records.ro-id-card}"></td>
 						<td th:text="#{vehicle-owners.input-batch.records.issue-date}"></td>
 						<td th:text="#{vehicle-owners.input-batch.records.reg-plate}"></td>
@@ -68,7 +67,7 @@
 							<form action="#"
 								th:action="@{'/app/delete/' + ${vehicleOwner.basic.roIdCard}}"
 								th:object="${vehicleOwner}" method="post">
-								<button class="btn btn-default btn-danger" type="submit">
+								<button id="delete-btn" class="btn btn-default btn-danger" type="submit">
 									<i class="fa fa-trash" aria-hidden="true"></i> <span
 										th:text="#{vehicle-owners.input-batch.records.delete-btn}"></span>
 								</button>
@@ -85,16 +84,33 @@
 
 			<div class="text-center">
 				<ul class="pagination" th:if="${pageCount > 0}">
-					<li th:each="pageIndex: ${#numbers.sequence(1, pageCount)}"
+				<li th:if="${start == true}"><a
+					th:href="@{${@currentUrlWithoutParam.apply('page,pageSize,search')}(page=${1},pageSize=${vehicleOwnerListForm.pageSize},search=${vehicleOwnerListForm.search})}"
+					th:text="${1}"> </a></li>
+
+				<li th:if="${dotsPrev == true}"><a
+					th:href="@{${@currentUrlWithoutParam.apply('page,pageSize,search')}(page=${vehicleOwnerListForm.page-2},pageSize=${vehicleOwnerListForm.pageSize},search=${vehicleOwnerListForm.search})}">...</a>
+				</li>
+					<li th:each="pageIndex: ${#numbers.sequence(startIndex, endIndex)}"
 						th:classappend="${vehicleOwnerListForm.page == pageIndex} ? active">
 						<a
 						th:href="@{${@currentUrlWithoutParam.apply('page,pageSize,search')}(page=${pageIndex},pageSize=${vehicleOwnerListForm.pageSize},search=${vehicleOwnerListForm.search})}"
 						th:text="${pageIndex}">1</a>
 					</li>
+									<li th:if="${dotsNext == true}"><a
+					th:href="@{${@currentUrlWithoutParam.apply('page,pageSize,search')}(page=${vehicleOwnerListForm.page+4},pageSize=${vehicleOwnerListForm.pageSize},search=${vehicleOwnerListForm.search})}">...</a>
+				</li>
+				<li th:if="${end == true}"><a
+					th:href="@{${@currentUrlWithoutParam.apply('page,pageSize,search')}(page=${pageCount},pageSize=${vehicleOwnerListForm.pageSize},search=${vehicleOwnerListForm.search})}"
+					th:text="${pageCount}"> </a></li>
+					
 				</ul>
 			</div>
 		</div>
 	</div>
 	<th:block th:replace="layout/frg::footer-js"></th:block>
+	<script type="text/javascript" th:inline="javascript">
+    	$('#delete-btn').click(function(){ return confirm([[#{generic.delete.confirm}]]); });
+   	</script>
 </body>
 </html>

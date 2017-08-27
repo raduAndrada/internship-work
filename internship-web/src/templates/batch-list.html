@@ -30,12 +30,7 @@
 
 				</div>
 			</form>
-			<form th:action="@{/app/create-batch}" method="post">
-				<button type="submit" th:title="#{batch.add}"
-					class="btn btn-md btn-default">
-					<i class="fa fa-plus"></i>
-				</button>
-			</form>
+
 		</div>
 		<div class="container-fluid nav navbar-nav navbar-right">
 			<div class="btn-group">
@@ -47,7 +42,7 @@
 					th:with="strList = ${ {1, 2, 5, 10, 20, 50, 100} }">
 					<li th:classappend="${pageSize == s} ? active"
 						th:each="s : ${strList}"><a th:text="${s}"
-						th:href="@{${@currentUrlWithoutParam.apply('page,pageSize,search')}(page=${pageIndex},pageSize=${s},search=${batchListForm.search})}"></a>
+						th:href="@{${@currentUrlWithoutParam.apply('page,pageSize,search')}(page=${batchListForm.page},pageSize=${s},search=${batchListForm.search})}"></a>
 
 					</li>
 				</ul>
@@ -57,6 +52,14 @@
 			<thead>
 				<tr>
 					<td th:text="#{batch-list.vehicle-owner.batch-id}"></td>
+					<td>
+						<form th:action="@{/app/create-batch}" method="post">
+							<button type="submit" th:title="#{batch.add}"
+								class="btn btn-large btn-default">
+								<i class="fa fa-plus"></i>
+							</button>
+						</form>
+					</td>
 				</tr>
 			</thead>
 			<tbody>
@@ -65,9 +68,8 @@
 						th:text="#{batch-list.vehicle-owner.batch-id}+' :'+${batch.batchId}">1</td>
 					<td>
 						<div class="btn-group">
-							<a
-								th:href="@{/app/vehicleOwners/(batchId=${batch.batchId},pageSize=${3},currentPage=${0})}"
-								class="btn btn-large btn-default"> <i class="fa fa-users"
+							<a th:href="@{/app/vehicleOwners/(batchId=${batch.batchId})}"
+								class="btn btn-large btn-info"> <i class="fa fa-users"
 								aria-hidden="true"></i> <span
 								th:text="#{batch-list.vehicle-owner.view-list}"> </span>
 							</a>
@@ -75,25 +77,25 @@
 					</td>
 					<td>
 						<div class="btn-group">
-							<a class="btn btn-large btn-default"
-								th:href="@{/results/process/(batchId=${batch.batchId})}">
-								<i class="fa fa-step-forward" aria-hidden="true"></i> <span
+							<a class="btn btn-large btn-success"
+								th:href="@{/results/process/(batchId=${batch.batchId})}"> <i
+								class="fa fa-step-forward" aria-hidden="true"></i> <span
 								th:text="#{default-process-msg}"></span>
 							</a>
 						</div>
 					</td>
 					<td>
 						<div class="btn-group">
-							<a class="btn btn-large btn-default"
-								th:href="@{'/results/' + ${batch.batchId}}">
-								<i class="fa fa-history" aria-hidden="true"></i> <span
+							<a class="btn btn-large btn-primary"
+								th:href="@{'/results/' + ${batch.batchId}}"> <i
+								class="fa fa-history" aria-hidden="true"></i> <span
 								th:text="#{batch.process-result.past}"> </span>
 							</a>
 						</div>
 					</td>
 					<td>
 						<div class="btn-group">
-							<a class="btn btn-large btn-default"
+							<a class="btn btn-large btn-warning"
 								th:href="@{/app/create(batchId=${batch.batchId})}"> <i
 								class="fa fa-user-plus" aria-hidden="true"></i> <span
 								th:text="#{batch-list.vehicle-owner.add-new}"> </span>
@@ -105,12 +107,27 @@
 		</table>
 		<div class="text-center">
 			<ul class="pagination" th:if="${pageCount > 0}">
-				<li th:each="pageIndex: ${#numbers.sequence(1, pageCount)}"
+				<li th:if="${start == true}"><a
+					th:href="@{${@currentUrlWithoutParam.apply('page,pageSize,search')}(page=${1},pageSize=${batchListForm.pageSize},search=${batchListForm.search})}"
+					th:text="${1}"> </a></li>
+
+				<li th:if="${dotsPrev == true}"><a
+					th:href="@{${@currentUrlWithoutParam.apply('page,pageSize,search')}(page=${batchListForm.page-2},pageSize=${batchListForm.pageSize},search=${batchListForm.search})}">...</a>
+				</li>
+				<li th:each="pageIndex: ${#numbers.sequence(startIndex, endIndex)}"
 					th:classappend="${batchListForm.page == pageIndex} ? active">
 					<a
 					th:href="@{${@currentUrlWithoutParam.apply('page,pageSize,search')}(page=${pageIndex},pageSize=${batchListForm.pageSize},search=${batchListForm.search})}"
 					th:text="${pageIndex}">1</a>
 				</li>
+				<li th:if="${dotsNext == true}"><a
+					th:href="@{${@currentUrlWithoutParam.apply('page,pageSize,search')}(page=${batchListForm.page+4},pageSize=${batchListForm.pageSize},search=${batchListForm.search})}">...</a>
+				</li>
+				<li th:if="${end == true}"><a
+					th:href="@{${@currentUrlWithoutParam.apply('page,pageSize,search')}(page=${pageCount},pageSize=${batchListForm.pageSize},search=${batchListForm.search})}"
+					th:text="${pageCount}"> </a></li>
+
+
 			</ul>
 		</div>
 	</div>

@@ -1,0 +1,23 @@
+dependencies {
+	apply plugin: 'org.springframework.boot'
+
+bootRepackage {
+	classifier = 'boot'
+}
+
+dependencies {
+	compile('org.mybatis.spring.boot:mybatis-spring-boot-starter:1.3.0')
+	compile('org.springframework.boot:spring-boot-starter-web:1.5.2.RELEASE') 
+
+	compile project(':internship-business-impl')
+	compile project(':internship-data-impl')
+	
+	compile 'com.fasterxml.jackson.datatype:jackson-datatype-guava:2.8.7'
+	compile 'com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.8.7'
+	compile 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.8.7'
+	compile 'org.mybatis:mybatis-typehandlers-jsr310:1.0.2'
+	
+	runtime 'mysql:mysql-connector-java:5.1.41'
+}
+
+}

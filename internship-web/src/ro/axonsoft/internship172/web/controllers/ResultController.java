@@ -37,8 +37,7 @@ import com.google.common.collect.ImmutableList;
 import ro.axonsoft.internship172.model.result.ResultMetricsGetResult;
 import ro.axonsoft.internship172.model.result.ResultRecord;
 import ro.axonsoft.internship172.web.model.ResultListForm;
-import ro.axonsoft.internship172.web.rest.ProcessRestController;
-import ro.axonsoft.internship172.web.rest.util.RestUrlResolver;
+import ro.axonsoft.internship172.web.util.RestUrlResolver;
 
 /**
  * Controller pentru procesare sau obtinere rezutlate
@@ -64,6 +63,13 @@ public class ResultController {
 	private static final String PAGE_SIZE = "pageSize";
 	private static final String PAGE = "page";
 	private static final String SEARCH = "search";
+	private static final String START = "start";
+	private static final String END = "end";
+	private static final String START_INDEX = "startIndex";
+	private static final String END_INDEX = "endIndex";
+	private static final String DOTS_NEXT = "dotsNext";
+	private static final String DOTS_PREV = "dotsPrev";
+
 	private static final String RESULT_LIST = "resultList";
 	private static final String PAGE_COUNT = "pageCount";
 	private static final String RESULT_DETAILS_VIEW = "result-details";
@@ -87,7 +93,7 @@ public class ResultController {
 		return new ResultListForm();
 	}
 
-	private static final Logger LOG = LoggerFactory.getLogger(ProcessRestController.class);
+	private static final Logger LOG = LoggerFactory.getLogger(ResultController.class);
 
 	/**
 	 * Metoda de procesare pentru inregistrarile din baza de date
@@ -137,15 +143,35 @@ public class ResultController {
 			LOG.error("Failed to fetch result list", e);
 			bindingResult.addError(GENERIC_ERROR);
 		}
+		final Integer currentPage = (resultListForm.getPage() != null) ? resultListForm.getPage() : 1;
+		final Integer startIndex = (currentPage - 3 > 1) ? currentPage : 1;
+		final boolean start = (startIndex > 3) ? true : false;
+		final boolean dotsPrev = (startIndex > 4) ? true : false;
+		final Integer endIndex = (currentPage + 3 < resultGetResult.getBody().getPageCount() ? currentPage + 3
+				: resultGetResult.getBody().getPageCount());
+		final boolean end = (currentPage < resultGetResult.getBody().getPageCount() - 3 ? true : false);
+		final boolean dotsNext = (currentPage < resultGetResult.getBody().getPageCount() - 4 ? true : false);
 
 		if (resultGetResult != null && resultGetResult.getStatusCode() == HttpStatus.OK) {
 			modelMap.put(RESULT_LIST, resultGetResult.getBody().getList());
 			modelMap.put(PAGE_COUNT, resultGetResult.getBody().getPageCount());
 			modelMap.put(PAGE_SIZE, resultGetResult.getBody().getPagination().getPageSize());
+			modelMap.put(START, start);
+			modelMap.put(END, end);
+			modelMap.put(START_INDEX, startIndex);
+			modelMap.put(END_INDEX, endIndex);
+			modelMap.put(DOTS_NEXT, dotsNext);
+			modelMap.put(DOTS_PREV, dotsPrev);
 		} else {
 			modelMap.put(RESULT_LIST, ImmutableList.of());
 			modelMap.put(PAGE_COUNT, 0);
 			modelMap.put(PAGE_SIZE, 10);
+			modelMap.put(START, start);
+			modelMap.put(END, end);
+			modelMap.put(START_INDEX, startIndex);
+			modelMap.put(END_INDEX, endIndex);
+			modelMap.put(DOTS_NEXT, dotsNext);
+			modelMap.put(DOTS_PREV, dotsPrev);
 		}
 		return RESULT_LIST_VIEW;
 	}

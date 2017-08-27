@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="ro.axonsoft.internship172.data.api.result.ResultMetricsDao">
+
+	<resultMap id="ResultMap" type="MdfResultEntity">
+		<id column="RESULT_METRICS_ID" property="resultMetricsId" />
+		<association property="record" javaType="MdfResultRecord">
+			<association property="basic" javaType="MdfResultBasic">
+				<result column="ODD_TO_EVEN_RATIO" property="oddToEvenRatio" />
+				<result column="PASSED_REG_CHANGE_DUE_DATE" property="passedRegChangeDueDate" />
+				<result column="RESULT_PROCESS_TIME" property="resultProcessTime" />
+			</association>
+			<association property="batch" javaType="MdfBatch">
+				<id column="BATCH_ID" property="batchId" />
+			</association>
+
+			<collection property="unregCars" javaType="ArrayList"
+				ofType="MdfResultUnregCarsCountByJudRecord">
+				<id column="UNREG_CARS_COUNT_ID" property="unregCarsCountId"></id>
+				<result column="RESULT_METRICS_ID" property="resultMetricsId" />
+				<association property="basic"
+					javaType="MdfResultUnregCarsCountByJudBasic">
+					<result column="JUDET" property="judet" />
+					<result column="UNREG_CARS_COUNT" property="unregCarsCount" />
+				</association>
+			</collection>
+			<collection property="errors" javaType="ArrayList"
+				ofType="MdfResultErrorRecord">
+				<id column="RESULT_ERROR_ID" property="resultErrorId"></id>
+				<result column="RESULT_METRICS_ID" property="resultMetricsId" />
+				<association property="basic" javaType="MdfResultErrorBasic">
+					<result column="TYPE" property="type" />
+					<result column="VEHICLE_OWNER_ID" property="vehicleOwnerId" />
+				</association>
+			</collection>
+		</association>
+	</resultMap>
+	<resultMap id="ResultErrorMap" type="MdfResultErrorRecord">
+		<id column="RESULT_ERROR_ID" property="resultErrorId"></id>
+		<result column="RESULT_METRICS_ID" property="resultMetricsId" />
+		<association property="basic" javaType="MdfResultErrorBasic">
+			<result column="TYPE" property="type" />
+			<result column="VEHICLE_OWNER_ID" property="vehicleOwnerId" />
+		</association>
+	</resultMap>
+
+	<resultMap id="ResultUnregCarsMap" type="MdfResultUnregCarsCountByJudRecord">
+		<id column="UNREG_CARS_COUNT_ID" property="unregCarsCountId"></id>
+		<result column="RESULT_METRICS_ID" property="resultMetricsId" />
+		<association property="basic" javaType="MdfResultUnregCarsCountByJudBasic">
+			<result column="JUDET" property="judet" />
+			<result column="UNREG_CARS_COUNT" property="unregCarsCount" />
+		</association>
+	</resultMap>
+
+
+
+
+
+	<select id="getResult" resultMap="ResultMap">
+		select * <!--distinct RESULT_METRICS_ID, <include refid="resmColumns" /> -->
+		from RESULT_METRICS
+
+		left join
+		RESULT_UNREG_CARS_COUNT_BY_JUD on
+		RESULT_METRICS.RESULT_METRICS_ID =
+		RESULT_UNREG_CARS_COUNT_BY_JUD.RESULT_METRICS_ID
+
+		left join
+		RESULT_ERROR
+		on
+		RESULT_METRICS.RESULT_METRICS_ID =
+		RESULT_ERROR.RESULT_METRICS_ID
+		<where>
+			<include refid="whereCriteria" />
+			<include refid="searchCriteria" />
+		</where>
+		<include refid="sortCriteria" />
+		<include refid="pagination" />
+	</select>
+
+	<select id="getResultMetrics" resultMap="ResultMap">
+		select distinct RESULT_METRICS_ID,
+		<include refid="resmColumns" />
+		from RESULT_METRICS
+		<where>
+			<include refid="whereCriteria" />
+			<include refid="searchCriteria" />
+		</where>
+		<include refid="sortCriteria" />
+		<include refid="pagination" />
+	</select>
+
+	<select id="getResultErrors" resultMap="ResultErrorMap">
+		select distinct RESULT_ERROR_ID,
+		<include refid="errColumns" />
+		from RESULT_ERROR
+		<where>
+			<include refid="whereChildTableCriteria" />
+		</where>
+
+	</select>
+
+
+	<select id="getResultUnregCars" resultMap="ResultUnregCarsMap">
+		select distinct UNREG_CARS_COUNT_ID,
+		<include refid="unregColumns" />
+		from RESULT_UNREG_CARS_COUNT_BY_JUD
+		<where>
+			<include refid="whereChildTableCriteria" />
+		</where>
+	</select>
+
+
+	<insert id="addResult" useGeneratedKeys='true' keyProperty="resultMetricsId">
+
+		insert into RESULT_METRICS (
+		<include refid="resmColumns" />
+		) VALUES (
+		#{record.basic.oddToEvenRatio},
+		#{record.basic.passedRegChangeDueDate},
+		#{record.basic.resultProcessTime},
+		#{record.batch.batchId}
+		)
+	</insert>
+
+	<insert id="addUnregCars" keyProperty="resultUnregCarsId">
+		<if test="unregCars != null and !unregCars.empty">
+			insert into RESULT_UNREG_CARS_COUNT_BY_JUD (
+			<include refid="unregColumns" />
+			) VALUES
+			<foreach item="unregCar" collection="unregCars" separator=",">
+				(#{unregCar.basic.judet},
+				#{unregCar.basic.unregCarsCount},
+				#{unregCar.resultMetricsId} )
+			</foreach>
+		</if>
+	</insert>
+
+	<insert id="addErrors" keyProperty="resultErrorId">
+		<if test="errors != null and !errors.empty">
+			insert into RESULT_ERROR (
+			<include refid="errColumns" />
+			) VALUES
+			<foreach item="error" collection="errors" separator=",">
+				(
+				#{error.basic.type},
+				#{error.basic.vehicleOwnerId},
+				#{error.resultMetricsId}
+				)
+			</foreach>
+		</if>
+
+
+	</insert>
+	<update id="updateResult">
+		update RESULT_METRICS
+		<set>
+			<if test="oddToEvenRatio != null">ODD_TO_EVEN_RATIO=#{oddToEvenRatio},</if>
+			<if test="passedRegChangeDueDate != null">PASSED_REG_CHANGE_DUE_DATE=#{passedRegChangeDueDate},
+			</if>
+			<if test="resultProcessTime != null">RESULT_PROCESS_TIME=#{resultProcessTime}</if>
+		</set>
+		<where>
+			<include refid="whereCriteria" />
+		</where>
+	</update>
+
+	<delete id="deleteResult">
+		delete from RESULT_METRICS
+		<where>
+			<include refid="whereCriteria" />
+		</where>
+	</delete>
+
+	<delete id="deleteResultError">
+		delete from RESULT_ERROR
+		<where>
+			<include refid="whereChildTableCriteria" />
+		</where>
+	</delete>
+
+	<delete id="deleteResultUnregCarsCountByJud">
+		delete from RESULT_UNREG_CARS_COUNT_BY_JUD
+		<where>
+			<include refid="whereChildTableCriteria" />
+		</where>
+	</delete>
+
+
+	<select id="countResult" resultType="Integer">
+		select count(*)
+		from RESULT_METRICS
+		<where>
+			<include refid="whereCriteria" />
+			<include refid="searchCriteria" />
+		</where>
+	</select>
+
+	<sql id="whereCriteria">
+		<if test="criteria != null">
+			<if test="criteria.idIncl != null and !criteria.idIncl.empty">
+				<foreach item="idInclItem" collection="criteria.idIncl"
+					open="and RESULT_METRICS.RESULT_METRICS_ID in (" separator=","
+					close=")">#{idInclItem}</foreach>
+			</if>
+
+			<if
+				test="criteria.idBatchSelect != null and !criteria.idBatchSelect.empty">
+				<foreach item="idBatchSelect" collection="criteria.idBatchSelect"
+					open="and RESULT_METRICS.BATCH_ID in (" separator="," close=")">#{idBatchSelect}
+				</foreach>
+			</if>
+		</if>
+	</sql>
+
+	<sql id="whereChildTableCriteria">
+		<if test="criteria != null">
+			<if
+				test="criteria.idResultSelect != null and !criteria.idResultSelect.empty">
+				<foreach item="idResultSelect" collection="criteria.idResultSelect"
+					open="and RESULT_METRICS_ID in (" separator="," close=")">#{idResultSelect}
+				</foreach>
+			</if>
+		</if>
+	</sql>
+
+	<sql id="sortCriteria">
+		<if test="sort.size() > 0">
+			order by
+			<foreach item="sortItem" index="index" collection="sort"
+				separator=",">
+				${sortItem.criterion} ${sortItem.direction}
+			</foreach>
+		</if>
+	</sql>
+
+	<sql id="pagination">
+		<if test="pagination != null">
+			limit #{pagination.pageSize}
+			offset #{pagination.offset}
+		</if>
+	</sql>
+
+	<sql id="searchCriteria">
+		<if test="search != null">
+			<bind name="likePattern" value="'%' + search + '%'" />
+			and
+			UPPER(BATCH_ID) like UPPER(#{likePattern})
+		</if>
+	</sql>
+
+	<sql id="resmColumns">
+		ODD_TO_EVEN_RATIO, PASSED_REG_CHANGE_DUE_DATE,
+		RESULT_PROCESS_TIME,
+		BATCH_ID
+	</sql>
+
+	<sql id="unregColumns">
+		JUDET,
+		UNREG_CARS_COUNT,
+		RESULT_METRICS_ID
+	</sql>
+
+	<sql id="errColumns">
+		TYPE, VEHICLE_OWNER_ID,
+		RESULT_METRICS_ID
+	</sql>
+
+</mapper>
+
+
