@@ -20,16 +20,8 @@
 				</th:block>
 				<input type="hidden" th:field="*{pageSize}" /> <input type="hidden"
 					th:field="*{page}" />
-				<div class="pull-left">
-					<ul class="nav navbar-nav">
-						<li class="form-group"><input type="text" id="myInput"
-							class="form-control" onkeyup="tableSearchOneColumn()"
-							placeholder="Search for batch by id" title="Type batch id" /></li>
-
-					</ul>
-
-				</div>
 			</form>
+
 
 		</div>
 		<div class="container-fluid nav navbar-nav navbar-right">
@@ -48,18 +40,29 @@
 				</ul>
 			</div>
 		</div>
+		<div class="pull-right">
+			<ul class="nav navbar-nav">
+				<li class="form-group"><input type="text" id="myInput"
+					class="form-control" onkeyup="tableSearchOneColumn()"
+					placeholder="Search for batch by id" title="Type batch id" /></li>
+
+			</ul>
+
+		</div>
+		<form th:action="@{/app/create-batch}" method="post">
+			<button type="submit" th:title="#{batch.add}"
+				class="btn btn-large btn-default">
+				<i class="fa fa-plus"></i>
+			</button>
+		</form>
 		<table id="myTable" class="table table-bordered table-hover">
 			<thead>
 				<tr>
 					<td th:text="#{batch-list.vehicle-owner.batch-id}"></td>
-					<td>
-						<form th:action="@{/app/create-batch}" method="post">
-							<button type="submit" th:title="#{batch.add}"
-								class="btn btn-large btn-default">
-								<i class="fa fa-plus"></i>
-							</button>
-						</form>
-					</td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
 				</tr>
 			</thead>
 			<tbody>

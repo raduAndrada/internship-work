@@ -13,6 +13,7 @@
 	<script type="text/javascript" th:src="@{/js/jquery.js}"></script>
 	<script type="text/javascript" th:src="@{/js/tableSearch.js}"></script>
 	<link rel="stylesheet" type="text/css" th:href="@{/css/navbar.css}" />
+	<link rel="stylesheet" type="text/css" th:href="@{/css/style.css}" />
 	<link rel="stylesheet" type="text/css" href="../css/full-body.css"
 		th:href="@{/css/full-body.css}" />
 </th:block>
@@ -68,19 +69,20 @@
 				class="alert alert-success"></div>
 		</th:block>
 	</div>
-	<footer>
+	<footer class="footer">
 		<th:block th:fragment="footer-js">
-		<div class="container">
-            <p>
-                Built with a lot of effort by <a
-                    href="https://github.com/raduAndrada">Andrada</a>.
-            </p>
-        </div>
+
 			<script type="text/javascript"
 				th:src="@{/webjars/jquery/jquery.min.js}"></script>
 			<script type="text/javascript"
 				th:src="@{/webjars/bootstrap/js/bootstrap.min.js}"></script>
 		</th:block>
+		<div class="container">
+			<p>
+				Built with a lot of effort by <a
+					href="https://github.com/raduAndrada">Andrada</a>.
+			</p>
+		</div>
 	</footer>
 </body>
 </html>

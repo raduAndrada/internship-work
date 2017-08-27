@@ -2,6 +2,7 @@ package ro.axonsoft.internship172.web.model;
 
 import java.io.Serializable;
 
+import javax.validation.constraints.Min;
 import javax.validation.constraints.Size;
 
 import com.google.common.base.MoreObjects;
@@ -42,6 +43,7 @@ public class VehicleOwnerForm implements Serializable {
 		this.comentariu = comentariu;
 	}
 
+	@Min(value = 0L, message = "{vehicle-owner.field.min}")
 	public Long getBatchId() {
 		return batchId;
 	}

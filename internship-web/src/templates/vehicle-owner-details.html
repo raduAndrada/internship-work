@@ -3,71 +3,100 @@
 <head>
 <meta charset="UTF-8" />
 <th:block th:replace="layout/frg::head"></th:block>
-<title><th:block th:text="#{app.name}"></th:block> :: <th:block th:if="${mode == 'create'}" th:text="#{vehicle-owner.create}"></th:block><th:block
-        th:if="${mode == 'update'}" th:text="#{vehicle-owners.update}"></th:block></title>
+<title><th:block th:text="#{app.name}"></th:block> :: <th:block
+		th:if="${mode == 'create'}" th:text="#{vehicle-owner.create}"></th:block><th:block
+		th:if="${mode == 'update'}" th:text="#{vehicle-owners.update}"></th:block></title>
 </head>
 <body>
-   <div th:substituteby="layout/navbar :: navbar('insert')"></div>
-   
-    <div class="lightbox container">
-      <h1 th:text="#{default-insert-msg.form}"></h1>
-        <div th:replace="layout/frg::success-messages"></div>
-        <div class="col-md-6 col-md-offset-3">
-            <th:block th:object="${vehicleOwnerForm}">
-                <th:block th:if="${#fields.hasErrors('global')}">
-                    <div class="alert alert-danger" th:each="err : ${#fields.errors('global')}" th:text="${err}">Generic Error</div>
-                </th:block>
-            </th:block>
-            <form class="margin-bottom" th:if="${mode=='update'}" method="post" th:action="@{'/app/delete/'+ ${vehicleOwnerForm.roIdCard}}">
-                <input type="hidden" /> <input type="hidden" name="roIdCard"
-                    th:field="${vehicleOwnerForm.roIdCard}" />
-                <button id="delete-btn" type="submit" class="btn btn-danger btn-md pull-right">
-                    <i class="fa fa-remove"></i> <span th:text="#{generic.delete}">Delete</span>
-                </button>
-                <br />
-            </form>
-            <form role="form" th:object="${vehicleOwnerForm}" method="post">
-                <input type="hidden" /> <input type="hidden" name="mode"
-                    th:value="${mode}" />
-                <div class="form-group float-label-control">
-                    <label><span th:text="#{vehicle-owners.input-batch.records.ro-id-card}"></span></label> <input th:if="${mode=='create'}" type="text"
-                        class="form-control" th:placeholder="MM872521" th:title="#{vehicle-owner.ro-id-card.input}" th:field="*{roIdCard}" />
-                    <input th:if="${mode=='update'}" type="text" class="form-control" readonly="readonly" disabled="disabled"
-                        th:field="*{roIdCard}" /> <input pattern="[A-Za-z]{2}[0-9]{6}" autofocus="true" th:if="${mode=='update'}" type="hidden" th:field="*{roIdCard}" />
-                </div>
-                <div th:id="${#fields.hasErrors('roIdCard')}" th:errors="*{roIdCard}" class="alert alert-danger"></div>
-                <div class="form-group float-label-control">
-                    <label><span  th:text="#{vehicle-owners.input-batch.records.issue-date}"></span></label> <input data-date-format="YYYY-MM-DD" type="date" class="form-control"
-                        th:placeholder="YYYY-MM-DD" th:title="#{vehicle-owner.issue-date.input}" th:field="*{issueDate}" />
-                </div>
-                 
-                <div th:id="${#fields.hasErrors('regPlate')}" th:errors="*{regPlate}" class="alert alert-danger"></div>
-                <div class="form-group float-label-control">
-                    <label><span th:text="#{vehicle-owners.input-batch.records.reg-plate}"></span></label> <input type="text" class="form-control"
-                      th:placeholder="B101BBB"  th:title="#{vehicle-owner.reg-plate.input}" th:field="*{regPlate}" />
-                </div>
-                <div th:id="${#fields.hasErrors('issueDate')}" th:errors="*{issueDate}" class="alert alert-danger"></div>
-                <div class="form-group float-label-control">
-                    <label><span th:text="#{vehicle-owners.input-batch.records.comentariu}"></span></label> <input type="text" class="form-control"
-                        th:placeholder="asdef" th:title="#{vehicle-owner.comentariu.input}" th:field="*{comentariu}" />
-                </div>
-                <div th:id="${#fields.hasErrors('comentariu')}" th:errors="*{comentariu}" class="alert alert-danger"></div>
-                <div class="form-group float-label-control">
-                    <label><span th:text="#{vehicle-owners.input-batch.records.batch-id}"></span></label> <input type="number" class="form-control"
-                         th:title="#{vehicle-owner.batch-id.input}" th:field="*{batchId}" />
-                </div>
-                <div th:id="${#fields.hasErrors('batchId')}" th:errors="*{batchId}" class="alert alert-danger"></div>
-                <button id="save-btn" type="submit" class="btn btn-success btn-md">
-                    <i class="fa fa-save"></i> <span th:text="#{generic.save}">Save</span>
-                </button>
-                <a id="cancel-btn" th:href="@{/app/batches/}" class="btn btn-info btn-md pull-right"> <i class="fa fa-undo"></i> <span
-                    th:text="#{generic.cancel}">Cancel</span>
-                </a>
-            </form>
-        </div>
-    </div>
-    <th:block th:replace="layout/frg::footer-js"></th:block>
-    <script type="text/javascript" th:inline="javascript">
+	<div th:substituteby="layout/navbar :: navbar('insert')"></div>
+	<div class="lightbox container">
+		<div class="text-center">
+			<h1 th:text="#{default-insert-msg.form}" style="color:silver;"></h1>
+		</div>
+		<div th:replace="layout/frg::success-messages"></div>
+		<div class="col-md-6 col-md-offset-3">
+			<th:block th:object="${vehicleOwnerForm}">
+				<th:block th:if="${#fields.hasErrors('global')}">
+					<div class="alert alert-danger"
+						th:each="err : ${#fields.errors('global')}" th:text="${err}">Generic
+						Error</div>
+				</th:block>
+			</th:block>
+			<form class="margin-bottom" th:if="${mode=='update'}" method="post"
+				th:action="@{'/app/delete/'+ ${vehicleOwnerForm.roIdCard}}">
+				<input type="hidden" /> <input type="hidden" name="roIdCard"
+					th:field="${vehicleOwnerForm.roIdCard}" />
+				<button id="delete-btn" type="submit"
+					class="btn btn-danger btn-md pull-right">
+					<i class="fa fa-remove"></i> <span th:text="#{generic.delete}">Delete</span>
+				</button>
+				<br />
+			</form>
+			<form role="form" th:object="${vehicleOwnerForm}" method="post">
+				<input type="hidden" /> <input type="hidden" name="mode"
+					th:value="${mode}" />
+				<div class="form-group float-label-control">
+					<label><span
+						th:text="#{vehicle-owners.input-batch.records.ro-id-card}"></span></label>
+					<input th:if="${mode=='create'}" type="text" class="form-control"
+						th:placeholder="MM872521"
+						th:title="#{vehicle-owner.ro-id-card.input}"
+						th:field="*{roIdCard}" /> <input th:if="${mode=='update'}"
+						type="text" class="form-control" readonly="readonly"
+						disabled="disabled" th:field="*{roIdCard}" /> <input
+						pattern="[A-Za-z]{2}[0-9]{6}" autofocus="true"
+						th:if="${mode=='update'}" type="hidden" th:field="*{roIdCard}" />
+				</div>
+				<div th:id="${#fields.hasErrors('roIdCard')}"
+					th:errors="*{roIdCard}" class="alert alert-danger"></div>
+				<div class="form-group float-label-control">
+					<label><span
+						th:text="#{vehicle-owners.input-batch.records.issue-date}"></span></label>
+					<input data-date-format="YYYY-MM-DD" type="date"
+						class="form-control" th:placeholder="YYYY-MM-DD"
+						th:title="#{vehicle-owner.issue-date.input}"
+						th:field="*{issueDate}" />
+				</div>
+
+				<div th:id="${#fields.hasErrors('regPlate')}"
+					th:errors="*{regPlate}" class="alert alert-danger"></div>
+				<div class="form-group float-label-control">
+					<label><span
+						th:text="#{vehicle-owners.input-batch.records.reg-plate}"></span></label>
+					<input type="text" class="form-control" th:placeholder="B101BBB"
+						th:title="#{vehicle-owner.reg-plate.input}" th:field="*{regPlate}" />
+				</div>
+				<div th:id="${#fields.hasErrors('issueDate')}"
+					th:errors="*{issueDate}" class="alert alert-danger"></div>
+				<div class="form-group float-label-control">
+					<label><span
+						th:text="#{vehicle-owners.input-batch.records.comentariu}"></span></label>
+					<input type="text" class="form-control" th:placeholder="asdef"
+						th:title="#{vehicle-owner.comentariu.input}"
+						th:field="*{comentariu}" />
+				</div>
+				<div th:id="${#fields.hasErrors('comentariu')}"
+					th:errors="*{comentariu}" class="alert alert-danger"></div>
+				<div class="form-group float-label-control">
+					<label><span
+						th:text="#{vehicle-owners.input-batch.records.batch-id}"></span></label> <input
+						type="number" class="form-control"
+						th:title="#{vehicle-owner.batch-id.input}" min="1" th:field="*{batchId}" />
+				</div>
+				<div th:id="${#fields.hasErrors('batchId')}" th:errors="*{batchId}"
+					class="alert alert-danger"></div>
+				<button id="save-btn" type="submit" class="btn btn-success btn-md">
+					<i class="fa fa-save"></i> <span th:text="#{generic.save}">Save</span>
+				</button>
+				<a id="cancel-btn" th:href="@{/app/batches/}"
+					class="btn btn-info btn-md pull-right"> <i class="fa fa-undo"></i>
+					<span th:text="#{generic.cancel}">Cancel</span>
+				</a>
+			</form>
+		</div>
+	</div>
+	<th:block th:replace="layout/frg::footer-js"></th:block>
+	<script type="text/javascript" th:inline="javascript">
     	$('#cancel-btn').click(function(){ return confirm([[#{generic.cancel.confirm}]]); });
     	$('#save-btn').click(function(){ return confirm([[#{generic.save.confirm}]]); });
     	$('#delete-btn').click(function(){ return confirm([[#{generic.delete.confirm}]]); });

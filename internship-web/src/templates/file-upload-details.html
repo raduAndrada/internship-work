@@ -3,50 +3,50 @@
 <head>
 <meta charset="UTF-8" />
 <th:block th:replace="layout/frg::head"></th:block>
-<title><th:block th:text="#{app.name}"></th:block> :: <th:block th:text="#{file-process.process}"></th:block><th:block></th:block></title>
+<title><th:block th:text="#{app.name}"></th:block> :: <th:block
+		th:text="#{file-process.process}"></th:block><th:block></th:block></title>
 </head>
 <body>
 	<div th:substituteby="layout/navbar :: navbar('file-upload')"></div>
 	<div class="lightbox">
-		<div class="container-fluid">
+		<div class="container text-center">
+		<h1 th:text="#{file-upload.title}" style="color:silver;"> </h1>
+				<form class="form-horizontal" action="#" method="POST"
+					enctype="multipart/form-data" th:action="@{/results/file-upload}">
+					<div class="form-group">
+						<table class="table table-hover">
+							<tr>
+								<td><label for="file" th:text="#{file-to-upload}"
+									class="col-sm-2 control-label"></label></td>
+								<td>
+									<div class="col-sm-10">
+										<label class="custom-file-upload btn btn-info"> <input
+											id="file" type="file" name="file" style="display: none;" /><span
+											th:text="#{browse}"></span> <i class="fa fa-paperclip"
+											aria-hidden="true"></i>
+										</label>
+									</div>
+								</td>
+							</tr>
+							<tr>
+								<td></td>
+								<td>
+									<div class=" col-sm-10">
+										<label class="btn btn-default btn-file"> <input
+											type="submit" class="btn btn-default" style="display: none;" />
+											<span th:text="#{upload}"></span> <i class="fa fa-upload"
+											aria-hidden="true"></i>
+										</label>
+									</div>
+								</td>
+							</tr>
+						</table>
 
-			<form class="form-horizontal" action="#" method="POST"
-				enctype="multipart/form-data" th:action="@{/results/file-upload}">
-				<div class="form-group">
-					<table class="table table-hover">
-						<tr>
-							<td><label for="file" th:text="#{file-to-upload}"
-								class="col-sm-2 control-label"></label></td>
-							<td>
-								<div class="col-sm-10">
-									<label class="custom-file-upload btn btn-info"> <input id="file"
-										type="file" name="file" 
-										style="display: none;" /><span  th:text="#{browse}"></span> <i class="fa fa-paperclip"
-										aria-hidden="true"></i>
-									</label>
-								</div>
-							</td>
-						</tr>
-						<tr>
-							<td></td>
-							<td>
-								<div class=" col-sm-10">
-									<label class="btn btn-default btn-file"> <input
-										type="submit" class="btn btn-default" style="display: none;" />
-										<span th:text="#{upload}"></span> <i class="fa fa-upload"
-										aria-hidden="true"></i>
-									</label>
-								</div>
-							</td>
-						</tr>
-					</table>
-
-				</div>
-			</form>
-
+					</div>
+				</form>
 		</div>
 	</div>
-	 <th:block th:replace="layout/frg::footer-js"></th:block>
+	<th:block th:replace="layout/frg::footer-js"></th:block>
 </body>
 </html>
 
